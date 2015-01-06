@@ -1,3 +1,6 @@
 [submodule "modules/coire-sync"]
 	path = modules/coire-sync
 	url = git@github.com:AbletonAppDev/coire-sync.git
+[submodule "modules/boost"]
+	path = modules/boost
+	url = git@github.com:AbletonAppDev/boost-stripped.git
