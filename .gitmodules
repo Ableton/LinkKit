@@ -1,0 +1,3 @@
+[submodule "modules/coire-sync"]
+	path = modules/coire-sync
+	url = git@github.com:AbletonAppDev/coire-sync.git
