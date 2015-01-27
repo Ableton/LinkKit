@@ -28,3 +28,6 @@ Applications that wish to participate in a distributed sync session must support
 These requirements imply an asynchronous application architecture in which user actions are submitted and application state is only updated later via notifications. The ABLSync library supports this design by handling change proposals, invoking application callbacks when changes have been processed, and delivering the necessary application state to the audio processing thread. In addition, the current state of the session can always be queried by the application.
 
 For consistency, it is recommended that applications use the proposal and callback mechanisms of the ABLSync library even when a network sync session is deactivated. In this case, the control flow remains the same but the latency of satisfying proposals will be reduced and proposals will not be rejected. This approach ensures that the same code pathways gets executed regardless of participation in a sync session.
+
+![](/docs/diagrams/architecture.png)
+<h6 align="center"> Figure 2: ABLSync mediates transport and tempo state </h6>
