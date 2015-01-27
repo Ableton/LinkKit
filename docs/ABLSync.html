@@ -1,0 +1,767 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=9">
+<meta name="generator" content="Doxygen 1.8.9.1">
+<title>ABLSync: ABLSync.h File Reference</title>
+<link href="ABLSync.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+<div class="header">
+  <div class="summary">
+<a href="#typedef-members">Typedefs</a>  </div>
+  <div class="headertitle">
+<div class="title">ABLSync.h File Reference</div>  </div>
+</div><!--header-->
+<div class="contents">
+
+<p>Clock, transport, and tempo syncing API.
+<a href="#details">More...</a></p>
+<div class="textblock"><code>#include &lt;CoreAudio/CoreAudioTypes.h&gt;</code><br>
+</div><table class="memberdecls">
+<tbody><tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
+Typedefs</h2></td></tr>
+<tr class="memitem:a80fab05b08ddfc4c94f9e2d91351e135"><td class="memItemLeft" align="right" valign="top">typedef Float64&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a80fab05b08ddfc4c94f9e2d91351e135">SharedTime</a></td></tr>
+<tr class="separator:a80fab05b08ddfc4c94f9e2d91351e135"><td class="memSeparator" colspan="2">&nbsp;</td></tr>
+<tr><td colspan="2"><div class="groupHeader">Interface to ABLSync</div></td></tr>
+<tr class="memitem:a20e3dc5aa4be17d1bb026d4d208667d5"><td class="memItemLeft" align="right" valign="top">typedef struct ABLSync *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a20e3dc5aa4be17d1bb026d4d208667d5">ABLSyncRef</a></td></tr>
+<tr class="separator:a20e3dc5aa4be17d1bb026d4d208667d5"><td class="memSeparator" colspan="2">&nbsp;</td></tr>
+<tr><td colspan="2"><div class="groupHeader">Callbacks for observing changes in the system state</div></td></tr>
+<tr class="memitem:a8499fe2951316f95b61103f1d03a348f"><td class="memItemLeft" align="right" valign="top">typedef void(*&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8499fe2951316f95b61103f1d03a348f">ABLSyncEventCallback</a>) (<a class="el" href="#a80fab05b08ddfc4c94f9e2d91351e135">SharedTime</a> eventAt, bool isPlaying, Float32 sharedBpm, void *context)</td></tr>
+<tr class="separator:a8499fe2951316f95b61103f1d03a348f"><td class="memSeparator" colspan="2">&nbsp;</td></tr>
+<tr class="memitem:a38087a3d29e10969535e799cee4e1fe1"><td class="memItemLeft" align="right" valign="top">typedef void(*&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a38087a3d29e10969535e799cee4e1fe1">ABLSyncConnectionStateCallback</a>) (bool isConnected, void *context)</td></tr>
+<tr class="separator:a38087a3d29e10969535e799cee4e1fe1"><td class="memSeparator" colspan="2">&nbsp;</td></tr>
+<tr><td colspan="2"><div class="groupHeader">Audio thread types</div></td></tr>
+<tr class="memitem:ae3787697aabe135c6c68d13f284f352c"><td class="memItemLeft" align="right" valign="top">typedef const struct ABLSyncBufferInfo *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae3787697aabe135c6c68d13f284f352c">ABLSyncBufferInfoRef</a></td></tr>
+<tr class="separator:ae3787697aabe135c6c68d13f284f352c"><td class="memSeparator" colspan="2">&nbsp;</td></tr>
+<tr class="memitem:a719f7711072d1d89c0339457b2d2835e"><td class="memItemLeft" align="right" valign="top">typedef const struct ABLSyncEventIterator *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a719f7711072d1d89c0339457b2d2835e">ABLSyncEventIteratorRef</a></td></tr>
+<tr class="separator:a719f7711072d1d89c0339457b2d2835e"><td class="memSeparator" colspan="2">&nbsp;</td></tr>
+</tbody></table><table class="memberdecls">
+<tbody><tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
+Functions</h2></td></tr>
+<tr><td colspan="2"><div class="groupHeader">Initialization and configuration</div></td></tr>
+<tr class="memitem:a134e6a29630472d3f3700798e1c3e131"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#a20e3dc5aa4be17d1bb026d4d208667d5">ABLSyncRef</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a134e6a29630472d3f3700798e1c3e131">ABLSyncNewSession</a> (Float64 outputLatency)</td></tr>
+<tr class="separator:a134e6a29630472d3f3700798e1c3e131"><td class="memSeparator" colspan="2">&nbsp;</td></tr>
+<tr class="memitem:ab42bd0444b46c867a2983c803fb303e4"><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab42bd0444b46c867a2983c803fb303e4">ABLSyncDeleteSession</a> (<a class="el" href="#a20e3dc5aa4be17d1bb026d4d208667d5">ABLSyncRef</a>)</td></tr>
+<tr class="separator:ab42bd0444b46c867a2983c803fb303e4"><td class="memSeparator" colspan="2">&nbsp;</td></tr>
+<tr class="memitem:a01d334e21cbc028ffaafc13e1362d5c0"><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a01d334e21cbc028ffaafc13e1362d5c0">ABLSyncUpdateOutputLatency</a> (<a class="el" href="#a20e3dc5aa4be17d1bb026d4d208667d5">ABLSyncRef</a>, Float64 latency)</td></tr>
+<tr class="separator:a01d334e21cbc028ffaafc13e1362d5c0"><td class="memSeparator" colspan="2">&nbsp;</td></tr>
+<tr><td colspan="2"><div class="groupHeader">Activate/Deactivate Connectivity</div></td></tr>
+<tr class="memitem:a0aaff1c0ce10cab8f0746381c0a1fb65"><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0aaff1c0ce10cab8f0746381c0a1fb65">ABLSyncActivateConnectivity</a> (<a class="el" href="#a20e3dc5aa4be17d1bb026d4d208667d5">ABLSyncRef</a>)</td></tr>
+<tr class="separator:a0aaff1c0ce10cab8f0746381c0a1fb65"><td class="memSeparator" colspan="2">&nbsp;</td></tr>
+<tr class="memitem:ad1c3d887970000f5cea660bfb73fb604"><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad1c3d887970000f5cea660bfb73fb604">ABLSyncDeactivateConnectivity</a> (<a class="el" href="#a20e3dc5aa4be17d1bb026d4d208667d5">ABLSyncRef</a>)</td></tr>
+<tr class="separator:ad1c3d887970000f5cea660bfb73fb604"><td class="memSeparator" colspan="2">&nbsp;</td></tr>
+<tr><td colspan="2"><div class="groupHeader">Application-level API for observing the state of the system</div></td></tr>
+<tr><td colspan="2"><div class="groupText"><p>The query and callback
+registration functions are intended to be called from the main thread.
+Callbacks will be invoked on the main thread. </p>
+</div></td></tr>
+<tr class="memitem:a2d490ff0a2c2c8b9eb9660a5d3d5681f"><td class="memItemLeft" align="right" valign="top">bool&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2d490ff0a2c2c8b9eb9660a5d3d5681f">ABLSyncGetIsTransportPlaying</a> (<a class="el" href="#a20e3dc5aa4be17d1bb026d4d208667d5">ABLSyncRef</a>)</td></tr>
+<tr class="separator:a2d490ff0a2c2c8b9eb9660a5d3d5681f"><td class="memSeparator" colspan="2">&nbsp;</td></tr>
+<tr class="memitem:a54cf24047d92e9fcca709500a3aaddc8"><td class="memItemLeft" align="right" valign="top">Float32&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a54cf24047d92e9fcca709500a3aaddc8">ABLSyncGetSharedBpm</a> (<a class="el" href="#a20e3dc5aa4be17d1bb026d4d208667d5">ABLSyncRef</a>)</td></tr>
+<tr class="separator:a54cf24047d92e9fcca709500a3aaddc8"><td class="memSeparator" colspan="2">&nbsp;</td></tr>
+<tr class="memitem:a551f2b17df784a551566f814fc0828c6"><td class="memItemLeft" align="right" valign="top">bool&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a551f2b17df784a551566f814fc0828c6">ABLSyncGetIsConnected</a> (<a class="el" href="#a20e3dc5aa4be17d1bb026d4d208667d5">ABLSyncRef</a>)</td></tr>
+<tr class="separator:a551f2b17df784a551566f814fc0828c6"><td class="memSeparator" colspan="2">&nbsp;</td></tr>
+<tr><td colspan="2"><div class="groupHeader">Callback Registration</div></td></tr>
+<tr><td colspan="2"><div class="groupText"><p>Setters for delegate notifications. </p>
+</div></td></tr>
+<tr class="memitem:aa0000af82337979d9fe243543cb4ec21"><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa0000af82337979d9fe243543cb4ec21">ABLSyncSetEventCallback</a> (<a class="el" href="#a20e3dc5aa4be17d1bb026d4d208667d5">ABLSyncRef</a>, <a class="el" href="#a8499fe2951316f95b61103f1d03a348f">ABLSyncEventCallback</a> callback, void *context)</td></tr>
+<tr class="separator:aa0000af82337979d9fe243543cb4ec21"><td class="memSeparator" colspan="2">&nbsp;</td></tr>
+<tr class="memitem:a31f7281f12787ae842c3781ef56324cd"><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a31f7281f12787ae842c3781ef56324cd">ABLSyncSetConnectionStateCallback</a> (<a class="el" href="#a20e3dc5aa4be17d1bb026d4d208667d5">ABLSyncRef</a>, <a class="el" href="#a38087a3d29e10969535e799cee4e1fe1">ABLSyncConnectionStateCallback</a> callback, void *context)</td></tr>
+<tr class="separator:a31f7281f12787ae842c3781ef56324cd"><td class="memSeparator" colspan="2">&nbsp;</td></tr>
+<tr><td colspan="2"><div class="groupHeader">Proposal functions</div></td></tr>
+<tr><td colspan="2"><div class="groupText"><p>Proposals are not
+satisfied immediately and can be rejected by the system. They are
+handled as soon as possible and are not guaranteed to happen at specific
+ points in time. Proposals are non-blocking but should not be called
+from the audio thread. </p>
+</div></td></tr>
+<tr class="memitem:a8b810d605cf7886d94ea542135a51d8d"><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8b810d605cf7886d94ea542135a51d8d">ABLSyncProposeTransportStart</a> (<a class="el" href="#a20e3dc5aa4be17d1bb026d4d208667d5">ABLSyncRef</a>, <a class="el" href="#a80fab05b08ddfc4c94f9e2d91351e135">SharedTime</a> startAtSharedTime)</td></tr>
+<tr class="separator:a8b810d605cf7886d94ea542135a51d8d"><td class="memSeparator" colspan="2">&nbsp;</td></tr>
+<tr class="memitem:ae4701ed1726e0c78e6eb7a181ce2fedb"><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae4701ed1726e0c78e6eb7a181ce2fedb">ABLSyncProposeTransportStop</a> (<a class="el" href="#a20e3dc5aa4be17d1bb026d4d208667d5">ABLSyncRef</a>)</td></tr>
+<tr class="separator:ae4701ed1726e0c78e6eb7a181ce2fedb"><td class="memSeparator" colspan="2">&nbsp;</td></tr>
+<tr class="memitem:ae64b4693521deec81b5a8fe7e775b090"><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae64b4693521deec81b5a8fe7e775b090">ABLSyncProposeBpm</a> (<a class="el" href="#a20e3dc5aa4be17d1bb026d4d208667d5">ABLSyncRef</a>, Float32 bpm)</td></tr>
+<tr class="separator:ae64b4693521deec81b5a8fe7e775b090"><td class="memSeparator" colspan="2">&nbsp;</td></tr>
+<tr><td colspan="2"><div class="groupHeader">Audio thread functions</div></td></tr>
+<tr class="memitem:ad79f9cbc49e864308f8a139b229e1a7a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#ae3787697aabe135c6c68d13f284f352c">ABLSyncBufferInfoRef</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad79f9cbc49e864308f8a139b229e1a7a">ABLSyncSynchronizeBuffer</a> (<a class="el" href="#a20e3dc5aa4be17d1bb026d4d208667d5">ABLSyncRef</a>, const AudioTimeStamp *inTimeStamp, UInt32 inNumberFrames, Float64 sampleRate)</td></tr>
+<tr class="separator:ad79f9cbc49e864308f8a139b229e1a7a"><td class="memSeparator" colspan="2">&nbsp;</td></tr>
+<tr class="memitem:a34b494198ac72bd9503b6fa59de8418c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#a719f7711072d1d89c0339457b2d2835e">ABLSyncEventIteratorRef</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a34b494198ac72bd9503b6fa59de8418c">ABLSyncBufferEvents</a> (<a class="el" href="#ae3787697aabe135c6c68d13f284f352c">ABLSyncBufferInfoRef</a>)</td></tr>
+<tr class="separator:a34b494198ac72bd9503b6fa59de8418c"><td class="memSeparator" colspan="2">&nbsp;</td></tr>
+<tr class="memitem:a07547dee448b91f830cef3e131d0d50c"><td class="memItemLeft" align="right" valign="top">bool&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a07547dee448b91f830cef3e131d0d50c">ABLSyncEventIteratorAtEnd</a> (<a class="el" href="#a719f7711072d1d89c0339457b2d2835e">ABLSyncEventIteratorRef</a>)</td></tr>
+<tr class="separator:a07547dee448b91f830cef3e131d0d50c"><td class="memSeparator" colspan="2">&nbsp;</td></tr>
+<tr class="memitem:a442c5f76d9104a22d7e6338e28398d50"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#a719f7711072d1d89c0339457b2d2835e">ABLSyncEventIteratorRef</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a442c5f76d9104a22d7e6338e28398d50">ABLSyncEventIteratorNext</a> (<a class="el" href="#a719f7711072d1d89c0339457b2d2835e">ABLSyncEventIteratorRef</a>)</td></tr>
+<tr class="separator:a442c5f76d9104a22d7e6338e28398d50"><td class="memSeparator" colspan="2">&nbsp;</td></tr>
+<tr class="memitem:a1b638fc1a5cd6ad671060b85189b27e9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#a80fab05b08ddfc4c94f9e2d91351e135">SharedTime</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1b638fc1a5cd6ad671060b85189b27e9">ABLSyncEventTime</a> (<a class="el" href="#a719f7711072d1d89c0339457b2d2835e">ABLSyncEventIteratorRef</a>)</td></tr>
+<tr class="separator:a1b638fc1a5cd6ad671060b85189b27e9"><td class="memSeparator" colspan="2">&nbsp;</td></tr>
+<tr class="memitem:a1303545b8a84ca7ffaef96cdb2b2d2bc"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#a80fab05b08ddfc4c94f9e2d91351e135">SharedTime</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1303545b8a84ca7ffaef96cdb2b2d2bc">ABLSyncSharedTimeAtSampleOffset</a> (<a class="el" href="#ae3787697aabe135c6c68d13f284f352c">ABLSyncBufferInfoRef</a>, Float32 sampleOffset)</td></tr>
+<tr class="separator:a1303545b8a84ca7ffaef96cdb2b2d2bc"><td class="memSeparator" colspan="2">&nbsp;</td></tr>
+<tr class="memitem:a7be83bf47ed7269665b008c959b3d2e9"><td class="memItemLeft" align="right" valign="top">Float32&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7be83bf47ed7269665b008c959b3d2e9">ABLSyncSampleOffsetAtSharedTime</a> (<a class="el" href="#ae3787697aabe135c6c68d13f284f352c">ABLSyncBufferInfoRef</a>, <a class="el" href="#a80fab05b08ddfc4c94f9e2d91351e135">SharedTime</a> sharedTime)</td></tr>
+<tr class="separator:a7be83bf47ed7269665b008c959b3d2e9"><td class="memSeparator" colspan="2">&nbsp;</td></tr>
+<tr class="memitem:ad51f700468b3bece78d14e2e02097d73"><td class="memItemLeft" align="right" valign="top">bool&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad51f700468b3bece78d14e2e02097d73">ABLSyncIsPlayingAtSharedTime</a> (<a class="el" href="#ae3787697aabe135c6c68d13f284f352c">ABLSyncBufferInfoRef</a>, <a class="el" href="#a80fab05b08ddfc4c94f9e2d91351e135">SharedTime</a> sharedTime)</td></tr>
+<tr class="separator:ad51f700468b3bece78d14e2e02097d73"><td class="memSeparator" colspan="2">&nbsp;</td></tr>
+<tr class="memitem:a780be8551f5893f53f08a777dbafe93c"><td class="memItemLeft" align="right" valign="top">Float32&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a780be8551f5893f53f08a777dbafe93c">ABLSyncBpmAtSharedTime</a> (<a class="el" href="#ae3787697aabe135c6c68d13f284f352c">ABLSyncBufferInfoRef</a>, <a class="el" href="#a80fab05b08ddfc4c94f9e2d91351e135">SharedTime</a> sharedTime)</td></tr>
+<tr class="separator:a780be8551f5893f53f08a777dbafe93c"><td class="memSeparator" colspan="2">&nbsp;</td></tr>
+</tbody></table>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Clock, transport, and tempo syncing API. </p>
+<p>It provides the capability to synchronize tempo and playback across
+multiple applications on multiple devices over a local wired or wifi
+network. </p>
+</div><h2 class="groupheader">Typedef Documentation</h2>
+<a class="anchor" id="a80fab05b08ddfc4c94f9e2d91351e135"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tbody><tr>
+          <td class="memname">typedef Float64 <a class="el" href="#a80fab05b08ddfc4c94f9e2d91351e135">SharedTime</a></td>
+        </tr>
+      </tbody></table>
+</div><div class="memdoc">
+<p>The central concept of the ABLSync library is a timeline that is
+shared by all participants. This shared timeline corresponds to musical
+beats - units on the timeline represent 96th notes (as in MIDI clock
+sync).</p>
+<p>Since the timeline is distributed amongst all participants, it will
+continue as long as any participant is still playing. This means that
+there is no need to designate a participant as the Master and the
+session can continue even after the first participant has left. </p>
+
+</div>
+</div>
+<a class="anchor" id="a20e3dc5aa4be17d1bb026d4d208667d5"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tbody><tr>
+          <td class="memname">typedef struct ABLSync* <a class="el" href="#a20e3dc5aa4be17d1bb026d4d208667d5">ABLSyncRef</a></td>
+        </tr>
+      </tbody></table>
+</div><div class="memdoc">
+<p>Reference to sync session. </p>
+
+</div>
+</div>
+<a class="anchor" id="a8499fe2951316f95b61103f1d03a348f"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tbody><tr>
+          <td class="memname">typedef void(* ABLSyncEventCallback) (<a class="el" href="#a80fab05b08ddfc4c94f9e2d91351e135">SharedTime</a> eventAt, bool isPlaying, Float32 sharedBpm, void *context)</td>
+        </tr>
+      </tbody></table>
+</div><div class="memdoc">
+<p>Called if either transport state, Bpm, or both change. </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tbody><tr><td class="paramname">eventAt</td><td>Shared time of given state changes </td></tr>
+    <tr><td class="paramname">isPlaying</td><td>Whether the client is playing </td></tr>
+    <tr><td class="paramname">sharedBpm</td><td>The Bpm value provided by this callback is the user-visible representation of the shared tempo as described in <a class="el" href="#a54cf24047d92e9fcca709500a3aaddc8">ABLSyncGetSharedBpm()</a> </td></tr>
+  </tbody></table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="a38087a3d29e10969535e799cee4e1fe1"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tbody><tr>
+          <td class="memname">typedef void(* ABLSyncConnectionStateCallback) (bool isConnected, void *context)</td>
+        </tr>
+      </tbody></table>
+</div><div class="memdoc">
+<p>Called if connection state changes. </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tbody><tr><td class="paramname">isConnected</td><td>Whether the client is connected to at least one other peer </td></tr>
+  </tbody></table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="ae3787697aabe135c6c68d13f284f352c"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tbody><tr>
+          <td class="memname">typedef const struct ABLSyncBufferInfo* <a class="el" href="#ae3787697aabe135c6c68d13f284f352c">ABLSyncBufferInfoRef</a></td>
+        </tr>
+      </tbody></table>
+</div><div class="memdoc">
+<p>Data type representing sync information computed for a particular audio buffer. </p>
+
+</div>
+</div>
+<a class="anchor" id="a719f7711072d1d89c0339457b2d2835e"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tbody><tr>
+          <td class="memname">typedef const struct ABLSyncEventIterator* <a class="el" href="#a719f7711072d1d89c0339457b2d2835e">ABLSyncEventIteratorRef</a></td>
+        </tr>
+      </tbody></table>
+</div><div class="memdoc">
+<p>Data type providing iteration over the sync events occuring in a
+particular audio buffer. Sync events represent either a change in
+transport state or a change in tempo. </p>
+
+</div>
+</div>
+<h2 class="groupheader">Function Documentation</h2>
+<a class="anchor" id="a134e6a29630472d3f3700798e1c3e131"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tbody><tr>
+          <td class="memname"><a class="el" href="#a20e3dc5aa4be17d1bb026d4d208667d5">ABLSyncRef</a> ABLSyncNewSession </td>
+          <td>(</td>
+          <td class="paramtype">Float64&nbsp;</td>
+          <td class="paramname"><em>outputLatency</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </tbody></table>
+</div><div class="memdoc">
+<p>Start a new sync session with the given output latency in seconds.</p>
+<dl class="section return"><dt>Returns</dt><dd>Reference to sync session. </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tbody><tr><td class="paramname">outputLatency</td><td>This is
+defined as the time between the audio timestamp given by the system's
+audio callback and the time of the soundcard's output of the
+corresponding audio. On iOS this corresponds to the outputLatency
+property of AVAudioSession. </td></tr>
+  </tbody></table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="ab42bd0444b46c867a2983c803fb303e4"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tbody><tr>
+          <td class="memname">void ABLSyncDeleteSession </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="#a20e3dc5aa4be17d1bb026d4d208667d5">ABLSyncRef</a>&nbsp;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </tbody></table>
+</div><div class="memdoc">
+<p>End the sync session and cleanup resources. </p>
+
+</div>
+</div>
+<a class="anchor" id="a01d334e21cbc028ffaafc13e1362d5c0"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tbody><tr>
+          <td class="memname">void ABLSyncUpdateOutputLatency </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="#a20e3dc5aa4be17d1bb026d4d208667d5">ABLSyncRef</a>&nbsp;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Float64&nbsp;</td>
+          <td class="paramname"><em>latency</em>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </tbody></table>
+</div><div class="memdoc">
+<p>This function must be called when the output latency of the audio system changes. </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tbody><tr><td class="paramname">latency</td><td>See outputLatency description in <a class="el" href="#a134e6a29630472d3f3700798e1c3e131">ABLSyncNewSession()</a>. </td></tr>
+  </tbody></table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="a0aaff1c0ce10cab8f0746381c0a1fb65"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tbody><tr>
+          <td class="memname">void ABLSyncActivateConnectivity </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="#a20e3dc5aa4be17d1bb026d4d208667d5">ABLSyncRef</a>&nbsp;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </tbody></table>
+</div><div class="memdoc">
+<p>Activate Network communication. Browse for peers and connect automatically whenever any peers are found. </p>
+
+</div>
+</div>
+<a class="anchor" id="ad1c3d887970000f5cea660bfb73fb604"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tbody><tr>
+          <td class="memname">void ABLSyncDeactivateConnectivity </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="#a20e3dc5aa4be17d1bb026d4d208667d5">ABLSyncRef</a>&nbsp;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </tbody></table>
+</div><div class="memdoc">
+<p>Disconnect from all peers and deactivate network communication. </p>
+
+</div>
+</div>
+<a class="anchor" id="a2d490ff0a2c2c8b9eb9660a5d3d5681f"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tbody><tr>
+          <td class="memname">bool ABLSyncGetIsTransportPlaying </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="#a20e3dc5aa4be17d1bb026d4d208667d5">ABLSyncRef</a>&nbsp;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </tbody></table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>Whether the transport is currently playing. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a54cf24047d92e9fcca709500a3aaddc8"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tbody><tr>
+          <td class="memname">Float32 ABLSyncGetSharedBpm </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="#a20e3dc5aa4be17d1bb026d4d208667d5">ABLSyncRef</a>&nbsp;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </tbody></table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>The current tempo in Bpm.</dd></dl>
+<p>The Bpm returned here is the shared tempo of the session. This is a
+value that is appropriate for display to the user but may not be exactly
+ the tempo used to drive the audio engine. The tempo provided by the <a class="el" href="#a780be8551f5893f53f08a777dbafe93c">ABLSyncBpmAtSharedTime()</a>
+ function in the audio thread section may deviate slightly from the
+value reported here because it is adjusted for device clock drift. </p>
+
+</div>
+</div>
+<a class="anchor" id="a551f2b17df784a551566f814fc0828c6"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tbody><tr>
+          <td class="memname">bool ABLSyncGetIsConnected </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="#a20e3dc5aa4be17d1bb026d4d208667d5">ABLSyncRef</a>&nbsp;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </tbody></table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>Whether the client is connected to at least one other peer. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="aa0000af82337979d9fe243543cb4ec21"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tbody><tr>
+          <td class="memname">void ABLSyncSetEventCallback </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="#a20e3dc5aa4be17d1bb026d4d208667d5">ABLSyncRef</a>&nbsp;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="#a8499fe2951316f95b61103f1d03a348f">ABLSyncEventCallback</a>&nbsp;</td>
+          <td class="paramname"><em>callback</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">void *&nbsp;</td>
+          <td class="paramname"><em>context</em>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </tbody></table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a31f7281f12787ae842c3781ef56324cd"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tbody><tr>
+          <td class="memname">void ABLSyncSetConnectionStateCallback </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="#a20e3dc5aa4be17d1bb026d4d208667d5">ABLSyncRef</a>&nbsp;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="#a38087a3d29e10969535e799cee4e1fe1">ABLSyncConnectionStateCallback</a>&nbsp;</td>
+          <td class="paramname"><em>callback</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">void *&nbsp;</td>
+          <td class="paramname"><em>context</em>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </tbody></table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a8b810d605cf7886d94ea542135a51d8d"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tbody><tr>
+          <td class="memname">void ABLSyncProposeTransportStart </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="#a20e3dc5aa4be17d1bb026d4d208667d5">ABLSyncRef</a>&nbsp;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="#a80fab05b08ddfc4c94f9e2d91351e135">SharedTime</a>&nbsp;</td>
+          <td class="paramname"><em>startAtSharedTime</em>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </tbody></table>
+</div><div class="memdoc">
+<p>Propose transport start at the given position on the shared timeline. </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tbody><tr><td class="paramname">startAtSharedTime</td><td>This
+Value only specifies the position, the start action will happen as soon
+as possible. This start time will not be honored if the shared timeline
+is already running. </td></tr>
+  </tbody></table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="ae4701ed1726e0c78e6eb7a181ce2fedb"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tbody><tr>
+          <td class="memname">void ABLSyncProposeTransportStop </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="#a20e3dc5aa4be17d1bb026d4d208667d5">ABLSyncRef</a>&nbsp;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </tbody></table>
+</div><div class="memdoc">
+<p>Propose transport stop. </p>
+
+</div>
+</div>
+<a class="anchor" id="ae64b4693521deec81b5a8fe7e775b090"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tbody><tr>
+          <td class="memname">void ABLSyncProposeBpm </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="#a20e3dc5aa4be17d1bb026d4d208667d5">ABLSyncRef</a>&nbsp;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Float32&nbsp;</td>
+          <td class="paramname"><em>bpm</em>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </tbody></table>
+</div><div class="memdoc">
+<p>Propose a change of the session's shared tempo. Tempo change proposals can be rejected for two reasons:</p><ol type="1">
+<li>It is out of the accepted Bpm range of 20 - 999</li>
+<li>Another participant is currently changing the tempo </li>
+</ol>
+
+</div>
+</div>
+<a class="anchor" id="ad79f9cbc49e864308f8a139b229e1a7a"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tbody><tr>
+          <td class="memname"><a class="el" href="#ae3787697aabe135c6c68d13f284f352c">ABLSyncBufferInfoRef</a> ABLSyncSynchronizeBuffer </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="#a20e3dc5aa4be17d1bb026d4d208667d5">ABLSyncRef</a>&nbsp;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const AudioTimeStamp *&nbsp;</td>
+          <td class="paramname"><em>inTimeStamp</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">UInt32&nbsp;</td>
+          <td class="paramname"><em>inNumberFrames</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Float64&nbsp;</td>
+          <td class="paramname"><em>sampleRate</em>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </tbody></table>
+</div><div class="memdoc">
+<p>This function must be called for every buffer while the audio system is running. </p><dl class="section return"><dt>Returns</dt><dd><a class="el" href="#ae3787697aabe135c6c68d13f284f352c">ABLSyncBufferInfoRef</a>
+ This should be used to compute mappings between shared time and buffer
+sample offset. It also provides access to transport and tempo change
+events that occur within the buffer. </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tbody><tr><td class="paramname">inTimeStamp</td><td>Buffer's CoreAudio timestamp </td></tr>
+    <tr><td class="paramname">inNumberFrames</td><td>Buffer size as provided to the audio callback </td></tr>
+    <tr><td class="paramname">sampleRate</td><td>Sample rate in Hertz </td></tr>
+  </tbody></table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="a34b494198ac72bd9503b6fa59de8418c"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tbody><tr>
+          <td class="memname"><a class="el" href="#a719f7711072d1d89c0339457b2d2835e">ABLSyncEventIteratorRef</a> ABLSyncBufferEvents </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="#ae3787697aabe135c6c68d13f284f352c">ABLSyncBufferInfoRef</a>&nbsp;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </tbody></table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>An iterator over the events in the buffer.</dd></dl>
+<p>If no events occurred in the buffer, the returned iterator ref will be at the end (meaning that <a class="el" href="#a07547dee448b91f830cef3e131d0d50c">ABLSyncEventIteratorAtEnd()</a> will return <em>true</em>) </p>
+
+</div>
+</div>
+<a class="anchor" id="a07547dee448b91f830cef3e131d0d50c"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tbody><tr>
+          <td class="memname">bool ABLSyncEventIteratorAtEnd </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="#a719f7711072d1d89c0339457b2d2835e">ABLSyncEventIteratorRef</a>&nbsp;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </tbody></table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>Whether the given iterator is at the end of the event list.</dd></dl>
+<p>Clients should not use an iterator that is at the end of the list, so
+ this function should be used to test the iterator before passing it to
+other functions. </p>
+
+</div>
+</div>
+<a class="anchor" id="a442c5f76d9104a22d7e6338e28398d50"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tbody><tr>
+          <td class="memname"><a class="el" href="#a719f7711072d1d89c0339457b2d2835e">ABLSyncEventIteratorRef</a> ABLSyncEventIteratorNext </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="#a719f7711072d1d89c0339457b2d2835e">ABLSyncEventIteratorRef</a>&nbsp;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </tbody></table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>The iterator that represents the next event in the list.</dd></dl>
+<p>The resulting iterator should be tested with <a class="el" href="#a07547dee448b91f830cef3e131d0d50c">ABLSyncEventIteratorAtEnd()</a>. </p>
+
+</div>
+</div>
+<a class="anchor" id="a1b638fc1a5cd6ad671060b85189b27e9"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tbody><tr>
+          <td class="memname"><a class="el" href="#a80fab05b08ddfc4c94f9e2d91351e135">SharedTime</a> ABLSyncEventTime </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="#a719f7711072d1d89c0339457b2d2835e">ABLSyncEventIteratorRef</a>&nbsp;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </tbody></table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>The shared time value for the event represented by the given iterator. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a1303545b8a84ca7ffaef96cdb2b2d2bc"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tbody><tr>
+          <td class="memname"><a class="el" href="#a80fab05b08ddfc4c94f9e2d91351e135">SharedTime</a> ABLSyncSharedTimeAtSampleOffset </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="#ae3787697aabe135c6c68d13f284f352c">ABLSyncBufferInfoRef</a>&nbsp;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Float32&nbsp;</td>
+          <td class="paramname"><em>sampleOffset</em>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </tbody></table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>The shared time value corresponding to the given sample offset into the associated buffer. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a7be83bf47ed7269665b008c959b3d2e9"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tbody><tr>
+          <td class="memname">Float32 ABLSyncSampleOffsetAtSharedTime </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="#ae3787697aabe135c6c68d13f284f352c">ABLSyncBufferInfoRef</a>&nbsp;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="#a80fab05b08ddfc4c94f9e2d91351e135">SharedTime</a>&nbsp;</td>
+          <td class="paramname"><em>sharedTime</em>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </tbody></table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>The sample offset into the associated buffer corresponding to the given shared time value. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="ad51f700468b3bece78d14e2e02097d73"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tbody><tr>
+          <td class="memname">bool ABLSyncIsPlayingAtSharedTime </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="#ae3787697aabe135c6c68d13f284f352c">ABLSyncBufferInfoRef</a>&nbsp;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="#a80fab05b08ddfc4c94f9e2d91351e135">SharedTime</a>&nbsp;</td>
+          <td class="paramname"><em>sharedTime</em>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </tbody></table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>Whether the client should be playing at the given shared time.</dd></dl>
+<p>The result is only valid if the given shared time occurs within the associated buffer. </p>
+
+</div>
+</div>
+<a class="anchor" id="a780be8551f5893f53f08a777dbafe93c"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tbody><tr>
+          <td class="memname">Float32 ABLSyncBpmAtSharedTime </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="#ae3787697aabe135c6c68d13f284f352c">ABLSyncBufferInfoRef</a>&nbsp;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="#a80fab05b08ddfc4c94f9e2d91351e135">SharedTime</a>&nbsp;</td>
+          <td class="paramname"><em>sharedTime</em>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </tbody></table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>The tempo in Bpm at the given shared time value.</dd></dl>
+<p>The result is only valid if the given shared time occurs within the associated buffer.</p>
+<p>The Bpm value provided by this function may differ slightly from the
+shared tempo because it is adjusted in order to compensate for clock
+drift. This value should be interepreted as the tempo at which to run
+the audio engine in order to stay in sync with the shared timeline. It
+should not be directly displayed to the user as it will be slightly
+different from the shared tempo. </p>
+
+</div>
+</div>
+</div><!-- contents -->
+<!-- start footer part -->
+
+
+</body></html>
