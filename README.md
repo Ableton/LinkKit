@@ -5,7 +5,7 @@ iOS SDK for tempo syncing and exporting app content to Live
 
 ##Tempo Syncing
 
-PanamaKit provides the capability to synchronize tempo and playback across multiple applications on multiple devices over a local wired or wifi network. This functionality is implemented by the **ABLSync** library.
+PanamaKit provides the capability to synchronize tempo and playback across multiple applications on multiple devices over a local wired or wifi network. This functionality is implemented by the [ABLSync](include/ABLSync.h) library.
 
 ###Shared Timeline
 The central concept of the ABLSync library is the **shared timeline**. While MIDI clock sync only provides participating applications with a pulse, ABLSync maintains a distributed musical timeline that is shared by all participants. The units on the timeline correspond to 1/24th of a beat - the same subdivision used by MIDI clock sync.
