@@ -1,7 +1,7 @@
 PanamaKit
 =========
 
-iOS SDK for tempo syncing and exporting app content to Live
+iOS SDK for tempo syncing from Ableton.
 
 ##Tempo Syncing
 
@@ -19,7 +19,7 @@ Any participant can propose a tempo change, but the proposal may be rejected if 
 
 Participants may also propose to start transport at a specified position on the shared timeline. If the shared timeline is not running (no other participants are playing) at the time of the proposal, such a proposal will succeed. But if the shared timeline is already running, the proposing participant will receive a start transport notification for the current position on the shared timeline, thereby joining in sync with the other participants.
 
-![](/docs/diagrams/timeline.png)
+![](docs/diagrams/timeline.png)
 <h6 align="center"> Figure 1: Transport proposals on the shared timeline </h6>
 
 ###Application Architecture
@@ -29,5 +29,22 @@ These requirements imply an asynchronous application architecture in which user 
 
 For consistency, it is recommended that applications use the proposal and callback mechanisms of the ABLSync library even when a network sync session is deactivated. In this case, the control flow remains the same but the latency of satisfying proposals will be reduced and proposals will not be rejected. This approach ensures that the same code pathways gets executed regardless of participation in a sync session.
 
-![](/docs/diagrams/architecture.png)
+![](docs/diagrams/architecture.png)
 <h6 align="center"> Figure 2: ABLSync mediates transport and tempo state </h6>
+
+##Metrics
+
+PanamaKit provides significant reduction in clock jitter compared to MIDI sync, especially when used over a wifi network. It also measures and compensates for inter-device clock drift when calculating the mapping from the shared timeline to the local sample time of a device. The result is a system that provides < 1ms scheduling accuracy between devices during normal operation.
+
+![](docs/diagrams/PanamaVsMIDI.png)
+<h6 align="center"> Figure 3: Sampled results from MIDI and Panama sync sessions over wifi
+
+The above graph shows a sync session with a constant tempo, but PanamaKit does especially well in the presence of tempo changes. Below we see a Live set with tempo automation.
+
+![](docs/diagrams/MIDIvsPanama_automation_1.png)
+
+
+And below we see the comparative performance of the MIDI and Panama sync technologies for this set.
+
+
+![](docs/diagrams/MIDIvsPanama_automation_2.png)
