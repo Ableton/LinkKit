@@ -16,15 +16,8 @@
 extern "C"
 {
 #endif
-  /** The central concept of the ABLSync library is a timeline that is shared by
-      all participants. This shared timeline corresponds to musical beats -
-      units on the timeline represent 96th notes (as in MIDI clock sync).
 
-      Since the timeline is distributed amongst all participants, it will
-      continue as long as any participant is still playing. This means that
-      there is no need to designate a participant as the Master and the session
-      can continue even after the first participant has left.
-  */
+  /** Type that represents values on the shared timeline */
   typedef Float64 ABLSharedTime;
 
   /** @name Interface to ABLSync */
@@ -199,7 +192,7 @@ extern "C"
 
   /** @return The iterator that represents the next event in the list.
 
-      The resulting iterator should be tested with ABLSyncEventIteratorAtEnd().
+      The resulting iterator should be tested with ABLSyncIsValidPlayRange().
   */
   ABLSyncPlayRangeRef ABLSyncNextPlayRange(ABLSyncPlayRangeRef);
 
