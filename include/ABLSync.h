@@ -80,6 +80,9 @@ extern "C"
    */
   bool ABLSyncGetIsConnected(ABLSyncRef);
 
+  /** @return The current SharedTime
+   */
+  ABLSharedTime ABLSyncGetSharedTime(ABLSyncRef);
 
   /** @name Callbacks for observing changes in the system state */
   /** Called if either transport state, Bpm, or both change.
@@ -226,7 +229,7 @@ extern "C"
   */
   ABLSharedTime ABLSyncSharedTimeAtSampleOffset(
     ABLSyncPlayRangeRef,
-    Float32 sampleOffset);
+    Float64 sampleOffset);
 
   /** @return The sample offset corresponding to the given shared time as
       defined by the given play range. This is only really useful for shared
@@ -234,7 +237,7 @@ extern "C"
       extrapolate for inputs outside of the range according to the tempo of
       the range.
   */
-  Float32 ABLSyncSampleOffsetAtSharedTime(
+  Float64 ABLSyncSampleOffsetAtSharedTime(
     ABLSyncPlayRangeRef,
     ABLSharedTime sharedTime);
 
