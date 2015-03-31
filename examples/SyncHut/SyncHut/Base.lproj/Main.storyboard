@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="6751" systemVersion="14C1514" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="BYZ-38-t0r">
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6736"/>
+    </dependencies>
+    <scenes>
+        <!--View Controller-->
+        <scene sceneID="tne-QT-ifu">
+            <objects>
+                <viewController id="BYZ-38-t0r" customClass="ViewController" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="y3c-jy-aDJ"/>
+                        <viewControllerLayoutGuide type="bottom" id="wfy-db-euE"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="zhj-32-wjX" userLabel="Playback">
+                                <rect key="frame" x="280.5" y="297" width="38" height="36"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="20"/>
+                                <state key="normal" title="Play">
+                                    <color key="titleColor" red="0.0" green="0.50196081399917603" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                </state>
+                                <state key="selected" title="Stop"/>
+                                <connections>
+                                    <action selector="transportButtonAction:" destination="BYZ-38-t0r" eventType="touchUpInside" id="9BF-9J-zdt"/>
+                                </connections>
+                            </button>
+                            <stepper opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" minimumValue="-100" maximumValue="100" translatesAutoresizingMaskIntoConstraints="NO" id="BSb-2m-Vvh" userLabel="Bpm Control">
+                                <rect key="frame" x="253" y="412" width="94" height="29"/>
+                                <connections>
+                                    <action selector="bpmStepperAction:" destination="BYZ-38-t0r" eventType="valueChanged" id="hPy-1w-B9v"/>
+                                </connections>
+                            </stepper>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="120.0 bpm" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="DiJ-tG-shs" userLabel="Bpm Display">
+                                <rect key="frame" x="259" y="384" width="83" height="20.5"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" red="0.0" green="0.50196081399917603" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="E0F-n9-5Aj" userLabel="Connectivity Control">
+                                <rect key="frame" x="276" y="521" width="51" height="31"/>
+                                <color key="onTintColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
+                                <color key="thumbTintColor" red="0.0" green="0.50196081400000003" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                <connections>
+                                    <action selector="connectivitySwitchAction:" destination="BYZ-38-t0r" eventType="valueChanged" id="OP3-3o-9ly"/>
+                                </connections>
+                            </switch>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Connectivity" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="oXm-pX-phr">
+                                <rect key="frame" x="252" y="492" width="95.5" height="20.5"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" red="0.0" green="0.50196081399917603" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                        </subviews>
+                        <color key="backgroundColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="E0F-n9-5Aj" secondAttribute="bottom" constant="48" id="SwN-ba-87q"/>
+                            <constraint firstAttribute="centerX" secondItem="BSb-2m-Vvh" secondAttribute="centerX" id="X0e-k5-UPZ"/>
+                            <constraint firstItem="BSb-2m-Vvh" firstAttribute="top" secondItem="DiJ-tG-shs" secondAttribute="bottom" constant="8" id="Xwr-Yo-GNw"/>
+                            <constraint firstItem="E0F-n9-5Aj" firstAttribute="centerX" secondItem="DiJ-tG-shs" secondAttribute="centerX" id="d5v-m5-n6i"/>
+                            <constraint firstItem="oXm-pX-phr" firstAttribute="top" secondItem="BSb-2m-Vvh" secondAttribute="bottom" constant="51" id="edB-LQ-eBf"/>
+                            <constraint firstAttribute="centerX" secondItem="oXm-pX-phr" secondAttribute="centerX" id="gNi-gp-hbk"/>
+                            <constraint firstItem="E0F-n9-5Aj" firstAttribute="top" secondItem="oXm-pX-phr" secondAttribute="bottom" constant="8" id="swq-YM-CeB"/>
+                            <constraint firstItem="DiJ-tG-shs" firstAttribute="top" secondItem="zhj-32-wjX" secondAttribute="bottom" constant="51" id="tAD-B2-YRg"/>
+                            <constraint firstAttribute="centerX" secondItem="DiJ-tG-shs" secondAttribute="centerX" id="tXL-dS-aes"/>
+                            <constraint firstAttribute="centerX" secondItem="zhj-32-wjX" secondAttribute="centerX" id="xmx-c7-eI1"/>
+                            <constraint firstAttribute="centerX" secondItem="E0F-n9-5Aj" secondAttribute="centerX" id="zIO-Ri-eyy"/>
+                        </constraints>
+                    </view>
+                    <nil key="simulatedStatusBarMetrics"/>
+                    <connections>
+                        <outlet property="bpmLabel" destination="DiJ-tG-shs" id="BTB-UX-Os9"/>
+                        <outlet property="bpmStepper" destination="BSb-2m-Vvh" id="8xS-AF-ipZ"/>
+                        <outlet property="transportButton" destination="zhj-32-wjX" id="PPA-C6-xR7"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
+            </objects>
+        </scene>
+    </scenes>
+</document>

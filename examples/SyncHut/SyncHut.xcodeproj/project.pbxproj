@@ -1,0 +1,360 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		423E47631AA7AECE00CDACEC /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 423E47621AA7AECE00CDACEC /* main.m */; };
+		423E47661AA7AECE00CDACEC /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 423E47651AA7AECE00CDACEC /* AppDelegate.m */; };
+		423E47691AA7AECE00CDACEC /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 423E47681AA7AECE00CDACEC /* ViewController.m */; };
+		423E476C1AA7AECE00CDACEC /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 423E476A1AA7AECE00CDACEC /* Main.storyboard */; };
+		423E476E1AA7AECE00CDACEC /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 423E476D1AA7AECE00CDACEC /* Images.xcassets */; };
+		423E47711AA7AECE00CDACEC /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 423E476F1AA7AECE00CDACEC /* LaunchScreen.xib */; };
+		423E478D1AA7B2C400CDACEC /* libABLSync.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 423E478C1AA7B2C400CDACEC /* libABLSync.a */; };
+		423E47901AA7B35400CDACEC /* AudioEngine.m in Sources */ = {isa = PBXBuildFile; fileRef = 423E478F1AA7B35400CDACEC /* AudioEngine.m */; };
+		423E47921AA7B38100CDACEC /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 423E47911AA7B38100CDACEC /* AudioToolbox.framework */; };
+		423E47961AA7B3D100CDACEC /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 423E47951AA7B3D100CDACEC /* UIKit.framework */; };
+		423E47981AA7B3DA00CDACEC /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 423E47971AA7B3DA00CDACEC /* AVFoundation.framework */; };
+		423E47991AA7B3E800CDACEC /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 423E47931AA7B3B600CDACEC /* Foundation.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		423E475D1AA7AECE00CDACEC /* SyncHut.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SyncHut.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		423E47611AA7AECE00CDACEC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		423E47621AA7AECE00CDACEC /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		423E47641AA7AECE00CDACEC /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		423E47651AA7AECE00CDACEC /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		423E47671AA7AECE00CDACEC /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
+		423E47681AA7AECE00CDACEC /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
+		423E476B1AA7AECE00CDACEC /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		423E476D1AA7AECE00CDACEC /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
+		423E47701AA7AECE00CDACEC /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
+		423E478C1AA7B2C400CDACEC /* libABLSync.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libABLSync.a; path = SyncHut/PanamaKit/libABLSync.a; sourceTree = "<group>"; };
+		423E478E1AA7B35400CDACEC /* AudioEngine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AudioEngine.h; sourceTree = "<group>"; };
+		423E478F1AA7B35400CDACEC /* AudioEngine.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AudioEngine.m; sourceTree = "<group>"; };
+		423E47911AA7B38100CDACEC /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
+		423E47931AA7B3B600CDACEC /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		423E47951AA7B3D100CDACEC /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		423E47971AA7B3DA00CDACEC /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		423E475A1AA7AECE00CDACEC /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				423E47991AA7B3E800CDACEC /* Foundation.framework in Frameworks */,
+				423E47981AA7B3DA00CDACEC /* AVFoundation.framework in Frameworks */,
+				423E47961AA7B3D100CDACEC /* UIKit.framework in Frameworks */,
+				423E47921AA7B38100CDACEC /* AudioToolbox.framework in Frameworks */,
+				423E478D1AA7B2C400CDACEC /* libABLSync.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		423E47541AA7AECE00CDACEC = {
+			isa = PBXGroup;
+			children = (
+				423E475F1AA7AECE00CDACEC /* SyncHut */,
+				423E475E1AA7AECE00CDACEC /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		423E475E1AA7AECE00CDACEC /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				423E475D1AA7AECE00CDACEC /* SyncHut.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		423E475F1AA7AECE00CDACEC /* SyncHut */ = {
+			isa = PBXGroup;
+			children = (
+				423E47641AA7AECE00CDACEC /* AppDelegate.h */,
+				423E47651AA7AECE00CDACEC /* AppDelegate.m */,
+				423E478E1AA7B35400CDACEC /* AudioEngine.h */,
+				423E478F1AA7B35400CDACEC /* AudioEngine.m */,
+				423E47671AA7AECE00CDACEC /* ViewController.h */,
+				423E47681AA7AECE00CDACEC /* ViewController.m */,
+				423E476A1AA7AECE00CDACEC /* Main.storyboard */,
+				423E476D1AA7AECE00CDACEC /* Images.xcassets */,
+				423E476F1AA7AECE00CDACEC /* LaunchScreen.xib */,
+				423E47601AA7AECE00CDACEC /* Supporting Files */,
+				423E479A1AA7B5E800CDACEC /* Frameworks */,
+			);
+			path = SyncHut;
+			sourceTree = "<group>";
+		};
+		423E47601AA7AECE00CDACEC /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				423E47611AA7AECE00CDACEC /* Info.plist */,
+				423E47621AA7AECE00CDACEC /* main.m */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		423E479A1AA7B5E800CDACEC /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				423E47971AA7B3DA00CDACEC /* AVFoundation.framework */,
+				423E47951AA7B3D100CDACEC /* UIKit.framework */,
+				423E47931AA7B3B600CDACEC /* Foundation.framework */,
+				423E47911AA7B38100CDACEC /* AudioToolbox.framework */,
+				423E478C1AA7B2C400CDACEC /* libABLSync.a */,
+			);
+			name = Frameworks;
+			path = ..;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		423E475C1AA7AECE00CDACEC /* SyncHut */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 423E47801AA7AECE00CDACEC /* Build configuration list for PBXNativeTarget "SyncHut" */;
+			buildPhases = (
+				423E47591AA7AECE00CDACEC /* Sources */,
+				423E475A1AA7AECE00CDACEC /* Frameworks */,
+				423E475B1AA7AECE00CDACEC /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = SyncHut;
+			productName = SyncHut;
+			productReference = 423E475D1AA7AECE00CDACEC /* SyncHut.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		423E47551AA7AECE00CDACEC /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0610;
+				ORGANIZATIONNAME = ableton;
+				TargetAttributes = {
+					423E475C1AA7AECE00CDACEC = {
+						CreatedOnToolsVersion = 6.1;
+						SystemCapabilities = {
+							com.apple.BackgroundModes = {
+								enabled = 1;
+							};
+						};
+					};
+				};
+			};
+			buildConfigurationList = 423E47581AA7AECE00CDACEC /* Build configuration list for PBXProject "SyncHut" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 423E47541AA7AECE00CDACEC;
+			productRefGroup = 423E475E1AA7AECE00CDACEC /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				423E475C1AA7AECE00CDACEC /* SyncHut */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		423E475B1AA7AECE00CDACEC /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				423E476C1AA7AECE00CDACEC /* Main.storyboard in Resources */,
+				423E47711AA7AECE00CDACEC /* LaunchScreen.xib in Resources */,
+				423E476E1AA7AECE00CDACEC /* Images.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		423E47591AA7AECE00CDACEC /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				423E47901AA7B35400CDACEC /* AudioEngine.m in Sources */,
+				423E47691AA7AECE00CDACEC /* ViewController.m in Sources */,
+				423E47661AA7AECE00CDACEC /* AppDelegate.m in Sources */,
+				423E47631AA7AECE00CDACEC /* main.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		423E476A1AA7AECE00CDACEC /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				423E476B1AA7AECE00CDACEC /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		423E476F1AA7AECE00CDACEC /* LaunchScreen.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				423E47701AA7AECE00CDACEC /* Base */,
+			);
+			name = LaunchScreen.xib;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		423E477E1AA7AECE00CDACEC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.1;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		423E477F1AA7AECE00CDACEC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = YES;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.1;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		423E47811AA7AECE00CDACEC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_CXX_LANGUAGE_STANDARD = "compiler-default";
+				GCC_C_LANGUAGE_STANDARD = "compiler-default";
+				INFOPLIST_FILE = SyncHut/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/../../lib",
+				);
+				OTHER_LDFLAGS = "-lc++";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
+				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../../include\"";
+			};
+			name = Debug;
+		};
+		423E47821AA7AECE00CDACEC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_CXX_LANGUAGE_STANDARD = "compiler-default";
+				GCC_C_LANGUAGE_STANDARD = "compiler-default";
+				INFOPLIST_FILE = SyncHut/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/../../lib",
+				);
+				OTHER_LDFLAGS = "-lc++";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
+				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../../include\"";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		423E47581AA7AECE00CDACEC /* Build configuration list for PBXProject "SyncHut" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				423E477E1AA7AECE00CDACEC /* Debug */,
+				423E477F1AA7AECE00CDACEC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		423E47801AA7AECE00CDACEC /* Build configuration list for PBXNativeTarget "SyncHut" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				423E47811AA7AECE00CDACEC /* Debug */,
+				423E47821AA7AECE00CDACEC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 423E47551AA7AECE00CDACEC /* Project object */;
+}
