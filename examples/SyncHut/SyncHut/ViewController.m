@@ -5,18 +5,9 @@
 
 @interface ViewController ()
 
-@property (strong, nonatomic) UIView *ablSyncIndicatorView;
-
 -(void) setIsPlaying:(BOOL)isPlaying atTempo:(Float32)bpm;
--(void) setConnectionState:(BOOL)state;
 
 @end
-
-#pragma mark - ABLSync Callbacks
-static void receivedConnectionState(bool connectionState, void *context) {
-    ViewController *vc = (__bridge ViewController *)context;
-    [vc setConnectionState:connectionState];
-}
 
 static void receivedEvent(ABLSharedTime _sharedTime, bool isPlaying, Float32 sharedBpm, void *context) {
     ViewController *vc = (__bridge ViewController *)context;
@@ -32,13 +23,10 @@ static void receivedEvent(ABLSharedTime _sharedTime, bool isPlaying, Float32 sha
     [super viewDidLoad];
 
     _audioEngine = [AudioEngine new];
-    _ablSyncIndicatorView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, 20)];
 
-    [self setConnectionState:NO];
     [self setIsPlaying:ABLSyncGetIsTransportPlaying(_audioEngine.ablSync)
                atTempo:ABLSyncGetSharedBpm(_audioEngine.ablSync)];
 
-    ABLSyncSetConnectionStateCallback(_audioEngine.ablSync, &receivedConnectionState, (__bridge void*)self);
     ABLSyncSetEventCallback(_audioEngine.ablSync, &receivedEvent, (__bridge void*)self);
 
     [_audioEngine start];
@@ -50,12 +38,6 @@ static void receivedEvent(ABLSharedTime _sharedTime, bool isPlaying, Float32 sha
     // The stepper is interpretted as a delta from the last set bpm value, so we
     // reset it whenever the value is updated.
     self.bpmStepper.value = 0;
-}
-
-- (void)setConnectionState:(BOOL)isConnected {
-    self.ablSyncIndicatorView.backgroundColor = isConnected
-        ? [UIColor colorWithRed:1 green:0.76f blue:0.01f alpha:1]
-        : [UIColor lightGrayColor];
 }
 
 #pragma mark - UI Actions
@@ -78,11 +60,9 @@ static void receivedEvent(ABLSharedTime _sharedTime, bool isPlaying, Float32 sha
 - (IBAction)connectivitySwitchAction:(UISwitch *)sender {
     if (sender.on) {
         ABLSyncActivateConnectivity(_audioEngine.ablSync);
-        [self.view addSubview:self.ablSyncIndicatorView];
     }
     else {
         ABLSyncDeactivateConnectivity(_audioEngine.ablSync);
-        [self.ablSyncIndicatorView removeFromSuperview];
     }
 }
 
