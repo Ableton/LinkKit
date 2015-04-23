@@ -9,7 +9,8 @@
 
 @end
 
-static void receivedEvent(ABLSharedTime _sharedTime, bool isPlaying, Float32 sharedBpm, void *context) {
+static void receivedEvent(ABLSharedTime sharedTime, bool isPlaying, Float32 sharedBpm, void *context) {
+#pragma unused(sharedTime)
     ViewController *vc = (__bridge ViewController *)context;
     [vc setIsPlaying:isPlaying atTempo:sharedBpm];
 }
@@ -17,6 +18,8 @@ static void receivedEvent(ABLSharedTime _sharedTime, bool isPlaying, Float32 sha
 @implementation ViewController {
   AudioEngine *_audioEngine;
 }
+
+@synthesize transportButton, bpmLabel, bpmStepper;
 
 - (void)viewDidLoad {
 
@@ -41,7 +44,7 @@ static void receivedEvent(ABLSharedTime _sharedTime, bool isPlaying, Float32 sha
 }
 
 #pragma mark - UI Actions
-- (IBAction)transportButtonAction:(UIButton *)sender {
+- (IBAction)transportButtonAction:(UISwitch *)sender {
     if (sender.selected) {
         ABLSyncProposeTransportStop(_audioEngine.ablSync);
     }
@@ -54,7 +57,7 @@ static void receivedEvent(ABLSharedTime _sharedTime, bool isPlaying, Float32 sha
 
 - (IBAction)bpmStepperAction:(UIStepper *)sender {
     Float32 currentBpm = ABLSyncGetSharedBpm(_audioEngine.ablSync);
-    ABLSyncProposeBpm(_audioEngine.ablSync, currentBpm + sender.value);
+    ABLSyncProposeBpm(_audioEngine.ablSync, currentBpm + (Float32)sender.value);
 }
 
 - (IBAction)connectivitySwitchAction:(UISwitch *)sender {

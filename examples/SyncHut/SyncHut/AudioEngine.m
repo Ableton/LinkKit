@@ -11,19 +11,19 @@
  * that occur within the given play range.
  */
 static void clickOnBeatsInRange(ABLSyncPlayRangeRef range, AudioBufferList *buffers) {
-    static const int16_t ticksPerClick = 6;
+    static const int ticksPerClick = 6;
 
-    const int64_t firstTick = ceil(ABLSyncSharedTimeAtPlayRangeStart(range));
-    const int64_t ticksEnd = ceil(ABLSyncSharedTimeAtPlayRangeEnd(range));
+    const long long firstTick = llround(ceil(ABLSyncSharedTimeAtPlayRangeStart(range)));
+    const long long ticksEnd = llround(ceil(ABLSyncSharedTimeAtPlayRangeEnd(range)));
 
-    const int16_t toNextClick = ticksPerClick - (firstTick % ticksPerClick);
+    const int toNextClick = ticksPerClick - (firstTick % ticksPerClick);
 
-    for (int64_t nextClick = firstTick + (toNextClick % ticksPerClick);
+    for (long long nextClick = firstTick + (toNextClick % ticksPerClick);
         nextClick < ticksEnd;
         nextClick += ticksPerClick) {
 
-        const UInt32 offset = ABLSyncSampleOffsetAtSharedTime(range, nextClick);
-        for (UInt32 i = 0; i < buffers->mNumberBuffers; ++i) {
+        const long offset = lround(ABLSyncSampleOffsetAtSharedTime(range, nextClick));
+        for (UInt32 i = 0; i < buffers->mNumberBuffers && offset >= 0; ++i) {
             SInt16 *bufData = buffers->mBuffers[i].mData;
             bufData[offset] = 8192; // Click!
         }
@@ -46,12 +46,13 @@ typedef struct {
  */
 static OSStatus audioCallback(
     void *inRefCon,
-    AudioUnitRenderActionFlags *_flags,
+    AudioUnitRenderActionFlags *flags,
     const AudioTimeStamp *inTimeStamp,
-    UInt32 _inBusNumber,
+    UInt32 inBusNumber,
     UInt32 inNumberFrames,
     AudioBufferList *ioData)
 {
+#pragma unused(inBusNumber, flags)
     for (UInt32 i = 0; i < ioData->mNumberBuffers; i++) {
         memset(ioData->mBuffers[i].mData, 0, inNumberFrames * sizeof(SInt16));
     }
