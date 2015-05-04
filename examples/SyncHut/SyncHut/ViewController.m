@@ -5,37 +5,38 @@
 
 @interface ViewController ()
 
--(void) setIsPlaying:(BOOL)isPlaying atTempo:(Float32)bpm;
+- (void)setIsPlaying:(BOOL)isPlaying atTempo:(Float64)bpm;
 
 @end
 
-static void receivedEvent(ABLSharedTime sharedTime, bool isPlaying, Float32 sharedBpm, void *context) {
-#pragma unused(sharedTime)
-    ViewController *vc = (__bridge ViewController *)context;
-    [vc setIsPlaying:isPlaying atTempo:sharedBpm];
-}
 
 @implementation ViewController {
   AudioEngine *_audioEngine;
+  NSTimer *_updateUiTimer;
 }
 
 @synthesize transportButton, bpmLabel, bpmStepper;
 
 - (void)viewDidLoad {
-
     [super viewDidLoad];
 
     _audioEngine = [AudioEngine new];
-
-    [self setIsPlaying:ABLSyncGetIsTransportPlaying(_audioEngine.ablSync)
-               atTempo:ABLSyncGetSharedBpm(_audioEngine.ablSync)];
-
-    ABLSyncSetEventCallback(_audioEngine.ablSync, &receivedEvent, (__bridge void*)self);
-
     [_audioEngine start];
+
+    _updateUiTimer =
+        [NSTimer scheduledTimerWithTimeInterval:0.016
+                                         target:self
+                                       selector:@selector(updateUi)
+                                       userInfo:nil
+                                        repeats:YES];
+    [[NSRunLoop mainRunLoop] addTimer:_updateUiTimer forMode:NSRunLoopCommonModes];
 }
 
-- (void)setIsPlaying:(BOOL)isPlaying atTempo:(Float32)bpm {
+- (void)dealloc {
+    [_updateUiTimer invalidate];
+}
+
+- (void)setIsPlaying:(BOOL)isPlaying atTempo:(Float64)bpm {
     self.transportButton.selected = isPlaying;
     self.bpmLabel.text = [NSString stringWithFormat:@"%.1f bpm", bpm];
     // The stepper is interpretted as a delta from the last set bpm value, so we
@@ -43,30 +44,22 @@ static void receivedEvent(ABLSharedTime sharedTime, bool isPlaying, Float32 shar
     self.bpmStepper.value = 0;
 }
 
+- (void)updateUi {
+    [self setIsPlaying:[_audioEngine isPlaying] atTempo:[_audioEngine bpm]];
+}
+
 #pragma mark - UI Actions
-- (IBAction)transportButtonAction:(UISwitch *)sender {
-    if (sender.selected) {
-        ABLSyncProposeTransportStop(_audioEngine.ablSync);
-    }
-    else {
-        // Propose starting transport at shared time 0 since we don't have a way to
-        // specify custom timeline values in the UI
-        ABLSyncProposeTransportStart(_audioEngine.ablSync, 0);
-    }
+- (IBAction)transportButtonAction:(UIButton *)sender {
+    [_audioEngine setIsPlaying: !sender.selected];
 }
 
 - (IBAction)bpmStepperAction:(UIStepper *)sender {
-    Float32 currentBpm = ABLSyncGetSharedBpm(_audioEngine.ablSync);
-    ABLSyncProposeBpm(_audioEngine.ablSync, currentBpm + (Float32)sender.value);
+    Float64 currentBpm = [_audioEngine bpm];
+    [_audioEngine setBpm:currentBpm + sender.value];
 }
 
 - (IBAction)connectivitySwitchAction:(UISwitch *)sender {
-    if (sender.on) {
-        ABLSyncActivateConnectivity(_audioEngine.ablSync);
-    }
-    else {
-        ABLSyncDeactivateConnectivity(_audioEngine.ablSync);
-    }
+    _audioEngine.isSyncEnabled = sender.on;
 }
 
 @end
