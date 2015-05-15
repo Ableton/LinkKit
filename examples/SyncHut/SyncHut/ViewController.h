@@ -9,7 +9,7 @@
 @property (weak, nonatomic) IBOutlet UILabel *bpmLabel;
 @property (weak, nonatomic) IBOutlet UIStepper *bpmStepper;
 
-- (IBAction)transportButtonAction:(UISwitch *)sender;
+- (IBAction)transportButtonAction:(UIButton *)sender;
 - (IBAction)bpmStepperAction:(UIStepper *)sender;
 - (IBAction)connectivitySwitchAction:(UISwitch *)sender;
 

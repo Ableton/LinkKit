@@ -1,42 +1,71 @@
 // Copyright: 2015, Ableton AG, Berlin. All rights reserved.
 
 #include "AudioEngine.h"
+#include "ABLSync.h"
 #include <AudioToolbox/AudioToolbox.h>
 #include <AVFoundation/AVAudioSession.h>
+#include <mach/mach_time.h>
+
 
 /*
- * Create an audible click in the given audio buffers for every 6th tick of the
- * shared timeline. The integers on the shared timeline represent 24ths of a
- * beat, so the clicks happen on quarter beats. Only produce clicks for ticks
- * that occur within the given play range.
+ * Calculate the effective Beats Per Minute value for a range of beat values
+ * over the given number of samples at the given sample rate.
  */
-static void clickOnBeatsInRange(ABLSyncPlayRangeRef range, AudioBufferList *buffers) {
-    static const int ticksPerClick = 6;
+static Float64 bpmInRange(
+    const Float64 fromBeat,
+    const Float64 toBeat,
+    const UInt32 numSamples,
+    const Float64 sampleRate) {
+    return (toBeat - fromBeat) * sampleRate * 60 / numSamples;
+}
 
-    const long long firstTick = llround(ceil(ABLSyncSharedTimeAtPlayRangeStart(range)));
-    const long long ticksEnd = llround(ceil(ABLSyncSharedTimeAtPlayRangeEnd(range)));
+/*
+ * Create an audible click in the given audio buffers for every half beat on
+ * the song timeline.
+ */
+static void clickInBuffer(
+    const Float64 positionAtBufferBegin,
+    const Float64 positionAtBufferEnd,
+    const UInt32 numSamples,
+    AudioBufferList *buffers) {
 
-    const int toNextClick = ticksPerClick - (firstTick % ticksPerClick);
+    static const Float64 beatsPerClick = 0.5;
 
-    for (long long nextClick = firstTick + (toNextClick % ticksPerClick);
-        nextClick < ticksEnd;
-        nextClick += ticksPerClick) {
+    const Float64 beatsInBuffer = positionAtBufferEnd - positionAtBufferBegin;
+    const Float64 samplesPerBeat = numSamples / beatsInBuffer;
 
-        const long offset = lround(ABLSyncSampleOffsetAtSharedTime(range, nextClick));
-        for (UInt32 i = 0; i < buffers->mNumberBuffers && offset >= 0; ++i) {
-            SInt16 *bufData = buffers->mBuffers[i].mData;
-            bufData[offset] = 8192; // Click!
+    Float64 clickAtPosition = positionAtBufferBegin - fmod(positionAtBufferBegin, beatsPerClick);
+
+    while (clickAtPosition < positionAtBufferEnd) {
+        const long offset = lround(samplesPerBeat * (clickAtPosition - positionAtBufferBegin));
+        if (offset >= 0 && offset < (long)(numSamples)) {
+            for (UInt32 i = 0; i < buffers->mNumberBuffers; ++i) {
+                SInt16 *bufData = buffers->mBuffers[i].mData;
+                if (fmod(clickAtPosition, 4) == 0) {
+                  bufData[offset] = 16384; // Click! Emphasize first Beat of 4/4 Bar
+                }
+                else {
+                  bufData[offset] = 8192; // Click!
+                }
+            }
         }
+        clickAtPosition += beatsPerClick;
     }
 }
 
 /*
- * Structure that stores the data needed by the audio callback: an ABLSync
- * instance and the current sample rate.
+ * Structure that stores the data needed by the audio callback
  */
 typedef struct {
     ABLSyncRef ablSync;
     Float64 sampleRate;
+    BOOL isPlaying;
+    Float64 bpm;
+    Float64 lastBeatTime;
+    Float64 startBeatTime;
+    Float64 quantum;
+    Float64 secondsToHostTime;
+    UInt64 outputLatency; // hardware output latency in HostTime
 } SyncData;
 
 /*
@@ -50,8 +79,7 @@ static OSStatus audioCallback(
     const AudioTimeStamp *inTimeStamp,
     UInt32 inBusNumber,
     UInt32 inNumberFrames,
-    AudioBufferList *ioData)
-{
+    AudioBufferList *ioData) {
 #pragma unused(inBusNumber, flags)
     for (UInt32 i = 0; i < ioData->mNumberBuffers; i++) {
         memset(ioData->mBuffers[i].mData, 0, inNumberFrames * sizeof(SInt16));
@@ -59,16 +87,44 @@ static OSStatus audioCallback(
 
     SyncData *syncData = (SyncData *)inRefCon;
 
-    ABLSyncPlayRangeRef range = ABLSyncSynchronizeBuffer(
-        syncData->ablSync,
-        inTimeStamp,
-        inNumberFrames,
-        syncData->sampleRate);
+    const Float64 beatTimeAtBufferBegin = syncData->lastBeatTime;
 
-    while (ABLSyncIsValidPlayRange(syncData->ablSync, range)) {
-        clickOnBeatsInRange(range, ioData);
-        range = ABLSyncNextPlayRange(range);
+    const UInt64 bufferDurationHostTime =
+        (UInt64)(syncData->secondsToHostTime * inNumberFrames / syncData->sampleRate);
+
+    // Find out what the beat time should be at the end of this
+    // buffer. The mHostTime member of the timestamp represents the
+    // time at which the buffer is delivered to the audio
+    // hardware. The output latency is the time from when the
+    // buffer is delivered to the audio hardware to when the beginning
+    // of the buffer starts reaching the output. We add these
+    // values with the buffer duration to get the host time at which
+    // the end of this buffer will be reaching the output.
+    const Float64 beatTimeAtBufferEnd = ABLSyncBeatTimeAtHostTime(
+        syncData->ablSync,
+        inTimeStamp->mHostTime + bufferDurationHostTime + syncData->outputLatency);
+
+    if (syncData->isPlaying) {
+        // Always re-quantize the start time in order to support changes to the
+        // shared quantization grid while playing
+        syncData->startBeatTime =
+            ABLSyncQuantizeBeatTime(syncData->ablSync, syncData->quantum, syncData->startBeatTime);
+        // Calculate song position values for the buffer. Song position is
+        // considered to be the number of beats since starting play.
+        const Float64 beginSongPosition = beatTimeAtBufferBegin - syncData->startBeatTime;
+        const Float64 endSongPosition = beatTimeAtBufferEnd - syncData->startBeatTime;
+        // Add audible clicks to the buffer according to the portion of the song
+        // timeline represented by this buffer.
+        clickInBuffer(beginSongPosition, endSongPosition, inNumberFrames, ioData);
     }
+    else {
+        // When not playing, move the start time to the end of every buffer
+        // so that it's already correct if we start playing in the next buffer.
+        syncData->startBeatTime = beatTimeAtBufferEnd;
+    }
+
+    syncData->lastBeatTime = beatTimeAtBufferEnd;
+    syncData->bpm = bpmInRange(beatTimeAtBufferBegin, beatTimeAtBufferEnd, inNumberFrames, syncData->sampleRate);
 
     return noErr;
 }
@@ -82,6 +138,43 @@ static OSStatus audioCallback(
 @end
 
 @implementation AudioEngine
+
+# pragma mark - Transport
+- (BOOL)isPlaying {
+    return _syncData.isPlaying;
+}
+
+- (void)setIsPlaying:(BOOL)isPlaying {
+    _syncData.isPlaying = isPlaying;
+}
+
+- (Float64)bpm {
+    return _syncData.bpm;
+}
+
+- (void)setBpm:(Float64)bpm {
+    ABLSyncProposeTempo(_syncData.ablSync, bpm, _syncData.lastBeatTime);
+}
+
+- (Float64)beatTime {
+    return _syncData.lastBeatTime;
+}
+
+- (Float64)quantum {
+    return _syncData.quantum;
+}
+
+- (void)setQuantum:(Float64)quantum {
+    _syncData.quantum = quantum;
+}
+
+- (BOOL)isSyncEnabled {
+    return ABLSyncIsEnabled(_syncData.ablSync);
+}
+
+- (void)setIsSyncEnabled:(BOOL)isEnabled {
+    ABLSyncEnable(_syncData.ablSync, isEnabled);
+}
 
 # pragma mark - create and delete engine
 - (id)init {
@@ -100,11 +193,7 @@ static OSStatus audioCallback(
             (int)result,
             (const char *)(&result));
     }
-    ABLSyncDeleteSession(_syncData.ablSync);
-}
-
-- (ABLSyncRef)ablSync {
-    return _syncData.ablSync;
+    ABLSyncDelete(_syncData.ablSync);
 }
 
 # pragma mark - start and stop engine
@@ -145,9 +234,19 @@ static OSStatus audioCallback(
         NSLog(@"Error setting category Audio Session: %@", [sessionError localizedDescription]);
     }
 
+    mach_timebase_info_data_t timeInfo;
+    mach_timebase_info(&timeInfo);
+
     // Initialize the sync session with the current latency
-    _syncData.ablSync = ABLSyncNewSession([[AVAudioSession sharedInstance] outputLatency]);
     _syncData.sampleRate = [[AVAudioSession sharedInstance] sampleRate];
+    _syncData.isPlaying = false;
+    _syncData.bpm = 120.0;
+    _syncData.lastBeatTime = 0;
+    _syncData.startBeatTime = 0;
+    _syncData.quantum = 4; // Sync to whole beats
+    _syncData.secondsToHostTime = (1.0e9 * timeInfo.denom) / (Float64)timeInfo.numer;
+    _syncData.outputLatency = (UInt64)(_syncData.secondsToHostTime * [AVAudioSession sharedInstance].outputLatency);
+    _syncData.ablSync = ABLSyncNew(_syncData.bpm);
 
     // Create Audio Unit
     AudioComponentDescription cd = {
@@ -198,7 +297,7 @@ static OSStatus audioCallback(
     AURenderCallbackStruct ioRemoteInput;
     ioRemoteInput.inputProc = audioCallback;
     ioRemoteInput.inputProcRefCon = &_syncData;
-  
+
     result = AudioUnitSetProperty(
         _ioUnit,
         kAudioUnitProperty_SetRenderCallback,
