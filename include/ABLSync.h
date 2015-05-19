@@ -69,6 +69,13 @@ extern "C"
    */
   Float64 ABLSyncBeatTimeAtHostTime(ABLSyncRef, UInt64 hostTimeAtOutput);
 
+
+  /** Conversion function to determine which host time at the device's output
+      represents the given beat time value. This function does not guarantee
+      a backwards conversion of the value returned by ABLSyncBeatTimeAtHostTime().
+  */
+  UInt64 ABLSyncHostTimeAtBeatTime(ABLSyncRef, Float64 beatTime);
+
   /** Quantize the given beat time according to the given quantum and
       the shared grid of the sync session. The returned quantized
       value will be the closest quantized beat time to the given beat
