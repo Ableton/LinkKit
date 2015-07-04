@@ -4,14 +4,13 @@
 
 @interface AudioEngine : NSObject
 
-@property (nonatomic) BOOL isPlaying;
 @property (nonatomic) Float64 bpm;
 @property (readonly, nonatomic) Float64 beatTime;
 @property (nonatomic) Float64 quantum;
+@property (nonatomic) BOOL isPlaying;
 @property (nonatomic) BOOL isSyncEnabled;
 
 - (void)start;
 - (void)stop;
 
 @end
-

@@ -50,7 +50,7 @@
 
 #pragma mark - UI Actions
 - (IBAction)transportButtonAction:(UIButton *)sender {
-    [_audioEngine setIsPlaying: !sender.selected];
+    _audioEngine.isPlaying = !sender.selected;
 }
 
 - (IBAction)bpmStepperAction:(UIStepper *)sender {

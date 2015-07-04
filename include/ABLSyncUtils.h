@@ -1,9 +1,8 @@
 // Copyright: 2015, Ableton AG, Berlin. All rights reserved.
 
-#include "ABLSync.h"
-#include <mach/mach_time.h>
-
 #pragma once
+
+#include "ABLSync.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -19,34 +18,6 @@ extern "C"
     const UInt32 numSamples,
     const Float64 sampleRate) {
     return (toBeat - fromBeat) * sampleRate * 60 / numSamples;
-  }
-
-
-  /** Calculate the next quantized beat time for a given quanta and beat time.
-
-      If there is no active sync session, the beatTime argument will
-      be returned unmodified.
-  */
-  inline Float64 ABLSyncNextQuantizedBeatTime(
-    ABLSyncRef syncRef,
-    const Float64 quantum,
-    const Float64 beatTime) {
-    const Float64 quantizedBeatTime = ABLSyncQuantizeBeatTime(syncRef, quantum, beatTime);
-    return quantizedBeatTime >= beatTime ? quantizedBeatTime : quantizedBeatTime + quantum;
-  }
-
-
-  /** Calculate the previous quantized beat time for a given quanta and beat time.
-
-      If there is no active sync session, the beatTime argument will
-      be returned unmodified.
-  */
-  inline Float64 ABLSyncPreviousQuantizedBeatTime(
-    ABLSyncRef syncRef,
-    const Float64 quantum,
-    const Float64 beatTime) {
-    const Float64 quantizedBeatTime = ABLSyncQuantizeBeatTime(syncRef, quantum, beatTime);
-    return quantizedBeatTime <= beatTime ? quantizedBeatTime : quantizedBeatTime - quantum;
   }
 
 #ifdef __cplusplus
