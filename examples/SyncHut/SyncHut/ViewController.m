@@ -2,11 +2,10 @@
 
 #import "ViewController.h"
 #import "AudioEngine.h"
+#include "ABLSync.h"
 
 @interface ViewController ()
-
 - (void)setIsPlaying:(BOOL)isPlaying atTempo:(Float64)bpm;
-
 @end
 
 
@@ -53,13 +52,38 @@
     _audioEngine.isPlaying = !sender.selected;
 }
 
+-(IBAction)showLinkSettings:(id)sender
+{
+  UIViewController *linkSettings = ABLSyncSettings(_audioEngine.syncRef);
+
+  UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:linkSettings];
+  // this will present a view controller as a popover in iPad and a modal VC on iPhone
+  linkSettings.navigationItem.rightBarButtonItem =
+    [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone
+                                                  target:self
+                                                  action:@selector(hideLinkSettings:)];
+
+  navController.modalPresentationStyle = UIModalPresentationPopover;
+
+  UIPopoverPresentationController *popC = navController.popoverPresentationController;
+  popC.permittedArrowDirections = UIPopoverArrowDirectionAny;
+  popC.sourceRect = [sender frame];
+  linkSettings.preferredContentSize = navController.topViewController.view.frame.size;
+  UIButton *button = (UIButton *)sender;
+  popC.sourceView = button.superview;
+
+  [self presentViewController:navController animated:YES completion:nil];
+}
+
+- (void)hideLinkSettings:(id)sender
+{
+  #pragma unused(sender)
+  [self dismissViewControllerAnimated:YES completion:nil];
+}
+
 - (IBAction)bpmStepperAction:(UIStepper *)sender {
     Float64 currentBpm = [_audioEngine bpm];
     [_audioEngine setBpm:currentBpm + sender.value];
-}
-
-- (IBAction)connectivitySwitchAction:(UISwitch *)sender {
-    _audioEngine.isSyncEnabled = sender.on;
 }
 
 @end

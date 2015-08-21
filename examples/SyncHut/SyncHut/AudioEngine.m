@@ -1,7 +1,6 @@
 // Copyright: 2015, Ableton AG, Berlin. All rights reserved.
 
 #include "AudioEngine.h"
-#include "ABLSync.h"
 #include <AudioToolbox/AudioToolbox.h>
 #include <AVFoundation/AVAudioSession.h>
 #include <mach/mach_time.h>
@@ -176,8 +175,8 @@ static OSStatus audioCallback(
     return ABLSyncIsEnabled(_syncData.ablSync);
 }
 
-- (void)setIsSyncEnabled:(BOOL)isEnabled {
-    ABLSyncEnable(_syncData.ablSync, isEnabled);
+- (ABLSyncRef)syncRef {
+    return _syncData.ablSync;
 }
 
 # pragma mark - create and delete engine

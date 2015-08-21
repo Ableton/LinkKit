@@ -19,6 +19,7 @@
 #pragma once
 
 #include <CoreAudio/CoreAudioTypes.h>
+#include <UIKit/UIKit.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -47,16 +48,15 @@ extern "C"
   void ABLSyncDelete(ABLSyncRef);
 
 
-  /** Enable/disable syncing. When syncing is enabled, the library
-      will browse for peers and establish a new sync session when
-      any are found. If shouldEnable matches the current enabled
-      state, the call is a noop.
+  /** Settings view controller that provides users with the ability to
+      to view Link status and modify Link-related settings. Clients
+      can integrate this view controller into their GUI as they see
+      fit, but it is recommended that it be presented as a popover.
   */
-  void ABLSyncEnable(ABLSyncRef, bool shouldEnable);
+  UIViewController *ABLSyncSettings(ABLSyncRef);
 
   /** Is syncing currently enabled? **/
   bool ABLSyncIsEnabled(ABLSyncRef);
-
 
   /** Propose a new tempo to the sync session, specifying the host time
       at which the change should occur. If the host time is too far in

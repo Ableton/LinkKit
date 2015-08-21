@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="6751" systemVersion="14C1514" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="BYZ-38-t0r">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="7706" systemVersion="14E46" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="BYZ-38-t0r">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6736"/>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="7703"/>
     </dependencies>
     <scenes>
         <!--View Controller-->
@@ -16,8 +17,8 @@
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="zhj-32-wjX" userLabel="Playback">
-                                <rect key="frame" x="280.5" y="297" width="38" height="36"/>
+                            <button opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="zhj-32-wjX" userLabel="Playback">
+                                <rect key="frame" x="281" y="297" width="38" height="36"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="20"/>
                                 <state key="normal" title="Play">
                                     <color key="titleColor" red="0.0" green="0.50196081399917603" blue="1" alpha="1" colorSpace="calibratedRGB"/>
@@ -33,42 +34,40 @@
                                     <action selector="bpmStepperAction:" destination="BYZ-38-t0r" eventType="valueChanged" id="hPy-1w-B9v"/>
                                 </connections>
                             </stepper>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="120.0 bpm" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="DiJ-tG-shs" userLabel="Bpm Display">
-                                <rect key="frame" x="259" y="384" width="83" height="20.5"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="120.0 bpm" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="DiJ-tG-shs" userLabel="Bpm Display">
+                                <rect key="frame" x="259" y="384" width="83" height="21"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <color key="textColor" red="0.0" green="0.50196081399917603" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="E0F-n9-5Aj" userLabel="Connectivity Control">
-                                <rect key="frame" x="276" y="521" width="51" height="31"/>
-                                <color key="onTintColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
-                                <color key="thumbTintColor" red="0.0" green="0.50196081400000003" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="K4A-qs-qer">
+                                <rect key="frame" x="253" y="486" width="94" height="30"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="30" id="d2P-Ma-t1R"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <state key="normal" title="Settings">
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
                                 <connections>
-                                    <action selector="connectivitySwitchAction:" destination="BYZ-38-t0r" eventType="valueChanged" id="OP3-3o-9ly"/>
+                                    <action selector="showLinkSettings:" destination="BYZ-38-t0r" eventType="touchUpInside" id="nDi-Lt-Fqy"/>
                                 </connections>
-                            </switch>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Connectivity" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="oXm-pX-phr">
-                                <rect key="frame" x="252" y="492" width="95.5" height="20.5"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                <color key="textColor" red="0.0" green="0.50196081399917603" blue="1" alpha="1" colorSpace="calibratedRGB"/>
-                                <nil key="highlightedColor"/>
-                            </label>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
-                            <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="E0F-n9-5Aj" secondAttribute="bottom" constant="48" id="SwN-ba-87q"/>
+                            <constraint firstItem="K4A-qs-qer" firstAttribute="leading" secondItem="BSb-2m-Vvh" secondAttribute="leading" id="97Y-pA-JZG"/>
+                            <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="K4A-qs-qer" secondAttribute="bottom" constant="84" id="TIO-Mm-bUF"/>
                             <constraint firstAttribute="centerX" secondItem="BSb-2m-Vvh" secondAttribute="centerX" id="X0e-k5-UPZ"/>
                             <constraint firstItem="BSb-2m-Vvh" firstAttribute="top" secondItem="DiJ-tG-shs" secondAttribute="bottom" constant="8" id="Xwr-Yo-GNw"/>
-                            <constraint firstItem="E0F-n9-5Aj" firstAttribute="centerX" secondItem="DiJ-tG-shs" secondAttribute="centerX" id="d5v-m5-n6i"/>
-                            <constraint firstItem="oXm-pX-phr" firstAttribute="top" secondItem="BSb-2m-Vvh" secondAttribute="bottom" constant="51" id="edB-LQ-eBf"/>
-                            <constraint firstAttribute="centerX" secondItem="oXm-pX-phr" secondAttribute="centerX" id="gNi-gp-hbk"/>
-                            <constraint firstItem="E0F-n9-5Aj" firstAttribute="top" secondItem="oXm-pX-phr" secondAttribute="bottom" constant="8" id="swq-YM-CeB"/>
+                            <constraint firstItem="K4A-qs-qer" firstAttribute="top" secondItem="BSb-2m-Vvh" secondAttribute="bottom" constant="45" id="a6M-NN-3bn"/>
                             <constraint firstItem="DiJ-tG-shs" firstAttribute="top" secondItem="zhj-32-wjX" secondAttribute="bottom" constant="51" id="tAD-B2-YRg"/>
                             <constraint firstAttribute="centerX" secondItem="DiJ-tG-shs" secondAttribute="centerX" id="tXL-dS-aes"/>
+                            <constraint firstItem="K4A-qs-qer" firstAttribute="trailing" secondItem="BSb-2m-Vvh" secondAttribute="trailing" id="vpk-0r-n0E"/>
                             <constraint firstAttribute="centerX" secondItem="zhj-32-wjX" secondAttribute="centerX" id="xmx-c7-eI1"/>
-                            <constraint firstAttribute="centerX" secondItem="E0F-n9-5Aj" secondAttribute="centerX" id="zIO-Ri-eyy"/>
                         </constraints>
                     </view>
+                    <navigationItem key="navigationItem" id="zSP-dC-f7C"/>
                     <nil key="simulatedStatusBarMetrics"/>
                     <connections>
                         <outlet property="bpmLabel" destination="DiJ-tG-shs" id="BTB-UX-Os9"/>
@@ -78,6 +77,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
+            <point key="canvasLocation" x="1130" y="348"/>
         </scene>
     </scenes>
 </document>

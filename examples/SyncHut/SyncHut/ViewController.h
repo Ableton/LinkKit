@@ -11,6 +11,5 @@
 
 - (IBAction)transportButtonAction:(UIButton *)sender;
 - (IBAction)bpmStepperAction:(UIStepper *)sender;
-- (IBAction)connectivitySwitchAction:(UISwitch *)sender;
 
 @end
