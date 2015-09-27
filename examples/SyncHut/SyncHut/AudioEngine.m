@@ -180,9 +180,9 @@ static OSStatus audioCallback(
 }
 
 # pragma mark - create and delete engine
-- (id)init {
+- (id)initWithTempo:(Float64)bpm {
     if ([super init]) {
-        [self initSyncData];
+        [self initSyncData:bpm];
         [self setupAudioEngine];
     }
     return self;
@@ -229,11 +229,11 @@ static OSStatus audioCallback(
     }
 }
 
-- (void)initSyncData {
+- (void)initSyncData:(Float64)bpm {
     mach_timebase_info_data_t timeInfo;
     mach_timebase_info(&timeInfo);
 
-    _syncData.ablSync = ABLSyncNew(120, 4); // quantize to 4 beats
+    _syncData.ablSync = ABLSyncNew(bpm, 4); // quantize to 4 beats
     _syncData.sampleRate = [[AVAudioSession sharedInstance] sampleRate];
     _syncData.secondsToHostTime = (1.0e9 * timeInfo.denom) / (Float64)timeInfo.numer;
     _syncData.outputLatency = (UInt64)(_syncData.secondsToHostTime * [AVAudioSession sharedInstance].outputLatency);

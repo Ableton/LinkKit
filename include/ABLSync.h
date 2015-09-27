@@ -18,8 +18,7 @@
 
 #pragma once
 
-#include <CoreAudio/CoreAudioTypes.h>
-#include <UIKit/UIKit.h>
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -42,34 +41,61 @@ extern "C"
       instances in the session that have a quantum of 4 (or a multiple
       of 4).
   */
-  ABLSyncRef ABLSyncNew(Float64 initialBpm, Float64 syncQuantum);
+  ABLSyncRef ABLSyncNew(double initialBpm, double syncQuantum);
 
   /** Destroy the library instance and cleanup its associated resources. */
   void ABLSyncDelete(ABLSyncRef);
 
 
-  /** Settings view controller that provides users with the ability to
-      to view Link status and modify Link-related settings. Clients
-      can integrate this view controller into their GUI as they see
-      fit, but it is recommended that it be presented as a popover.
-  */
-  UIViewController *ABLSyncSettings(ABLSyncRef);
-
   /** Is syncing currently enabled? **/
   bool ABLSyncIsEnabled(ABLSyncRef);
+
+
+  /** @name Callbacks for observing changes in the system state */
+  /** Called if Session Tempo changes.
+      @param sessionTempo User-visible representation of the session tempo as
+      described in ABLSyncGetSessionTempo()
+  */
+  typedef void (*ABLSyncSessionTempoCallback)(
+    double sessionTempo,
+    void *context);
+
+  /** Called if isEnabled state changes.
+      @param isEnabled Whether syncing is currently enabled
+  */
+  typedef void (*ABLSyncIsEnabledCallback)(
+    bool isEnabled,
+    void *context);
+
+
+  /** @name Callback Registration
+   * Setters for delegate notifications. */
+  void ABLSyncSetSessionTempoCallback(
+    ABLSyncRef,
+    ABLSyncSessionTempoCallback callback,
+    void* context);
+
+  void ABLSyncSetIsEnabledCallback(
+    ABLSyncRef,
+    ABLSyncIsEnabledCallback callback,
+    void* context);
+
 
   /** Propose a new tempo to the sync session, specifying the host time
       at which the change should occur. If the host time is too far in
       the past or future it will be rejected.
   */
-  void ABLSyncProposeTempo(ABLSyncRef, Float64 bpm, UInt64 hostTimeAtOutput);
+  void ABLSyncProposeTempo(
+    ABLSyncRef,
+    double bpm,
+    uint64_t hostTimeAtOutput);
 
   /** Get the current tempo for the sync session in Beats Per
       Minute. This is a stable value that is appropriate for display
       to the user (unlike the value derived for a given audio buffer,
       which will vary due to clock drift, latency compensation, etc.)
   */
-  Float64 ABLSyncGetSessionTempo(ABLSyncRef);
+  double ABLSyncGetSessionTempo(ABLSyncRef);
 
   /** Conversion function to determine which value on the beat
       timeline should be hitting the device's output at the given host
@@ -81,13 +107,13 @@ extern "C"
       resulting beat time: hostTime_2 > hostTime_1 => beatTime_2 >
       beatTime_1 when called twice from the same thread.
   */
-  Float64 ABLSyncBeatTimeAtHostTime(ABLSyncRef, UInt64 hostTimeAtOutput);
+  double ABLSyncBeatTimeAtHostTime(ABLSyncRef, uint64_t hostTimeAtOutput);
 
   /** Conversion function to determine which host time at the device's output
       represents the given beat time value. This function does not guarantee
       a backwards conversion of the value returned by ABLSyncBeatTimeAtHostTime.
   */
-  UInt64 ABLSyncHostTimeAtBeatTime(ABLSyncRef, Float64 beatTime);
+  uint64_t ABLSyncHostTimeAtBeatTime(ABLSyncRef, double beatTime);
 
 
   /** Reset the beat timeline with a desire to map the given beat time
@@ -96,10 +122,10 @@ extern "C"
       from the requested beat time by up to a quantum due to
       quantization, but will always be <= the given beat time.
   */
-  Float64 ABLSyncResetBeatTime(
+  double ABLSyncResetBeatTime(
     ABLSyncRef,
-    Float64 beatTime,
-    UInt64 hostTimeAtOutput);
+    double beatTime,
+    uint64_t hostTimeAtOutput);
 
 
   /** Set the value used for quantization to the shared beat grid.
@@ -107,12 +133,12 @@ extern "C"
       playback may result in beat time jumps in order to align to the
       new value.
   */
-  void ABLSyncSetQuantum(ABLSyncRef, Float64 quantum);
+  void ABLSyncSetQuantum(ABLSyncRef, double quantum);
 
   /** Get the value currently being used by the system for
       quantization to the shared beat grid.
   */
-  Float64 ABLSyncGetQuantum(ABLSyncRef);
+  double ABLSyncGetQuantum(ABLSyncRef);
 
 #ifdef __cplusplus
 }

@@ -12,6 +12,7 @@
 @property (readonly, nonatomic) BOOL isSyncEnabled;
 @property (readonly, nonatomic) ABLSyncRef syncRef;
 
+- (id)initWithTempo:(Float64)bpm;
 - (void)start;
 - (void)stop;
 

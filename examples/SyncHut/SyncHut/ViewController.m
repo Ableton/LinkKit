@@ -3,15 +3,23 @@
 #import "ViewController.h"
 #import "AudioEngine.h"
 #include "ABLSync.h"
+#include "ABLSyncSettingsViewController.h"
 
 @interface ViewController ()
-- (void)setIsPlaying:(BOOL)isPlaying atTempo:(Float64)bpm;
+
+- (void)updateSessionTempo:(Float64)bpm;
+
 @end
 
+static void onSessionTempoChanged(Float64 bpm, void* context) {
+    ViewController* vc = (__bridge ViewController *)context;
+    [vc updateSessionTempo:bpm];
+}
 
 @implementation ViewController {
-  AudioEngine *_audioEngine;
-  NSTimer *_updateUiTimer;
+    AudioEngine *_audioEngine;
+    BOOL _isPlaying;
+    Float64 _bpm;
 }
 
 @synthesize transportButton, bpmLabel, bpmStepper;
@@ -19,42 +27,44 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
 
-    _audioEngine = [AudioEngine new];
+    _isPlaying = false;
+    _bpm = 120;
+    _audioEngine = [[AudioEngine alloc] initWithTempo:_bpm];
+    ABLSyncSetSessionTempoCallback(_audioEngine.syncRef, onSessionTempoChanged, (__bridge void *)self);
     [_audioEngine start];
-
-    _updateUiTimer =
-        [NSTimer scheduledTimerWithTimeInterval:0.016
-                                         target:self
-                                       selector:@selector(updateUi)
-                                       userInfo:nil
-                                        repeats:YES];
-    [[NSRunLoop mainRunLoop] addTimer:_updateUiTimer forMode:NSRunLoopCommonModes];
 }
 
-- (void)dealloc {
-    [_updateUiTimer invalidate];
-}
-
-- (void)setIsPlaying:(BOOL)isPlaying atTempo:(Float64)bpm {
-    self.transportButton.selected = isPlaying;
-    self.bpmLabel.text = [NSString stringWithFormat:@"%.1f bpm", bpm];
-    // The stepper is interpretted as a delta from the last set bpm value, so we
-    // reset it whenever the value is updated.
-    self.bpmStepper.value = 0;
+- (BOOL)prefersStatusBarHidden {
+  return YES;
 }
 
 - (void)updateUi {
-    [self setIsPlaying:[_audioEngine isPlaying] atTempo:[_audioEngine bpm]];
+    self.transportButton.selected = _isPlaying;
+    self.bpmLabel.text = [NSString stringWithFormat:@"%.1f bpm", _bpm];
 }
 
 #pragma mark - UI Actions
 - (IBAction)transportButtonAction:(UIButton *)sender {
-    _audioEngine.isPlaying = !sender.selected;
+    _isPlaying = !sender.selected;
+    _audioEngine.isPlaying = _isPlaying;
+    [self updateUi];
+}
+
+- (IBAction)bpmStepperAction:(UIStepper *)sender {
+    _bpm = _bpm + sender.value;
+    self.bpmStepper.value = 0;
+    [_audioEngine setBpm:_bpm];
+    [self updateUi];
+}
+
+- (void)updateSessionTempo:(Float64)bpm {
+    _bpm = bpm;
+    [self updateUi];
 }
 
 -(IBAction)showLinkSettings:(id)sender
 {
-  UIViewController *linkSettings = ABLSyncSettings(_audioEngine.syncRef);
+  UIViewController *linkSettings = [ABLSyncSettingsViewController instance:_audioEngine.syncRef];
 
   UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:linkSettings];
   // this will present a view controller as a popover in iPad and a modal VC on iPhone
@@ -68,7 +78,10 @@
   UIPopoverPresentationController *popC = navController.popoverPresentationController;
   popC.permittedArrowDirections = UIPopoverArrowDirectionAny;
   popC.sourceRect = [sender frame];
-  linkSettings.preferredContentSize = navController.topViewController.view.frame.size;
+
+  // we recommend using a size of 320x400 for the display in a popover
+  linkSettings.preferredContentSize = CGSizeMake(320.f, 400.f);
+
   UIButton *button = (UIButton *)sender;
   popC.sourceView = button.superview;
 
@@ -79,11 +92,6 @@
 {
   #pragma unused(sender)
   [self dismissViewControllerAnimated:YES completion:nil];
-}
-
-- (IBAction)bpmStepperAction:(UIStepper *)sender {
-    Float64 currentBpm = [_audioEngine bpm];
-    [_audioEngine setBpm:currentBpm + sender.value];
 }
 
 @end
