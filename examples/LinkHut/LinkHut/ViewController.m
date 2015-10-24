@@ -2,8 +2,8 @@
 
 #import "ViewController.h"
 #import "AudioEngine.h"
-#include "ABLSync.h"
-#include "ABLSyncSettingsViewController.h"
+#include "ABLLink.h"
+#include "ABLLinkSettingsViewController.h"
 
 @interface ViewController ()
 
@@ -30,7 +30,7 @@ static void onSessionTempoChanged(Float64 bpm, void* context) {
     _isPlaying = false;
     _bpm = 120;
     _audioEngine = [[AudioEngine alloc] initWithTempo:_bpm];
-    ABLSyncSetSessionTempoCallback(_audioEngine.syncRef, onSessionTempoChanged, (__bridge void *)self);
+    ABLLinkSetSessionTempoCallback(_audioEngine.linkRef, onSessionTempoChanged, (__bridge void *)self);
     [_audioEngine start];
 }
 
@@ -64,7 +64,7 @@ static void onSessionTempoChanged(Float64 bpm, void* context) {
 
 -(IBAction)showLinkSettings:(id)sender
 {
-  UIViewController *linkSettings = [ABLSyncSettingsViewController instance:_audioEngine.syncRef];
+  UIViewController *linkSettings = [ABLLinkSettingsViewController instance:_audioEngine.linkRef];
 
   UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:linkSettings];
   // this will present a view controller as a popover in iPad and a modal VC on iPhone

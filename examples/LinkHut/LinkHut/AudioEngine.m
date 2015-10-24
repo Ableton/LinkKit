@@ -46,7 +46,7 @@ static void clickInBuffer(
  * Structure that stores the data needed by the audio callback.
  */
 typedef struct {
-    ABLSyncRef ablSync;
+    ABLLinkRef ablLink;
     Float64 sampleRate;
     Float64 secondsToHostTime;
     UInt64 outputLatency; // hardware output latency in HostTime
@@ -54,7 +54,7 @@ typedef struct {
     Float64 resetToBeatTime;
     Float64 proposeBpm;
     BOOL isPlaying;
-} SyncData;
+} LinkData;
 
 /*
  * The audio callback. Query or reset the beat time and generate audible clicks
@@ -72,20 +72,20 @@ static OSStatus audioCallback(
         memset(ioData->mBuffers[i].mData, 0, inNumberFrames * sizeof(SInt16));
     }
 
-    SyncData *syncData = (SyncData *)inRefCon;
+    LinkData *linkData = (LinkData *)inRefCon;
 
-    Float64 beatTimeAtBufferBegin = syncData->lastBeatTime;
+    Float64 beatTimeAtBufferBegin = linkData->lastBeatTime;
 
     // The mHostTime member of the timestamp represents the time at which the buffer is
     // delivered to the audio hardware. The output latency is the time from when the
     // buffer is delivered to the audio hardware to when the beginning of the buffer
     // starts reaching the output. We add those values to get the host time at which
     // the first sample of this buffer will be reaching the output.
-    const UInt64 hostTimeAtBufferBegin = inTimeStamp->mHostTime + syncData->outputLatency;
+    const UInt64 hostTimeAtBufferBegin = inTimeStamp->mHostTime + linkData->outputLatency;
 
     // Handle a timeline reset
-    const Float64 resetToBeatTime = syncData->resetToBeatTime;
-    syncData->resetToBeatTime = INVALID_BEAT_TIME;
+    const Float64 resetToBeatTime = linkData->resetToBeatTime;
+    linkData->resetToBeatTime = INVALID_BEAT_TIME;
     if (resetToBeatTime != INVALID_BEAT_TIME) {
         // Reset the beat timeline so that the requested beat time
         // occurs near the beginning of this buffer. The requested beat
@@ -96,36 +96,36 @@ static OSStatus audioCallback(
         // buffer, which therefore may be less than the requested beat
         // time by up to a quantum.
         beatTimeAtBufferBegin =
-            ABLSyncResetBeatTime(syncData->ablSync, resetToBeatTime, hostTimeAtBufferBegin);
+            ABLLinkResetBeatTime(linkData->ablLink, resetToBeatTime, hostTimeAtBufferBegin);
     }
 
     // Handle a tempo proposal
-    const Float64 proposeBpm = syncData->proposeBpm;
-    syncData->proposeBpm = INVALID_BPM;
+    const Float64 proposeBpm = linkData->proposeBpm;
+    linkData->proposeBpm = INVALID_BPM;
     if (proposeBpm != INVALID_BPM)
     {
         // Propose that the new tempo takes effect at the beginning of
         // this buffer.
-        ABLSyncProposeTempo(syncData->ablSync, proposeBpm, hostTimeAtBufferBegin);
+        ABLLinkProposeTempo(linkData->ablLink, proposeBpm, hostTimeAtBufferBegin);
     }
 
     // Fill the buffer
-    if (syncData->isPlaying) {
+    if (linkData->isPlaying) {
         // To calculate the host time at buffer end we add the buffer duration to the host
-        // time at buffer begin. We use ABLSyncBeatTimeAtHostTime to query the according
+        // time at buffer begin. We use ABLLinkBeatTimeAtHostTime to query the according
         // beat time.
         const UInt64 bufferDurationHostTime =
-            (UInt64)(syncData->secondsToHostTime * inNumberFrames / syncData->sampleRate);
+            (UInt64)(linkData->secondsToHostTime * inNumberFrames / linkData->sampleRate);
 
-        const Float64 beatTimeAtBufferEnd = ABLSyncBeatTimeAtHostTime(
-            syncData->ablSync,
-            inTimeStamp->mHostTime + bufferDurationHostTime + syncData->outputLatency);
+        const Float64 beatTimeAtBufferEnd = ABLLinkBeatTimeAtHostTime(
+            linkData->ablLink,
+            inTimeStamp->mHostTime + bufferDurationHostTime + linkData->outputLatency);
 
         // Add audible clicks to the buffer according to the portion of the song
         // timeline represented by this buffer.
         clickInBuffer(beatTimeAtBufferBegin, beatTimeAtBufferEnd, inNumberFrames, ioData);
 
-        syncData->lastBeatTime = beatTimeAtBufferEnd;
+        linkData->lastBeatTime = beatTimeAtBufferEnd;
     }
 
     return noErr;
@@ -135,7 +135,7 @@ static OSStatus audioCallback(
 
 @interface AudioEngine () {
     AudioUnit _ioUnit;
-    SyncData _syncData;
+    LinkData _linkData;
 }
 @end
 
@@ -143,46 +143,46 @@ static OSStatus audioCallback(
 
 # pragma mark - Transport
 - (BOOL)isPlaying {
-    return _syncData.isPlaying;
+    return _linkData.isPlaying;
 }
 
 - (void)setIsPlaying:(BOOL)isPlaying {
-    _syncData.resetToBeatTime = 0;
-    _syncData.isPlaying = isPlaying;
+    _linkData.resetToBeatTime = 0;
+    _linkData.isPlaying = isPlaying;
 }
 
 - (Float64)bpm {
-    return ABLSyncGetSessionTempo(_syncData.ablSync);
+    return ABLLinkGetSessionTempo(_linkData.ablLink);
 }
 
 - (void)setBpm:(Float64)bpm {
-  _syncData.proposeBpm = bpm;
+  _linkData.proposeBpm = bpm;
 }
 
 - (Float64)beatTime {
-    return _syncData.lastBeatTime;
+    return _linkData.lastBeatTime;
 }
 
 - (Float64)quantum {
-    return ABLSyncGetQuantum(_syncData.ablSync);
+    return ABLLinkGetQuantum(_linkData.ablLink);
 }
 
 - (void)setQuantum:(Float64)quantum {
-    ABLSyncSetQuantum(_syncData.ablSync, quantum);
+    ABLLinkSetQuantum(_linkData.ablLink, quantum);
 }
 
-- (BOOL)isSyncEnabled {
-    return ABLSyncIsEnabled(_syncData.ablSync);
+- (BOOL)isLinkEnabled {
+    return ABLLinkIsEnabled(_linkData.ablLink);
 }
 
-- (ABLSyncRef)syncRef {
-    return _syncData.ablSync;
+- (ABLLinkRef)linkRef {
+    return _linkData.ablLink;
 }
 
 # pragma mark - create and delete engine
 - (id)initWithTempo:(Float64)bpm {
     if ([super init]) {
-        [self initSyncData:bpm];
+        [self initLinkData:bpm];
         [self setupAudioEngine];
     }
     return self;
@@ -197,7 +197,7 @@ static OSStatus audioCallback(
             (int)result,
             (const char *)(&result));
     }
-    ABLSyncDelete(_syncData.ablSync);
+    ABLLinkDelete(_linkData.ablLink);
 }
 
 # pragma mark - start and stop engine
@@ -229,18 +229,18 @@ static OSStatus audioCallback(
     }
 }
 
-- (void)initSyncData:(Float64)bpm {
+- (void)initLinkData:(Float64)bpm {
     mach_timebase_info_data_t timeInfo;
     mach_timebase_info(&timeInfo);
 
-    _syncData.ablSync = ABLSyncNew(bpm, 4); // quantize to 4 beats
-    _syncData.sampleRate = [[AVAudioSession sharedInstance] sampleRate];
-    _syncData.secondsToHostTime = (1.0e9 * timeInfo.denom) / (Float64)timeInfo.numer;
-    _syncData.outputLatency = (UInt64)(_syncData.secondsToHostTime * [AVAudioSession sharedInstance].outputLatency);
-    _syncData.lastBeatTime = 0;
-    _syncData.resetToBeatTime = INVALID_BEAT_TIME;
-    _syncData.proposeBpm = INVALID_BPM;
-    _syncData.isPlaying = false;
+    _linkData.ablLink = ABLLinkNew(bpm, 4); // quantize to 4 beats
+    _linkData.sampleRate = [[AVAudioSession sharedInstance] sampleRate];
+    _linkData.secondsToHostTime = (1.0e9 * timeInfo.denom) / (Float64)timeInfo.numer;
+    _linkData.outputLatency = (UInt64)(_linkData.secondsToHostTime * [AVAudioSession sharedInstance].outputLatency);
+    _linkData.lastBeatTime = 0;
+    _linkData.resetToBeatTime = INVALID_BEAT_TIME;
+    _linkData.proposeBpm = INVALID_BPM;
+    _linkData.isPlaying = false;
 }
 
 - (void)setupAudioEngine {
@@ -281,7 +281,7 @@ static OSStatus audioCallback(
         .mFramesPerPacket   = 1,
         .mBytesPerFrame     = sizeof(SInt16),
         .mBitsPerChannel    = 8 * sizeof(SInt16),
-        .mSampleRate        = _syncData.sampleRate
+        .mSampleRate        = _linkData.sampleRate
     };
 
     result = AudioUnitSetProperty(
@@ -300,7 +300,7 @@ static OSStatus audioCallback(
     // Set Audio Callback
     AURenderCallbackStruct ioRemoteInput;
     ioRemoteInput.inputProc = audioCallback;
-    ioRemoteInput.inputProcRefCon = &_syncData;
+    ioRemoteInput.inputProcRefCon = &_linkData;
 
     result = AudioUnitSetProperty(
         _ioUnit,

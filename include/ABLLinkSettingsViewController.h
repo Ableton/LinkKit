@@ -3,7 +3,7 @@
 #pragma once
 
 #import <UIKit/UIKit.h>
-#import "ABLSync.h"
+#import "ABLLink.h"
 
 
 /** Settings view controller that provides users with the ability to
@@ -12,8 +12,8 @@
     fit, but it is recommended that it be presented as a popover.
 */
 
-@interface ABLSyncSettingsViewController : UIViewController
+@interface ABLLinkSettingsViewController : UIViewController
 
-+ (id)instance:(ABLSyncRef)ablSync;
++ (id)instance:(ABLLinkRef)ablLink;
 
 @end
