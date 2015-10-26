@@ -50,6 +50,8 @@ extern "C"
   /** Is Link currently enabled? **/
   bool ABLLinkIsEnabled(ABLLinkRef);
 
+  /** Is Link currently connected to other peers? **/
+  bool ABLLinkIsConnected(ABLLinkRef);
 
   /** @name Callbacks for observing changes in the system state */
   /** Called if Session Tempo changes.
