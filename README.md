@@ -3,6 +3,10 @@ LinkKit
 
 iOS SDK for pulse and tempo synchronization and shared quantization across multiple applications running on multiple devices. Apps that integrate the provided [ABLLink](include/ABLLink.h) library find each other automatically when connected to the same network and are immediately able to play together in time without any configuration.
 
+**Please read our [integration guidelines](Ableton Link Integration Guidelines.pdf). The referenced UI assets are [here](assets).**
+
+**Usage of LinkKit is governed by the [Ableton Link SDK license](Ableton_Link_SDK_License_v1.0.pdf).**
+
 ###Pulse Synchronization
 Playing "in time" might have different meanings for different musical use cases or different combinations of apps. At the most basic level, ABLLink provides a shared pulse between instances and exposes this pulse to client apps. By aligning their musical beats with this pulse, apps can be assured that their beats will align with those of other participating apps. Apps can join and leave the session without stopping the music, the library aligns to the pulse stream of an existing session when joining.
 
