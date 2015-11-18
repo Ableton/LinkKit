@@ -156,7 +156,7 @@ static OSStatus audioCallback(
 }
 
 - (void)setBpm:(Float64)bpm {
-  _linkData.proposeBpm = bpm;
+    _linkData.proposeBpm = bpm;
 }
 
 - (Float64)beatTime {
@@ -247,6 +247,7 @@ static OSStatus audioCallback(
     // Start a playback audio session
     NSError *sessionError = NULL;
     BOOL success = [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback
+                                                    withOptions:AVAudioSessionCategoryOptionMixWithOthers
                                                           error:&sessionError];
     if(!success) {
         NSLog(@"Error setting category Audio Session: %@", [sessionError localizedDescription]);

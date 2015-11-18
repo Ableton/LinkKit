@@ -26,12 +26,28 @@ static void onSessionTempoChanged(Float64 bpm, void* context) {
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-
     _isPlaying = false;
     _bpm = 120;
-    _audioEngine = [[AudioEngine alloc] initWithTempo:_bpm];
-    ABLLinkSetSessionTempoCallback(_audioEngine.linkRef, onSessionTempoChanged, (__bridge void *)self);
-    [_audioEngine start];
+    _audioEngine = NULL;
+    [self enableAudioEngine:YES];
+}
+
+- (BOOL)isPlaying {
+    return _isPlaying;
+}
+
+- (void)enableAudioEngine:(BOOL)enable {
+    if (enable && !_audioEngine) {
+        _audioEngine = [[AudioEngine alloc] initWithTempo:_bpm];
+        ABLLinkSetSessionTempoCallback(
+            _audioEngine.linkRef, onSessionTempoChanged, (__bridge void *)self);
+        _audioEngine.isPlaying = _isPlaying;
+        [_audioEngine start];
+    }
+    else if (_audioEngine && !enable) {
+        [_audioEngine stop];
+        _audioEngine = NULL;
+    }
 }
 
 - (BOOL)prefersStatusBarHidden {
@@ -64,6 +80,9 @@ static void onSessionTempoChanged(Float64 bpm, void* context) {
 
 -(IBAction)showLinkSettings:(id)sender
 {
+  if (!_audioEngine) {
+      return;
+  }
   UIViewController *linkSettings = [ABLLinkSettingsViewController instance:_audioEngine.linkRef];
 
   UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:linkSettings];

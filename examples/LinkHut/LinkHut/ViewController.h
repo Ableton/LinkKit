@@ -8,8 +8,11 @@
 @property (weak, nonatomic) IBOutlet UIButton *transportButton;
 @property (weak, nonatomic) IBOutlet UILabel *bpmLabel;
 @property (weak, nonatomic) IBOutlet UIStepper *bpmStepper;
+@property (readonly) BOOL isPlaying;
 
 - (IBAction)transportButtonAction:(UIButton *)sender;
 - (IBAction)bpmStepperAction:(UIStepper *)sender;
+
+- (void)enableAudioEngine:(BOOL)enable;
 
 @end
