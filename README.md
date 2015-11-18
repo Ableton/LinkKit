@@ -39,3 +39,17 @@ All host time values used in the ABLLink API refer to host times at speaker outp
 In the audio callback, the system provides an `AudioTimeStamp` value for the audio buffer. The `mHostTime` field of this structure represents the host time at which the audio buffer will be passed to the hardware for output. Adding the output latency (see `AVAudioSession.outputLatency`) to this value will generally result in the correct host time at speaker output for the *beginning* of that buffer. To get the host time at speaker output for the end of the buffer, you would just add the buffer duration. For an example of this calculation, see the [LinkHut example project](examples/LinkHut/LinkHut/AudioEngine.m).
 
 Note that if your app adds additional software latency, you will need to add this as well in the calculation of the host time at speaker output.
+
+###App life cycle###
+In order to provide the best user experience across the ecosystem of Link-enabled apps, it's important that apps take a consistent approach towards Link with regards to life cycle management. Furthermore, since the ABLLink library does not have access to all of the necessary information to correctly respond to life cycle events, app developers must follow the life cycle guidelines below in order to meet user expectations. Please consider these carefully.
+
+- When an app is in the foreground, then an ABLLink instance should exist, whether actively playing audio or not. This ensures that the Link connection is established and the app is prepared to respond to any user input events that would start audio.
+- When an app moves to the background, nothing should be done to the ABLLink instance if the app is playing audio in the background or is part of an AudioBus or InterAppAudio session.
+- When an app moves to the background and is not playing audio or part of an AudioBus or InterAppAudio session, it should destroy the ABLLink instance with the `ABLLinkDelete` function. This should be done in response to the `applicationDidEnterBackground` callback or equivalent `UIApplication` notification.
+- When an app returns to the foreground, if it destroyed its ABLLink instance when moving to the background then it should create a new one with `ABLLinkNew`. This should be done in response to the `applicationDidBecomeActive` callback or equivalent notification so that any notifications that may be presented by the library will not be missed.
+
+The LinkHut example app implements these guidelines, as can be seen in its [AppDelegate](examples/LinkHut/LinkHut/AppDelegate.m).
+
+It is very important that the third guideline be followed. Two possible bad outcomes that have been observed when this advice is not followed:
+- The user turns off their device with no apps playing and puts it in their bag. The OS decides not to suspend the app because there is low memory load on the device, so Link is left on and trying to connect from the users bag. This drains the battery. Furthermore, when they come home and start Live on their laptop, they inexplicably have a Link connection.
+- The OS suspends the app. ABLLink relies on timers and sockets for correct operation and the OS will destroy these while in the suspended state. Without a re-initialization from the app, the ABLLink library itself is not able to recover from the suspended state. When the user resumes the app, there are 0 Link connections (even when there are other Link-enabled apps present) and Link will never be able to connect again until it is manually disabled and re-enabled by the user.
