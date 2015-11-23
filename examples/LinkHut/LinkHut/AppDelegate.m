@@ -34,6 +34,9 @@
 
   ViewController *controller = (ViewController*)window.rootViewController;
   if (!controller.isPlaying) {
+    // Deactivate Link if the app is not playing so that it won't
+    // continue to browse for connections while in the background.
+    ABLLinkSetActive(controller.linkRef, false);
     [controller enableAudioEngine:NO];
   }
 }
@@ -47,7 +50,11 @@
 {
   #pragma unused(application)
 
-  [(ViewController*)window.rootViewController enableAudioEngine:YES];
+  ViewController *controller = (ViewController*)window.rootViewController;
+  // Unconditionally activate link when becoming active. If the app is
+  // active, Link should be active.
+  ABLLinkSetActive(controller.linkRef, true);
+  [controller enableAudioEngine:YES];
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application

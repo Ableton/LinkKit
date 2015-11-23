@@ -2,7 +2,6 @@
 
 #import "ViewController.h"
 #import "AudioEngine.h"
-#include "ABLLink.h"
 #include "ABLLinkSettingsViewController.h"
 
 @interface ViewController ()
@@ -20,6 +19,7 @@ static void onSessionTempoChanged(Float64 bpm, void* context) {
     AudioEngine *_audioEngine;
     BOOL _isPlaying;
     Float64 _bpm;
+    UIViewController *_linkSettings;
 }
 
 @synthesize transportButton, bpmLabel, bpmStepper;
@@ -28,7 +28,10 @@ static void onSessionTempoChanged(Float64 bpm, void* context) {
     [super viewDidLoad];
     _isPlaying = false;
     _bpm = 120;
-    _audioEngine = NULL;
+    _audioEngine = [[AudioEngine alloc] initWithTempo:_bpm];
+    ABLLinkSetSessionTempoCallback(
+        _audioEngine.linkRef, onSessionTempoChanged, (__bridge void *)self);
+    _linkSettings = [ABLLinkSettingsViewController instance:_audioEngine.linkRef];
     [self enableAudioEngine:YES];
 }
 
@@ -36,17 +39,16 @@ static void onSessionTempoChanged(Float64 bpm, void* context) {
     return _isPlaying;
 }
 
+- (ABLLinkRef)linkRef {
+    return _audioEngine.linkRef;
+}
+
 - (void)enableAudioEngine:(BOOL)enable {
-    if (enable && !_audioEngine) {
-        _audioEngine = [[AudioEngine alloc] initWithTempo:_bpm];
-        ABLLinkSetSessionTempoCallback(
-            _audioEngine.linkRef, onSessionTempoChanged, (__bridge void *)self);
-        _audioEngine.isPlaying = _isPlaying;
+    if (enable) {
         [_audioEngine start];
     }
-    else if (_audioEngine && !enable) {
+    else {
         [_audioEngine stop];
-        _audioEngine = NULL;
     }
 }
 
@@ -80,14 +82,9 @@ static void onSessionTempoChanged(Float64 bpm, void* context) {
 
 -(IBAction)showLinkSettings:(id)sender
 {
-  if (!_audioEngine) {
-      return;
-  }
-  UIViewController *linkSettings = [ABLLinkSettingsViewController instance:_audioEngine.linkRef];
-
-  UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:linkSettings];
+  UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:_linkSettings];
   // this will present a view controller as a popover in iPad and a modal VC on iPhone
-  linkSettings.navigationItem.rightBarButtonItem =
+  _linkSettings.navigationItem.rightBarButtonItem =
     [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone
                                                   target:self
                                                   action:@selector(hideLinkSettings:)];
@@ -99,7 +96,7 @@ static void onSessionTempoChanged(Float64 bpm, void* context) {
   popC.sourceRect = [sender frame];
 
   // we recommend using a size of 320x400 for the display in a popover
-  linkSettings.preferredContentSize = CGSizeMake(320.f, 400.f);
+  _linkSettings.preferredContentSize = CGSizeMake(320.f, 400.f);
 
   UIButton *button = (UIButton *)sender;
   popC.sourceView = button.superview;

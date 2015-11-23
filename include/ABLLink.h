@@ -46,8 +46,19 @@ extern "C"
   /** Destroy the library instance and cleanup its associated resources. */
   void ABLLinkDelete(ABLLinkRef);
 
+  /** Set whether Link should be active or not. When Link is active,
+      it advertises itself on the local network and initiates
+      connections with other peers. It is active by default after init
+      and automatically becomes active whenever the app becomes active.
+      It should be deactivated by the client when going to the
+      background if the app will not make sound while in the background.
+  */
+  void ABLLinkSetActive(ABLLinkRef, bool active);
 
-  /** Is Link currently enabled? **/
+  /** Is Link currently enabled by the user? The enabled status is
+      only controllable by the user via the Link settings dialog and
+      is not controllable programmatically.
+  **/
   bool ABLLinkIsEnabled(ABLLinkRef);
 
   /** Is Link currently connected to other peers? **/
@@ -131,9 +142,11 @@ extern "C"
 
 
   /** Set the value used for quantization to the shared beat grid.
-      This value is specified in beats. Changing the quantum during
-      playback may result in beat time jumps in order to align to the
-      new value.
+      This value is specified in beats. The quantum value set here
+      will be used when joining a session and when resetting the beat
+      timeline with ABLLinkResetBeatTime. It doesn't affect the
+      results of the beat time / host time conversion functions and
+      therefore will not cause a beat time jump if invoked while playing.
   */
   void ABLLinkSetQuantum(ABLLinkRef, double quantum);
 
