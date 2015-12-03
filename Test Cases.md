@@ -51,4 +51,6 @@ Below are a set of user interactions to test with apps integrating Link. In orde
 - Make sure transport is stopped and switch to Audiobus
 - Add the App as **Input** in Audiobus. Do this without tapping to wake it up. If the App is sleeping, switch back to it and then back to Audiobus and try again.
 - Switch back to LinkHut **->** The Link settings should indicate 1 connected App.
-- **Note**: When an App in the background has deactivated Link, it must re-activate it if it becomes part of an Audiobus or IAA session, even if does not come to the foreground.
+- Switch back to Audibus and eject the App from the Audiobus session
+- Switch back to LinkHut **->** The Link settings should indicate 0 connected Apps.
+- **Note**: When an App in the background has deactivated Link, it must re-activate it if it becomes part of an Audiobus or IAA session, even if does not come to the foreground. Conversely, an App that is part of an Audiobus or IAA session session and is then disconnected from the session while in the background and not playing should deactivate Link. This can be achieved by listening to the Audiobus `ABConnectionsChangedNotification`.
