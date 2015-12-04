@@ -36,7 +36,7 @@ Below are a set of user interactions to test with apps integrating Link. In orde
 - Open LinkHut, press **Settings** **->** there should be “0 Links."
 - Bring App to the foreground again **->** there should be a notification “1 Link” and the Link settings should reflect this.
 - Disable and enable Link in App **->** there should be “1 Link” and the Link settings should reflect this.
-- **Note**: This is the expected behavior even if the App's background audio mode is enabled. Whenever the App goes to the background and it's known that the App will not be playing audio while in the background (not receiving MIDI, not connected to IAA or Audiobus), Link should be deactivated. This is important because otherwise Link may remain enabled and connecting to peers and networks after the user has put the device away.
+- **Note**: This is the expected behavior even if the App's background audio mode is enabled. Whenever the App goes to the background and it's known that the App will not be playing audio while in the background (not receiving MIDI, not connected to IAA or Audiobus), Link should be deactivated. This is important because otherwise Link may remain enabled and connecting to peers and networks after the user has put the device away. Please see the `ABLLinkSetActive` function to activate/deactivate Link.
 
 ####T7 - Link remains active when going to background while part of an IAA or Audiobus session (if supported)
 - Open LinkHut, press **Play**, and set Link to **Enabled**.
@@ -45,7 +45,7 @@ Below are a set of user interactions to test with apps integrating Link. In orde
 - Make sure that App transport is stopped and switch to LinkHut **->** No notification is presented. The Link settings should still indicate 1 connected App.
 - **Note**: While connected to Audiobus Link must remain active even while not playing in the background because the App must be prepared to start playing at anytime.
 
-####T8 - Link is activated when App added to an Audiobus session while not playing in the background.
+####T8 - Link is activated when App added to an Audiobus or IAA session while not playing in the background.
 - Open LinkHut, press **Play**, and set Link to **Enabled**.
 - Open App to test and set Link to **Enabled**.**->** The Link settings should indicate 1 connected App.
 - Make sure transport is stopped and switch to Audiobus
