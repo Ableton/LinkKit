@@ -16,8 +16,12 @@ Tempo is a well understood parameter that represents the velocity of a beat time
 
 With Link, any participant can propose a change to the session tempo at any time. No single participant is responsible for maintaining the shared session tempo. Rather, each participant chooses to adopt the last tempo value that they've seen proposed on the network. This means that it is possible for participants' tempi to diverge during periods of tempo modification (especially during simultaneous modification by multiple participants), but this state is only temporary. The session will converge quickly to a common tempo after any modification. The Link approach to tempo relies on group adaptation to changes made by independent, autonomous actors - much like a group of traditional instrumentalists playing together.
 
-###Beat Synchronization
-At the most basic level, ABLLink provides the a shared pulse between instances and exposes this pulse to client apps. By aligning their musical beats with this pulse, apps can be assured that their beats will align with those of other participating apps. Apps can join and leave the session without stopping the music, the library aligns to the pulse stream of an existing session when joining.
+###Beat Alignment
+It's conceivable that for certain musical situations, participants would wish to only synchronize tempo and not other musical parameters. But for the vast majority of cases, playing with synchronized tempo in the absence of beat alignment would not be perceived as playing "in time." In this scenario, participants' beat timelines would advance at the same rate, but the relationship between values on those beat timelines would be undefined (i.e. Beat 1 on one participant's timeline might correspond to beat 3.23 on another's).
+
+In most cases, we want to provide a stronger timing property for a session than just tempo synchronization - we also want beat alignment. When a session is in a state of beat alignment, an integral value on any participant's beat timeline corresponds to an integral value on all other participants' beat timelines. This property says nothing about the magnitude of beat values on each timeline, which can be different, just that any two timelines must only differ by an integral offset. For example, beat 1 on one participant's timeline might corrsepond to beat 3 or beat 4 on another's, but it cannot correspond to beat 3.5.
+
+Note that in order for a session to be in a state of beat alignment, it must have synchronized tempo. Tempo determines beat length and beat length equivalence among all timelines is a pre-requisite for beat alignment.
 
 ###Shared Quantization
 But simply playing beat-aligned may not be enough in many musical contexts. ABLLink also provides a shared reference grid for quantization, allowing apps to synchronize phase over durations longer or shorter than a single beat.
