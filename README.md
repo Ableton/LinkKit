@@ -1,16 +1,18 @@
 LinkKit
 =========
 
-iOS SDK for [Ableton Link](https://ableton.com/link), a technology that enables beat and tempo synchronization with shared quantization across multiple applications running on multiple devices. Apps that integrate the provided [ABLLink](include/ABLLink.h) library find each other automatically when connected to the same network and are immediately able to play together in time without any configuration.
+iOS SDK for [Ableton Link](https://ableton.com/link), a **new technology** that **synchronizes musical beat, tempo,** and **phase** across multiple applications running on multiple devices. Applications on devices connected to a **local network** discover each other automatically and **form a musical session** in which each participant can **perform independently**: anyone can start or stop while still staying in time. Anyone can change the tempo, the **others will follow**. Anyone can **join** or **leave** without disrupting the session.
 
-**Please read our [integration and promotion guidelines](Ableton Link Integration Guidelines.pdf). The referenced assets are [here](assets). You can also find additional info and images in our [press kits](https://ableton.com/press) and use them as you please.**
+##License
+Usage of LinkKit is governed by the [Ableton Link SDK license](Ableton_Link_SDK_License_v1.0.pdf).
 
-**Usage of LinkKit is governed by the [Ableton Link SDK license](Ableton_Link_SDK_License_v1.0.pdf).**
+##Conceptual Overview
+Link is different from other approaches to synchronizing electronic instruments that you may be familiar with. It is not designed to orchestrate multiple instruments so that they play together in lock-step along a shared timeline. In fact, Link-enabled apps each have their own independent timelines. The Link library maintains a temporal relationship between these independent timelines that provides the experience of playing in time without the timelines being identical.
 
-**Please see our [test cases](Test Cases.md) for validating Link behavior in apps. All Link-enabled apps should pass these tests cases before submission to the App Store.**
+Playing "in time" is an intentionally vague term that might have different meanings for different musical contexts and different apps. As an app maker, you must decide the most natural way to map your app's musical concepts onto Link's synchronization model. For this reason, it's important to gain an intuitive understanding of how Link synchronizes **tempo**, **beat**, and **phase**.
 
-###Pulse Synchronization
-Playing "in time" might have different meanings for different musical use cases or different combinations of apps. At the most basic level, ABLLink provides a shared pulse between instances and exposes this pulse to client apps. By aligning their musical beats with this pulse, apps can be assured that their beats will align with those of other participating apps. Apps can join and leave the session without stopping the music, the library aligns to the pulse stream of an existing session when joining.
+###Beat Synchronization
+At the most basic level, ABLLink provides the a shared pulse between instances and exposes this pulse to client apps. By aligning their musical beats with this pulse, apps can be assured that their beats will align with those of other participating apps. Apps can join and leave the session without stopping the music, the library aligns to the pulse stream of an existing session when joining.
 
 ###Tempo Synchronization
 The rate at which these shared pulses occur is the tempo, which is also synchronized between apps. Any participant in a session may propose changes to the shared tempo, which is propagated to all other participants. Importantly, this may happen while the music is playing - there is no need to stop, change tempo, and then restart.
