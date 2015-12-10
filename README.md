@@ -11,11 +11,13 @@ Link is different from other approaches to synchronizing electronic instruments 
 
 Playing "in time" is an intentionally vague term that might have different meanings for different musical contexts and different apps. As an app maker, you must decide the most natural way to map your app's musical concepts onto Link's synchronization model. For this reason, it's important to gain an intuitive understanding of how Link synchronizes **tempo**, **beat**, and **phase**.
 
+###Tempo Synchronization
+Tempo is a well understood parameter that represents the velocity of a beat timeline with respect to real time, giving it a unit of beats/time. Tempo synchronization is achieved when the beat timelines of all participants in a session are advancing at the same rate.
+
+With Link, any participant can propose a change to the session tempo at any time. No single participant is responsible for maintaining the shared session tempo. Rather, each participant chooses to adopt the last tempo value that they've seen proposed on the network. This means that it is possible for participants' tempi to diverge during periods of tempo modification (especially during simultaneous modification by multiple participants), but this state is only temporary. The session will converge quickly to a common tempo after any modification. The Link approach to tempo relies on group adaptation to changes made by independent, autonomous actors - much like a group of traditional instrumentalists playing together.
+
 ###Beat Synchronization
 At the most basic level, ABLLink provides the a shared pulse between instances and exposes this pulse to client apps. By aligning their musical beats with this pulse, apps can be assured that their beats will align with those of other participating apps. Apps can join and leave the session without stopping the music, the library aligns to the pulse stream of an existing session when joining.
-
-###Tempo Synchronization
-The rate at which these shared pulses occur is the tempo, which is also synchronized between apps. Any participant in a session may propose changes to the shared tempo, which is propagated to all other participants. Importantly, this may happen while the music is playing - there is no need to stop, change tempo, and then restart.
 
 ###Shared Quantization
 But simply playing beat-aligned may not be enough in many musical contexts. ABLLink also provides a shared reference grid for quantization, allowing apps to synchronize phase over durations longer or shorter than a single beat.
