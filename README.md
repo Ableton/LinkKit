@@ -1,7 +1,7 @@
 LinkKit
 =========
 
-iOS SDK for pulse and tempo synchronization and shared quantization across multiple applications running on multiple devices. Apps that integrate the provided [ABLLink](include/ABLLink.h) library find each other automatically when connected to the same network and are immediately able to play together in time without any configuration.
+iOS SDK for [Ableton Link](https://ableton.com/link), a technology that enables beat and tempo synchronization with shared quantization across multiple applications running on multiple devices. Apps that integrate the provided [ABLLink](include/ABLLink.h) library find each other automatically when connected to the same network and are immediately able to play together in time without any configuration.
 
 **Please read our [integration and promotion guidelines](Ableton Link Integration Guidelines.pdf). The referenced assets are [here](assets). You can also find additional info and images in our [press kits](https://ableton.com/press) and use them as you please.**
 
