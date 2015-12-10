@@ -7,7 +7,7 @@ iOS SDK for [Ableton Link](https://ableton.com/link), a technology that enables 
 
 **Usage of LinkKit is governed by the [Ableton Link SDK license](Ableton_Link_SDK_License_v1.0.pdf).**
 
-**Please see our [test cases](Test Cases.md) for validating Link behavior in Apps. All Link-enabled Apps should pass these tests cases before submission to the App store.**
+**Please see our [test cases](Test Cases.md) for validating Link behavior in apps. All Link-enabled apps should pass these tests cases before submission to the App Store.**
 
 ###Pulse Synchronization
 Playing "in time" might have different meanings for different musical use cases or different combinations of apps. At the most basic level, ABLLink provides a shared pulse between instances and exposes this pulse to client apps. By aligning their musical beats with this pulse, apps can be assured that their beats will align with those of other participating apps. Apps can join and leave the session without stopping the music, the library aligns to the pulse stream of an existing session when joining.
