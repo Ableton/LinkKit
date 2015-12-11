@@ -6,6 +6,18 @@ iOS SDK for [Ableton Link](https://ableton.com/link), a **new technology** that 
 ##License
 Usage of LinkKit is governed by the [Ableton Link SDK license](Ableton_Link_SDK_License_v1.0.pdf).
 
+##Table of Contents
+[Conceptual Overview](#conceptual-overview)
+- [Tempo Synchronization](#tempo-synchronization)
+- [Beat Alignment](#beat-alignment)
+- [Phase Synchronization](#phase-synchronization)
+
+[Technical Notes for Integrators](#technical-notes-for-integrators)
+- [Integration Concept](#integration-concept)
+- [Host and Beat Times](#host-and-beat-times)
+- [Host Time at Speaker Output](#host-time-at-speaker-output)
+- [App Life Cycle](#app-life-cycle)
+
 ##Conceptual Overview
 Link is different from other approaches to synchronizing electronic instruments that you may be familiar with. It is not designed to orchestrate multiple instruments so that they play together in lock-step along a shared timeline. In fact, Link-enabled apps each have their own independent timelines. The Link library maintains a temporal relationship between these independent timelines that provides the experience of playing in time without the timelines being identical.
 
