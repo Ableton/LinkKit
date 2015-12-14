@@ -12,7 +12,8 @@ Usage of LinkKit is governed by the [Ableton Link SDK license](Ableton_Link_SDK_
 - [Beat Alignment](#beat-alignment)
 - [Phase Synchronization](#phase-synchronization)
 
-[Technical Notes for Integrators](#technical-notes-for-integrators)
+[Integration Guide](#integration-guide)
+- [Getting Started](#getting-started)
 - [Integration Concept](#integration-concept)
 - [Host and Beat Times](#host-and-beat-times)
 - [Host Time at Speaker Output](#host-time-at-speaker-output)
@@ -46,7 +47,17 @@ A decision that nearly all apps have to make is how phase synchronization affect
 
 A final note on phase synchronization: notice that it is more fundamental than beat alignment. There is in fact no special handling of beat alignment in Link. It is a property that emerges from synchronizing phase with a non-zero integral quantum value. This is worth noting because it is also possible to abandon beat alignment (perhaps to achieve polyrhythms) by specifying non-integral quantum values. A quantum value of 0 results in no phase synchronization at all and therefore no beat alignment. So it's easy to create the tempo-only synchronization scenario described previously in the [Beat Alignment](#beat-alignment) section if you can find a use for it.
 
-##Technical notes for integrators
+##Integration Guide
+
+The LinkKit SDK is distributed as a zip file attached to a release in this repo. Please see the [releases tab](https://github.com/AbletonAppDev/LinkKit/releases) for the latest release. Apps **must** be built against an official release for final submission to the App Store. Official releases are those not marked "Pre-release."
+
+A `LinkKit.zip` file has the following contents:
+- `libAblLink.a`: A static library containing the implementation of Link. This file is **not** in the repo - you must download a release to get it.
+- [`ABLLink.h`](include/ABLLink.h): Pure C header containing the Link API.
+- [`ABLLinkSettingsViewController.h`](include/ABLLinkSettingsViewController.h): Objective-C header containing `UIViewController` subclass that is used to display Link settings.
+- [LinkHut](examples/LinkHut): Very simple app to be used as example code and for testing integrations. It should build and run in-place without modification.
+
+
 ###Integration concept###
 Since the library must negotiate tempo and quantization with other participants on the network, the app must defer control over these aspects of playback to the library. For each audio buffer, the integrating app must ask the library where it's supposed to be on the beat timeline by the end of that buffer. The app then figures out how it can render its buffer so as to get to that beat time. This could mean speeding up or slowing down or doing a beat time jump to get to the right position. The library does not specify *how* the app should get there, it just reports where it should be at a given time.
 
