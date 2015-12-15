@@ -17,7 +17,7 @@ Usage of LinkKit is governed by the [Ableton Link SDK license](Ableton_Link_SDK_
 - [User Interface Guidelines](#user-interface-guidelines)
 - [Link API Concepts](#link-api-concepts)
   - [Host and Beat Times](#host-and-beat-times)
-  - [Host Time at Speaker Output](#host-time-at-speaker-output)
+  - [Host Time at Output](#host-time-at-output)
 - [App Life Cycle](#app-life-cycle)
 
 ##Conceptual Overview
@@ -79,12 +79,12 @@ Host time as used in the API always refers to the system host time and is the sa
 
 Beat time as used in the API refers to a coordinate system in which integral values represent beats. The library maintains a beat timeline, which starts at zero when the library is initialized and runs continuously at a rate defined by the shared session tempo. Clients may sample this beat timeline at a given host time via the `ABLLinkBeatTimeAtHostTime` function. Clients may reset this beat time to a chosen value via the `ABLLinkResetBeatTime` function, which is useful for aligning the values on the library's beat timeline to an app's transport timeline.
 
-####Host Time at Speaker Output
-All host time values used in the Link API refer to host times at speaker output. This is the important value for the library to know, since it must coordinate the timelines of multiple devices such that audio for the same beat time is hitting the speakers of those devices at the same moment. This is made more complicated by the fact that different devices (and even the same device in different configurations) can have different output latencies.
+####Host Time at Output
+All host time values used in the Link API refer to host times at output. This is the important value for the library to know, since it must coordinate the timelines of multiple devices such that audio for the same beat time is hitting the output of those devices at the same moment. This is made more complicated by the fact that different devices (and even the same device in different configurations) can have different output latencies.
 
-In the audio callback, the system provides an `AudioTimeStamp` value for the audio buffer. The `mHostTime` field of this structure represents the host time at which the audio buffer will be passed to the hardware for output. Adding the output latency (see `AVAudioSession.outputLatency`) to this value will generally result in the correct host time at speaker output for the *beginning* of that buffer. To get the host time at speaker output for the end of the buffer, you would just add the buffer duration. For an example of this calculation, see the [LinkHut example project](examples/LinkHut/LinkHut/AudioEngine.m).
+In the audio callback, the system provides an `AudioTimeStamp` value for the audio buffer. The `mHostTime` field of this structure represents the host time at which the audio buffer will be passed to the hardware for output. Adding the output latency (see `AVAudioSession.outputLatency`) to this value will result in the correct host time at output for the *beginning* of that buffer. To get the host time at output for the end of the buffer, you would just add the buffer duration. For an example of this calculation, see the [LinkHut example project](examples/LinkHut/LinkHut/AudioEngine.m).
 
-Note that if your app adds additional software latency, you will need to add this as well in the calculation of the host time at speaker output.
+Note that if your app adds additional software latency, you will need to add this as well in the calculation of the host time at output. Also note that the `AVAudioSession.outputLatency` property can change, so you should update your output latency in response to the [`AVAudioSessionRouteChangedNotification`](https://developer.apple.com/library/ios/documentation/AVFoundation/Reference/AVAudioSession_ClassReference/#//apple_ref/c/data/AVAudioSessionRouteChangeNotification) in order to maintain the correct values in your latency calculations.
 
 ####Later
 When there are no other participants on the network, or if syncing is disabled, it's guaranteed that no quantization is applied and tempo proposals are handled immediately. This means that client code in the audio callback should call the same ABLLink functions in all cases. There is no need (and it will almost certainly introduce bugs) to try to only use the library functions in the audio callback when syncing is enabled or there are other participants in a session.
