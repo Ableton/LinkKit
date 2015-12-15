@@ -51,12 +51,14 @@ A final note on phase synchronization: notice that it is more fundamental than b
 
 The LinkKit SDK is distributed as a zip file attached to a release in this repo. Please see the [releases tab](https://github.com/AbletonAppDev/LinkKit/releases) for the latest release. Apps **must** be built against an official release for final submission to the App Store. Official releases are those not marked "Pre-release."
 
-A `LinkKit.zip` file has the following contents:
-- `libAblLink.a`: A static library containing the implementation of Link. This file is **not** in the repo - you must download a release to get it.
+###Getting Started
+Download the `LinkKit.zip` file attached to the latest release. A `LinkKit.zip` file has the following contents:
+- `libABLLink.a`: A static library containing the implementation of Link. This file is **not** in the repo - you must download a release to get it.
 - [`ABLLink.h`](include/ABLLink.h): Pure C header containing the Link API.
 - [`ABLLinkSettingsViewController.h`](include/ABLLinkSettingsViewController.h): Objective-C header containing `UIViewController` subclass that is used to display Link settings.
 - [LinkHut](examples/LinkHut): Very simple app to be used as example code and for testing integrations. It should build and run in-place without modification.
 
+In order to build and link against `libABLLink.a`, make sure that the location of the header files is added to the include path of your project and location of the library added to the linker path. `libABLLink.a` is implemented in C++, so you may also need to add `-lc++` to your link line if you're not already using C++ in your project. This is needed to pull in the C++ standard library.
 
 ###Integration concept###
 Since the library must negotiate tempo and quantization with other participants on the network, the app must defer control over these aspects of playback to the library. For each audio buffer, the integrating app must ask the library where it's supposed to be on the beat timeline by the end of that buffer. The app then figures out how it can render its buffer so as to get to that beat time. This could mean speeding up or slowing down or doing a beat time jump to get to the right position. The library does not specify *how* the app should get there, it just reports where it should be at a given time.
