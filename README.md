@@ -14,6 +14,7 @@ Usage of LinkKit is governed by the [Ableton Link SDK license](Ableton_Link_SDK_
 
 [Integration Guide](#integration-guide)
 - [Getting Started](#getting-started)
+- [User Interface Guidelines](#user-interface-guidelines)
 - [Integration Concept](#integration-concept)
 - [Host and Beat Times](#host-and-beat-times)
 - [Host Time at Speaker Output](#host-time-at-speaker-output)
@@ -55,10 +56,16 @@ The LinkKit SDK is distributed as a zip file attached to a release in this repo.
 Download the `LinkKit.zip` file attached to the latest release. A `LinkKit.zip` file has the following contents:
 - `libABLLink.a`: A static library containing the implementation of Link. This file is **not** in the repo - you must download a release to get it.
 - [`ABLLink.h`](include/ABLLink.h): Pure C header containing the Link API.
-- [`ABLLinkSettingsViewController.h`](include/ABLLinkSettingsViewController.h): Objective-C header containing `UIViewController` subclass that is used to display Link settings.
+- [`ABLLinkSettingsViewController.h`](include/ABLLinkSettingsViewController.h): Objective-C header containing `UIViewController` subclass that is used to display the Link preference pane.
+- [User interface assets](assets)
 - [LinkHut](examples/LinkHut): Very simple app to be used as example code and for testing integrations. It should build and run in-place without modification.
 
 In order to build and link against `libABLLink.a`, make sure that the location of the header files is added to the include path of your project and location of the library added to the linker path. `libABLLink.a` is implemented in C++, so you may also need to add `-lc++` to your link line if you're not already using C++ in your project. This is needed to pull in the C++ standard library.
+
+###User Interface Guidelines
+LinkKit includes a Link preference pane that must be added to an app's user interface. The appearance and behavior of the preference pane itself is not configurable, but you must make the choice of where and how to expose access to the preference pane within the app. In order to provide a consistent user experience across all Link-enabled apps, we have developed [UI integration guidelines](docs/Ableton Link UI Guidelines.pdf) that provide guidance on this matter. Please follow them carefully.
+
+Also included in this repo are [assets](assets) to be used if you choose to put a Link button in your app. All assets relating to the Ableton Link identity will be provided by Ableton and all buttons, copy, and labels should follow the [UI integration guidelines](docs/Ableton Link UI Guidelines.pdf).
 
 ###Integration concept###
 Since the library must negotiate tempo and quantization with other participants on the network, the app must defer control over these aspects of playback to the library. For each audio buffer, the integrating app must ask the library where it's supposed to be on the beat timeline by the end of that buffer. The app then figures out how it can render its buffer so as to get to that beat time. This could mean speeding up or slowing down or doing a beat time jump to get to the right position. The library does not specify *how* the app should get there, it just reports where it should be at a given time.
