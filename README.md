@@ -19,6 +19,9 @@ Usage of LinkKit is governed by the [Ableton Link SDK license](Ableton_Link_SDK_
     - [Host Time at Output](#host-time-at-output)
   - [App Life Cycle](#app-life-cycle)
   - [Audiobus](#audiobus)
+- [Test Plan](#test-plan)
+  - [Tempo Changes](#tempo-changes)
+  - [Background Behavior](#background-behavior)
 - [Promoting Link Integration](#promoting-link-integration)
 
 ##Conceptual Overview
@@ -102,6 +105,66 @@ Please see the LinkHut [AppDelegate.m](examples/LinkHut/LinkHut/AppDelegate.m) f
 
 ###Audiobus
 We have worked closely with the developers of Audiobus to provide some additional features when using Link-enabled apps within Audiobus. In order to take advantage of these additional features, please be sure to build against the latest available version of the Audiobus SDK when adding Link to your app. No code changes are required on your part to enable the Audiobus-Link integration.
+
+##Test Plan
+Below are a set of user interactions that are expected to work consistently across all Link-enabled apps. In order to provide the best user experience, it's important that apps behave consistently with respect to these test cases. *Please verify that your app passes __all__ of the test cases before submitting to the App Store.* Apps that do not pass this test suite will not be considered conforming Link integrations.
+
+###Tempo Changes
+- **TEMPO-1**: *Tempo changes should be transmitted between connected apps*
+  - Open LinkHut, press **Play**, and set Link to **Enabled**.
+  - Open App and set Link to **Enabled**
+  - Without starting to play, change tempo in App **->** LinkHut clicks should speed up or slow down to match the tempo specified in the App.
+  - Start playing in the App **->** App and LinkHut should be in sync
+  - Change tempo in App and in LinkHut **->** App and LinkHut should remain in sync
+- **TEMPO-2**: *Opening an app with Link enabled should not change the tempo of an existing Link session*
+  - Open App and set Link to **Enabled**.
+  - Set App tempo to 100bpm.
+  - Terminate App.
+  - Open LinkHut, press **Play** and set Link to **Enabled**.
+  - Set LinkHut tempo to 130bpm.
+  - Open App **->** Link should be connected (“1 Link”) and the App and LinkHut’s tempo should both be 130bpm.
+- **TEMPO-3**: *When connected, loading a new document should not change the Link session tempo*
+  - Open LinkHut, press **Play**, and set Link to **Enabled**.
+  - Set LinkHut tempo to 130bpm.
+  - Open App and set Link to **Enabled** **->** LinkHut’s tempo should not change.
+  - Load new Song/Set/Session with a tempo other than 130bpm **->** App and LinkHut tempo should both be 130bpm.
+- **TEMPO-4**: *Tempo range handling*
+  - Open LinkHut, press **Play**, and set Link to **Enabled**.
+  - Open App, start Audio, and set Link to **Enabled**.
+  - Change tempo in LinkHut to **20bpm** **->** App and LinkHut should stay in sync.
+  - Change Tempo in LinkHut to **999bpm** **->** App and LinkHut should stay in sync.
+  - If App does not support the full range of tempos supported by Link, it should stay in sync by switching to a multiple of the Link session tempo.
+
+###Background Behavior
+These cases test the correct implementation of the [app life cycle guidelines](#app-life-cycle).
+- **BACKGROUND-1**: *Link remains active when going to the background while playing audio*
+  - Open LinkHut, press **Play**, and set Link to **Enabled**.
+  - Open App and set Link to **Enabled**.
+  - Start playing audio.
+  - Open LinkHut, press **Settings** **->** there should be 1 connected app
+- **BACKGROUND-2**: *Link is deactivated when going to the background and audio will not be played while in background*
+  - Open LinkHut, press **Play**, and set Link to **Enabled**.
+  - Open App and set Link to **Enabled**.
+  - Stop App from playing audio and put it in the background
+  - Open LinkHut, press **Settings** **->** there should be 0 connected apps.
+  - Bring App to the foreground again **->** there should be a notification “1 Link” and the Link settings should reflect this.
+  - Disable and enable Link in App **->** there should be a notification “1 Link” and the Link settings should reflect this.
+  - **Note**: This is the expected behavior even if the App's background audio mode is enabled. Whenever the App goes to the background and it's known that the App will not be playing audio while in the background (not receiving MIDI, not connected to IAA or Audiobus), Link should be deactivated.
+- **BACKGROUND-3** - *Link remains active when going to background while part of an IAA or Audiobus session (if supported).*
+  - Open LinkHut, press **Play**, and set Link to **Enabled**.
+  - Open Audiobus and add the App as **Input**.
+  - Switch to the App and set Link to **Enabled** **->** there should be a notification "1 Link" and the Link settings should reflect this.
+  - Make sure the App is not playing and switch to LinkHut **->** No notification is presented. The Link settings should still indicate 1 connected App.
+  - **Note**: While connected to Audiobus/IAA Link must remain active even while not playing in the background because the App must be prepared to start playing at anytime.
+- **BACKGROUND-4** - *Link is activated when App added to an Audiobus or IAA session while not playing in the background (if supported).*
+  - Open LinkHut, press **Play**, and set Link to **Enabled**.
+  - Open App and set Link to **Enabled**.**->** The Link settings should indicate 1 connected App.
+  - Make sure the app is not playing and switch to Audiobus
+  - Add the App as **Input** in Audiobus. Do this without tapping to wake it up. If the App is sleeping, switch back to it and then back to Audiobus and try again.
+  - Switch back to LinkHut **->** The Link settings should indicate 1 connected App.
+  - Switch back to Audibus and eject the App from the Audiobus session
+  - Switch back to LinkHut **->** The Link settings should indicate 0 connected Apps.
+  - **Note**: When an App in the background has deactivated Link, it must re-activate it if it becomes part of an Audiobus or IAA session, even if does not come to the foreground. Conversely, an App that is part of an Audiobus or IAA session session and is then disconnected from the session while in the background and not playing should deactivate Link.
 
 ##Promoting Link Integration
 After investing the time and effort to add Link to your app, you will probably want to tell the world about it. When you do so, please be sure to follow our [Ableton Link promotion guidelines](docs/Ableton Link Promotion.pdf). The Link badge referred to in the guidelines can be found in the [assets](assets) folder. You can also find additional info and images in our [press kits](https://ableton.com/press) and use them as you please.
