@@ -21,6 +21,8 @@ Usage of LinkKit is governed by the [Ableton Link SDK license](Ableton_Link_SDK_
 - [App Life Cycle](#app-life-cycle)
 - [Audiobus](#audiobus)
 
+[Promoting Link Integration](#promoting-link-integration)
+
 ##Conceptual Overview
 Link is different from other approaches to synchronizing electronic instruments that you may be familiar with. It is not designed to orchestrate multiple instruments so that they play together in lock-step along a shared timeline. In fact, Link-enabled apps each have their own independent timelines. The Link library maintains a temporal relationship between these independent timelines that provides the experience of playing in time without the timelines being identical.
 
@@ -102,3 +104,6 @@ Please see the LinkHut [AppDelegate.m](examples/LinkHut/LinkHut/AppDelegate.m) f
 
 ###Audiobus
 We have worked closely with the developers of Audiobus to provide some additional features when using Link-enabled apps within Audiobus. In order to take advantage of these additional features, please be sure to build against the latest available version of the Audiobus SDK when adding Link to your app. No code changes are required on your part to enable the Audiobus-Link integration.
+
+##Promoting Link Integration
+After investing the time and effort to add Link to your app, you will probably want to tell the world about it. When you do so, please be sure to follow our [Ableton Link promotion guidelines](docs/Ableton Link Promotion.pdf). The Link badge referred to in the guidelines can be found in the [assets](assets) folder. You can also find additional info and images in our [press kits](https://ableton.com/press) and use them as you please.
