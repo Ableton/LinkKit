@@ -7,21 +7,19 @@ iOS SDK for [Ableton Link](https://ableton.com/link), a **new technology** that 
 Usage of LinkKit is governed by the [Ableton Link SDK license](Ableton_Link_SDK_License_v1.0.pdf).
 
 ##Table of Contents
-[Conceptual Overview](#conceptual-overview)
-- [Tempo Synchronization](#tempo-synchronization)
-- [Beat Alignment](#beat-alignment)
-- [Phase Synchronization](#phase-synchronization)
-
-[Integration Guide](#integration-guide)
-- [Getting Started](#getting-started)
-- [User Interface Guidelines](#user-interface-guidelines)
-- [Link API Concepts](#link-api-concepts)
-  - [Host and Beat Times](#host-and-beat-times)
-  - [Host Time at Output](#host-time-at-output)
-- [App Life Cycle](#app-life-cycle)
-- [Audiobus](#audiobus)
-
-[Promoting Link Integration](#promoting-link-integration)
+- [Conceptual Overview](#conceptual-overview)
+  - [Tempo Synchronization](#tempo-synchronization)
+  - [Beat Alignment](#beat-alignment)
+  - [Phase Synchronization](#phase-synchronization)
+- [Integration Guide](#integration-guide)
+  - [Getting Started](#getting-started)
+  - [User Interface Guidelines](#user-interface-guidelines)
+  - [Link API Concepts](#link-api-concepts)
+    - [Host and Beat Times](#host-and-beat-times)
+    - [Host Time at Output](#host-time-at-output)
+  - [App Life Cycle](#app-life-cycle)
+  - [Audiobus](#audiobus)
+- [Promoting Link Integration](#promoting-link-integration)
 
 ##Conceptual Overview
 Link is different from other approaches to synchronizing electronic instruments that you may be familiar with. It is not designed to orchestrate multiple instruments so that they play together in lock-step along a shared timeline. In fact, Link-enabled apps each have their own independent timelines. The Link library maintains a temporal relationship between these independent timelines that provides the experience of playing in time without the timelines being identical.
