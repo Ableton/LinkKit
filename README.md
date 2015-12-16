@@ -19,6 +19,7 @@ Usage of LinkKit is governed by the [Ableton Link SDK license](Ableton_Link_SDK_
   - [Host and Beat Times](#host-and-beat-times)
   - [Host Time at Output](#host-time-at-output)
 - [App Life Cycle](#app-life-cycle)
+- [Audiobus](#audiobus)
 
 ##Conceptual Overview
 Link is different from other approaches to synchronizing electronic instruments that you may be familiar with. It is not designed to orchestrate multiple instruments so that they play together in lock-step along a shared timeline. In fact, Link-enabled apps each have their own independent timelines. The Link library maintains a temporal relationship between these independent timelines that provides the experience of playing in time without the timelines being identical.
@@ -98,3 +99,6 @@ In order to provide the best user experience across the ecosystem of Link-enable
 - It is possible for an app to be added to an Audiobus or IAA session while it is in the background. If Link was deactivated when moving to the background and the app is then added to an Audiobus or IAA session, Link should be re-activated in anticipation of playing audio as part of the session. Conversely, if an app in the background is ejected from an Audiobus or IAA session and will therefore no longer be playing audio, it should deactivate Link. Handling these cases correctly will generally require listening to the [ABConnectionsChangedNotification](https://developer.audiob.us/doc/_a_b_audiobus_controller_8h.html#a336d7bc67873e51abf5b09f7fe15b9f4).
 
 Please see the LinkHut [AppDelegate.m](examples/LinkHut/LinkHut/AppDelegate.m) file for a basic example of implementing the app life cycle guidelines, although it does not support Audiobus or IAA.
+
+###Audiobus
+We have worked closely with the developers of Audiobus to provide some additional features when using Link-enabled apps within Audiobus. In order to take advantage of these additional features, please be sure to build against the latest available version of the Audiobus SDK when adding Link to your app. No code changes are required on your part to enable the Audiobus-Link integration.
