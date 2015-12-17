@@ -17,6 +17,8 @@ Usage of LinkKit is governed by the [Ableton Link SDK license](Ableton_Link_SDK_
   - [Link API Concepts](#link-api-concepts)
     - [Host and Beat Times](#host-and-beat-times)
     - [Host Time at Output](#host-time-at-output)
+  - [Link API Functions](#link-api-functions)
+    - [Initialization and Destruction](#initialization-and-destruction)
   - [App Life Cycle](#app-life-cycle)
   - [Audiobus](#audiobus)
 - [Test Plan](#test-plan)
@@ -89,6 +91,16 @@ All host time values used in the Link API refer to host times at output. This is
 In the audio callback, the system provides an `AudioTimeStamp` value for the audio buffer. The `mHostTime` field of this structure represents the host time at which the audio buffer will be passed to the hardware for output. Adding the output latency (see `AVAudioSession.outputLatency`) to this value will result in the correct host time at output for the *beginning* of that buffer. To get the host time at output for the end of the buffer, you would just add the buffer duration. For an example of this calculation, see the [LinkHut example project](examples/LinkHut/LinkHut/AudioEngine.m).
 
 Note that if your app adds additional software latency, you will need to add this as well in the calculation of the host time at output. Also note that the `AVAudioSession.outputLatency` property can change, so you should update your output latency in response to the [`AVAudioSessionRouteChangedNotification`](https://developer.apple.com/library/ios/documentation/AVFoundation/Reference/AVAudioSession_ClassReference/#//apple_ref/c/data/AVAudioSessionRouteChangeNotification) in order to maintain the correct values in your latency calculations.
+
+###Link API Functions
+This section contains extended discussion on the functions found in the [ABLLink.h](include/ABLLink.h) header file.
+
+####Initialization and Destruction
+An ABLLink library instance is created with the `ABLLinkNew` function. All other API functions take a library instance as an argument, so calling this is a pre-requisite to using the rest of the API. It is recommended that the library instance be created on the main thread during app initialization and that it be preserved for the lifetime of the app. There should not be a reason to create and destroy multiple instances of the library during an app's lifetime. To cleanup the instance on app shutdown, call `ABLLinkDelete`.
+
+The client must provide an initial tempo and quantum value when creating an instance of the library. The tempo is required because, as mentioned in the [*Host and Beat Times*](#host-and-beat-times) section, a library instance starts running a beat timeline from the moment it is initialized. The initial tempo provided to `ABLLinkNew` determines the rate of progression of this beat timeline until the client sets a new tempo or a new tempo comes in from the network. It is important that a valid tempo be provided to the library at initialization time, even if it's just a default value like 120bpm.
+
+The quantum parameter provides the initial value of the library instance's quantum property. It's necessary for the library to have an appropriate quantum at initialization time because this value is used to compute the timeline offset when joining a Link session (see the [Phase Synchronization](#phase-synchronization) section for more on this). For apps that use a constant quantum value, this is the only time the quantum must be specified. Apps that allow the quantum to vary would update it with the `ABLLinkSetQuantum` function.
 
 ####Later
 When there are no other participants on the network, or if syncing is disabled, it's guaranteed that no quantization is applied and tempo proposals are handled immediately. This means that client code in the audio callback should call the same ABLLink functions in all cases. There is no need (and it will almost certainly introduce bugs) to try to only use the library functions in the audio callback when syncing is enabled or there are other participants in a session.
