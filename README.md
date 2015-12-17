@@ -1,7 +1,9 @@
 LinkKit
 =========
 
-iOS SDK for [Ableton Link](https://ableton.com/link), a **new technology** that **synchronizes musical beat, tempo,** and **phase** across multiple applications running on multiple devices. Applications on devices connected to a **local network** discover each other automatically and **form a musical session** in which each participant can **perform independently**: anyone can start or stop while still staying in time. Anyone can change the tempo, the **others will follow**. Anyone can **join** or **leave** without disrupting the session.
+iOS SDK for [Ableton Link](https://ableton.com/link), a **new technology** that **synchronizes musical beat, tempo,** and **phase** across multiple applications running on one or more devices. Applications on devices connected to a **local network** discover each other automatically and **form a musical session** in which each participant can **perform independently**: anyone can start or stop while still staying in time. Anyone can change the tempo, the **others will follow**. Anyone can **join** or **leave** without disrupting the session.
+
+We strongly recommend reading all of the content below, but please pay special attention to the [user interface guidelines](#user-interface-guidelines) and the [test plan](#test-plan) in order to make sure that your app is consistent with others in the Link ecosystem.
 
 ##License
 Usage of LinkKit is governed by the [Ableton Link SDK license](Ableton_Link_SDK_License_v1.0.pdf).
