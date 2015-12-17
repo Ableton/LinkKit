@@ -17,8 +17,12 @@ Usage of LinkKit is governed by the [Ableton Link SDK license](Ableton_Link_SDK_
   - [Link API Concepts](#link-api-concepts)
     - [Host and Beat Times](#host-and-beat-times)
     - [Host Time at Output](#host-time-at-output)
-  - [Link API Functions](#link-api-functions)
+  - [Link API Usage](#link-api-usage)
     - [Initialization and Destruction](#initialization-and-destruction)
+    - [Active, Enabled, and Connected](#active-enabled-and-connected)
+    - [Controlling Tempo](#controlling-tempo)
+    - [Quantized Launch and `ABLLinkResetBeatTime`](#quantized-launch-and-abllinkresetbeattime)
+    - [Observing Phase](#observing-phase)
   - [App Life Cycle](#app-life-cycle)
   - [Audiobus](#audiobus)
 - [Test Plan](#test-plan)
@@ -92,18 +96,33 @@ In the audio callback, the system provides an `AudioTimeStamp` value for the aud
 
 Note that if your app adds additional software latency, you will need to add this as well in the calculation of the host time at output. Also note that the `AVAudioSession.outputLatency` property can change, so you should update your output latency in response to the [`AVAudioSessionRouteChangedNotification`](https://developer.apple.com/library/ios/documentation/AVFoundation/Reference/AVAudioSession_ClassReference/#//apple_ref/c/data/AVAudioSessionRouteChangeNotification) in order to maintain the correct values in your latency calculations.
 
-###Link API Functions
-This section contains extended discussion on the functions found in the [ABLLink.h](include/ABLLink.h) header file.
+###Link API Usage
+This section contains extended discussion on the contents of the C header [ABLLink.h](include/ABLLink.h) and the Objective-C header [ABLLinkSettingsViewController.h](include/ABLLinkSettingsViewController.h), which togther make up the Link API.
 
 ####Initialization and Destruction
 An ABLLink library instance is created with the `ABLLinkNew` function. All other API functions take a library instance as an argument, so calling this is a pre-requisite to using the rest of the API. It is recommended that the library instance be created on the main thread during app initialization and that it be preserved for the lifetime of the app. There should not be a reason to create and destroy multiple instances of the library during an app's lifetime. To cleanup the instance on app shutdown, call `ABLLinkDelete`.
 
-The client must provide an initial tempo and quantum value when creating an instance of the library. The tempo is required because, as mentioned in the [*Host and Beat Times*](#host-and-beat-times) section, a library instance starts running a beat timeline from the moment it is initialized. The initial tempo provided to `ABLLinkNew` determines the rate of progression of this beat timeline until the client sets a new tempo or a new tempo comes in from the network. It is important that a valid tempo be provided to the library at initialization time, even if it's just a default value like 120bpm.
+An app must provide an initial tempo and quantum value when creating an instance of the library. The tempo is required because, as mentioned in the [*Host and Beat Times*](#host-and-beat-times) section, a library instance starts running a beat timeline from the moment it is initialized. The initial tempo provided to `ABLLinkNew` determines the rate of progression of this beat timeline until the app sets a new tempo or a new tempo comes in from the network. It is important that a valid tempo be provided to the library at initialization time, even if it's just a default value like 120bpm.
 
 The quantum parameter provides the initial value of the library instance's quantum property. It's necessary for the library to have an appropriate quantum at initialization time because this value is used to compute the timeline offset when joining a Link session (see the [Phase Synchronization](#phase-synchronization) section for more on this). For apps that use a constant quantum value, this is the only time the quantum must be specified. Apps that allow the quantum to vary would update it with the `ABLLinkSetQuantum` function.
 
-####Later
-When there are no other participants on the network, or if syncing is disabled, it's guaranteed that no quantization is applied and tempo proposals are handled immediately. This means that client code in the audio callback should call the same ABLLink functions in all cases. There is no need (and it will almost certainly introduce bugs) to try to only use the library functions in the audio callback when syncing is enabled or there are other participants in a session.
+####Active, Enabled, and Connected
+Once an ABLLink instance is created, in order for it to start attempting to connect to other participants on the network, it must be both *active* and *enabled*. The active and enabled properties are two independent boolean conditions, the first of which is controlled by the app, and the second by the end user. So Link needs permission from both the app and the end user before it starts communicating on the network.
+
+The enabled state is controlled directly by the user via the [`ABLLinkSettingsViewController`](include/ABLLinkSettingsViewController.h). It is persisted across app runs, so if the user enables Link they don't have to re-enable it every time they re-launch the app. Since it is a persistent value that is visible and meaningful to the user, the API does not allow it to be modified programmatically by the app. However, the app can observe the enabled state via the `ABLLinkIsEnabled` function and the `ABLLinkSetIsEnabledCallback` callback registration function. These should only be needed to update UI elements that reflect the Link-enabled state. If you are dependening on the enabled state in audio code, you're doing something wrong (you should probably be using `ABLLinkIsConnected` instead. More on that soon...)
+
+The active state is controlled by the app via the `ABLLinkSetActive` function. This is primarily used to implement [background behavior](#background-behavior) - by calling `ABLLinkSetActive(false)` when going to the background, an app can make sure that the ABLLink instance is not communicating on the network when it's not needed or expected.
+
+When an ABLLink instance is both active and enabled, it will attempt to find other participants on the network in order to form a Link session. When at least one other participant has been found and a session has been formed, then the instance is considered connected. This state can be queried with the `ABLLinkIsConnected` function.
+
+####Controlling Tempo
+TOOD
+
+####Quantized Launch and `ABLLinkResetBeatTime`
+TODO
+
+####Observing Phase
+TODO
 
 ###App Life Cycle
 In order to provide the best user experience across the ecosystem of Link-enabled apps, it's important that apps take a consistent approach towards Link with regards to life cycle management. Furthermore, since the Link library does not have access to all of the necessary information to correctly respond to life cycle events, app developers must follow the life cycle guidelines below in order to meet user expectations. Please consider these carefully.
