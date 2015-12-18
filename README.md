@@ -100,7 +100,7 @@ In the audio callback, the system provides an `AudioTimeStamp` value for the aud
 Note that if your app adds additional software latency, you will need to add this as well in the calculation of the host time at output. Also note that the `AVAudioSession.outputLatency` property can change, so you should update your output latency in response to the [`AVAudioSessionRouteChangedNotification`](https://developer.apple.com/library/ios/documentation/AVFoundation/Reference/AVAudioSession_ClassReference/#//apple_ref/c/data/AVAudioSessionRouteChangeNotification) in order to maintain the correct values in your latency calculations.
 
 ###Link API Usage
-This section contains extended discussion on the contents of the C header [ABLLink.h](include/ABLLink.h) and the Objective-C header [ABLLinkSettingsViewController.h](include/ABLLinkSettingsViewController.h), which togther make up the Link API.
+This section contains extended discussion on the contents of the C header [ABLLink.h](include/ABLLink.h) and the Objective-C header [ABLLinkSettingsViewController.h](include/ABLLinkSettingsViewController.h), which together make up the Link API.
 
 ####Initialization and Destruction
 An ABLLink library instance is created with the `ABLLinkNew` function. All other API functions take a library instance as an argument, so calling this is a pre-requisite to using the rest of the API. It is recommended that the library instance be created on the main thread during app initialization and that it be preserved for the lifetime of the app. There should not be a reason to create and destroy multiple instances of the library during an app's lifetime. To cleanup the instance on app shutdown, call `ABLLinkDelete`.
