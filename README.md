@@ -23,8 +23,9 @@ Usage of LinkKit is governed by the [Ableton Link SDK license](Ableton_Link_SDK_
     - [Initialization and Destruction](#initialization-and-destruction)
     - [Active, Enabled, and Connected](#active-enabled-and-connected)
     - [Controlling Tempo](#controlling-tempo)
-    - [Quantized Launch and `ABLLinkResetBeatTime`](#quantized-launch-and-abllinkresetbeattime)
-    - [Observing Phase](#observing-phase)
+    - [Quantized Launch](#quantized-launch)
+      - [`ABLLinkPhase`](#abllinkphase)
+      - [`ABLLinkResetBeatTime`](#abllinkresetbeattime)
   - [App Life Cycle](#app-life-cycle)
   - [Audiobus](#audiobus)
 - [Test Plan](#test-plan)
@@ -126,11 +127,26 @@ The `ABLLinkProposeTempo` function takes a `hostTimeAtOutput` parameter, which p
 
 Since any participant can propose a new tempo to the session, your app must be prepared to observe and adopt changes made to the session tempo by other participants. At the audio level, there is no work to do - the new session tempo will automatically be incorporated into the results of the `ABLLinkBeatTimeAtHostTime` and `ABLLinkHostTimeAtBeatTime` functions. However, for the purpose of updating your app's tempo display, you can query the current session tempo with `ABLLinkGetSessionTempo` and register for tempo change callbacks with `ABLLinkSetSessionTempoCallback`. The session tempo values exposed by these functions are stable values that are appropriate for display to the user. It's important to understand that you should not try to derive the current tempo for each buffer and display that to the user. Individual buffer tempos will be much noisier than the reported session tempo as the ABLLink library is frequently making slight adjustments to keep everyone in sync.
 
-####Quantized Launch and `ABLLinkResetBeatTime`
-TODO
+####Quantized Launch
+When an app is connected to a Link session, there is a shared concept of phase between all participants with respect to any given quantum value. This is one of the fundamental features provided by Link. With shared phase comes a shared understanding of where the beginning of bars and loops fall, and therefore the ability for multiple participants to start together on these bar and loop boundaries.
 
-####Observing Phase
-TODO
+Quantized launch means that no matter the current phase value when a user presses play, the app will start playing at the desired phase, usually at the beginning of the next quantum. By utilizing a quantized launch strategy, apps can provide their users the ability to begin playing together, in phase, just by pressing play within the same bar or loop.
+
+There are two possible approaches to implementing quantized launch using the Link API. The first is slightly simpler and is most appropriate for loopers, step sequencers, and drum machines where the only thing that matters is the phase within a loop. This approach makes use of the `ABLLinkPhase` function. The second is better if your app has a user-visible beat timeline with bars, similar to Ableton Live's arrangement view. This approach makes use of the `ABLLinkResetBeatTime` function. It is a little bit harder to understand than the first, but it does a lot of work for you if your app needs that functionality.
+
+#####`ABLLinkPhase`
+If your app plays sound in a loop and it only cares about the phase within that loop and never about the magnitude of beats on a beat timeline, then this function is for you. It allows you to directly sample the phase of the shared session for a given beat time and quantum value. The result is a value in beats between zero and the given quantum. This function is designed to be called from the audio thread.
+
+Using `ABLLinkPhase` to implement quantized launch is straightforward. After the user presses play, calculate the phase range of each subsequent buffer with `ABLLinkPhase` and start playing when you've reached the desired phase (usually zero).
+
+#####`ABLLinkResetBeatTime`
+This function takes a desired starting beat time and a host time and returns a beat time before the desired starting beat time that corresponds to the given host time. The returned beat time is guaranteed to be within a quantum of the desired starting beat time. It's designed to be called from the audio thread.
+
+So how does this help with quantized launch? If you have an app that has a beat timeline that's exposed to the user (something like the arrangement timeline in Ableton Live), then a common use case would be for the user to move the start marker to a specific beat and then press play. When they press play, the app needs to delay the actual start until the phase matches that of the requested beat time. The length of this delay will depend on how out of phase the requested beat time is from the shared session phase when the user presses play.
+
+In this scenario, the app should pass the requested beat time from the user and the host time at which the user pressed play (generally the beginning of the next audio buffer after the action was detected) as the arguments to `ABLLinkResetBeatTime.` This resets the library's beat timeline such that the requested beat time is phase aligned with the session. The returned value is then just the beat time that corresponds to the given host time, which is the same value that you would get by calling `ABLLinkBeatTimeAtHostTime` after the reset. To complete the quantized launch, the app then simply waits for the user-requested beat time to come and starts playing. By making this call, the app has synchronized the user-visible beat timeline and the library's beat timeline, meaning that beat values provided by the library can be treated directly as beat values in the app's timeline. In this way, the library can act as a simple sequencer for your app. Please see the usage of this function in the LinkHut example app's [AudioEngine.m](examples/LinkHut/LinkHut/AudioEngine.m) file.
+
+It's worth noting that this sequencing capability works regardless of whether Link is enabled or connected to other participants. If you call `ABLLinkResetBeatTime` when the library is not connected, it will always return the same beat time that was passed to it. Therefore, if you modify your engine to use ABLLink as a sequencer in this way, you never have to check whether Link is connected or not in your audio code. The library will just do the right thing and only quantize when connected to a Link session.
 
 ###App Life Cycle
 In order to provide the best user experience across the ecosystem of Link-enabled apps, it's important that apps take a consistent approach towards Link with regards to life cycle management. Furthermore, since the Link library does not have access to all of the necessary information to correctly respond to life cycle events, app developers must follow the life cycle guidelines below in order to meet user expectations. Please consider these carefully.
