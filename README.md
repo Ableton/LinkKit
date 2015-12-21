@@ -28,6 +28,7 @@ Usage of LinkKit is governed by the [Ableton Link SDK license](Ableton_Link_SDK_
       - [`ABLLinkResetBeatTime`](#abllinkresetbeattime)
   - [App Life Cycle](#app-life-cycle)
   - [Audiobus](#audiobus)
+  - [Other Sync Technologies](#other-sync-technologies)
 - [Test Plan](#test-plan)
   - [Tempo Changes](#tempo-changes)
   - [Background Behavior](#background-behavior)
@@ -160,6 +161,9 @@ Please see the LinkHut [AppDelegate.m](examples/LinkHut/LinkHut/AppDelegate.m) f
 
 ###Audiobus
 We have worked closely with the developers of Audiobus to provide some additional features when using Link-enabled apps within Audiobus. In order to take advantage of these additional features, please be sure to build against the latest available version of the Audiobus SDK when adding Link to your app. No code changes are required on your part to enable the Audiobus-Link integration.
+
+### Other Sync Technologies
+We recommend making Link mutually exclusive with other sync technologies that may be supported by your app, such as MIDI Clock or WIST. Having two concurrent clock sources fighting each other will degrade the Link session and compromise the user experience. The `ABLLinkSetIsEnabledCallback` callback registration function can be used to observe when Link has been enabled by the user in order to disable UI elements and functionality of other sync technologies.
 
 ##Test Plan
 Below are a set of user interactions that are expected to work consistently across all Link-enabled apps. In order to provide the best user experience, it's important that apps behave consistently with respect to these test cases. *Please verify that your app passes __all__ of the test cases before submitting to the App Store.* Apps that do not pass this test suite will not be considered conforming Link integrations.
