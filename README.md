@@ -161,6 +161,10 @@ Please see the LinkHut [AppDelegate.m](examples/LinkHut/LinkHut/AppDelegate.m) f
 ###Audiobus
 We have worked closely with the developers of Audiobus to provide some additional features when using Link-enabled apps within Audiobus. In order to take advantage of these additional features, please be sure to build against the latest available version of the Audiobus SDK when adding Link to your app. No code changes are required on your part to enable the Audiobus-Link integration.
 
+### Other Sync Technologies
+We generally recommend handling other sync technologies such as MIDI Clock or WIST mutually exclusive, since an application can only listen to one clock source at any given time. The `ABLLinkSetIsEnabledCallback` callback registration function can be used in order to disable UI elements and functionality of other sync technologies. Furthermore
+if other technologies are to disable Link, the `ABLLinkSetActive` setter shall be used and access to the `ABLLinkSettingsViewController` should be avoided (e.g. by greying out the option).
+
 ##Test Plan
 Below are a set of user interactions that are expected to work consistently across all Link-enabled apps. In order to provide the best user experience, it's important that apps behave consistently with respect to these test cases. *Please verify that your app passes __all__ of the test cases before submitting to the App Store.* Apps that do not pass this test suite will not be considered conforming Link integrations.
 
