@@ -3,6 +3,7 @@
 #include "AudioEngine.h"
 #include <AudioToolbox/AudioToolbox.h>
 #include <AVFoundation/AVAudioSession.h>
+#include <libkern/OSAtomic.h>
 #include <mach/mach_time.h>
 
 /*
@@ -42,6 +43,8 @@ static void clickInBuffer(
 #define INVALID_BEAT_TIME DBL_MIN
 #define INVALID_BPM DBL_MIN
 
+static OSSpinLock lock;
+
 /*
  * Structure that stores the data needed by the audio callback.
  */
@@ -49,7 +52,7 @@ typedef struct {
     ABLLinkRef ablLink;
     Float64 sampleRate;
     Float64 secondsToHostTime;
-    UInt64 outputLatency; // hardware output latency in HostTime
+    UInt32 outputLatency; // hardware output latency in HostTime
     Float64 lastBeatTime;
     Float64 resetToBeatTime;
     Float64 proposeBpm;
@@ -74,18 +77,27 @@ static OSStatus audioCallback(
 
     LinkData *linkData = (LinkData *)inRefCon;
 
+    const Float64 sampleRate = linkData->sampleRate;
+    const Float64 secondsToHostTime = linkData->secondsToHostTime;
     Float64 beatTimeAtBufferBegin = linkData->lastBeatTime;
+
+    OSSpinLockLock(&lock);
+    const UInt32 outputLatency = linkData->outputLatency;
+    const Float64 resetToBeatTime = linkData->resetToBeatTime;
+    linkData->resetToBeatTime = INVALID_BEAT_TIME;
+    const Float64 proposeBpm = linkData->proposeBpm;
+    linkData->proposeBpm = INVALID_BPM;
+    const BOOL isPlaying = linkData->isPlaying;
+    OSSpinLockUnlock(&lock);
 
     // The mHostTime member of the timestamp represents the time at which the buffer is
     // delivered to the audio hardware. The output latency is the time from when the
     // buffer is delivered to the audio hardware to when the beginning of the buffer
     // starts reaching the output. We add those values to get the host time at which
     // the first sample of this buffer will be reaching the output.
-    const UInt64 hostTimeAtBufferBegin = inTimeStamp->mHostTime + linkData->outputLatency;
+    const UInt64 hostTimeAtBufferBegin = inTimeStamp->mHostTime + outputLatency;
 
     // Handle a timeline reset
-    const Float64 resetToBeatTime = linkData->resetToBeatTime;
-    linkData->resetToBeatTime = INVALID_BEAT_TIME;
     if (resetToBeatTime != INVALID_BEAT_TIME) {
         // Reset the beat timeline so that the requested beat time
         // occurs near the beginning of this buffer. The requested beat
@@ -100,8 +112,6 @@ static OSStatus audioCallback(
     }
 
     // Handle a tempo proposal
-    const Float64 proposeBpm = linkData->proposeBpm;
-    linkData->proposeBpm = INVALID_BPM;
     if (proposeBpm != INVALID_BPM)
     {
         // Propose that the new tempo takes effect at the beginning of
@@ -110,22 +120,23 @@ static OSStatus audioCallback(
     }
 
     // Fill the buffer
-    if (linkData->isPlaying) {
+    if (isPlaying) {
         // To calculate the host time at buffer end we add the buffer duration to the host
         // time at buffer begin. We use ABLLinkBeatTimeAtHostTime to query the according
         // beat time.
         const UInt64 bufferDurationHostTime =
-            (UInt64)(linkData->secondsToHostTime * inNumberFrames / linkData->sampleRate);
+            (UInt64)(secondsToHostTime * inNumberFrames / sampleRate);
 
         const Float64 beatTimeAtBufferEnd = ABLLinkBeatTimeAtHostTime(
             linkData->ablLink,
-            inTimeStamp->mHostTime + bufferDurationHostTime + linkData->outputLatency);
+            inTimeStamp->mHostTime + bufferDurationHostTime + outputLatency);
 
         // Add audible clicks to the buffer according to the portion of the song
         // timeline represented by this buffer.
         clickInBuffer(beatTimeAtBufferBegin, beatTimeAtBufferEnd, inNumberFrames, ioData);
-
+        OSSpinLockLock(&lock);
         linkData->lastBeatTime = beatTimeAtBufferEnd;
+        OSSpinLockUnlock(&lock);
     }
 
     return noErr;
@@ -147,8 +158,10 @@ static OSStatus audioCallback(
 }
 
 - (void)setIsPlaying:(BOOL)isPlaying {
+    OSSpinLockLock(&lock);
     _linkData.resetToBeatTime = 0;
     _linkData.isPlaying = isPlaying;
+    OSSpinLockUnlock(&lock);
 }
 
 - (Float64)bpm {
@@ -156,7 +169,9 @@ static OSStatus audioCallback(
 }
 
 - (void)setBpm:(Float64)bpm {
+    OSSpinLockLock(&lock);
     _linkData.proposeBpm = bpm;
+    OSSpinLockUnlock(&lock);
 }
 
 - (Float64)beatTime {
@@ -179,11 +194,31 @@ static OSStatus audioCallback(
     return _linkData.ablLink;
 }
 
+- (void)handleRouteChange:(NSNotification *)notification {
+#pragma unused(notification)
+    OSSpinLockLock(&lock);
+    _linkData.outputLatency = (UInt32)(_linkData.secondsToHostTime * [AVAudioSession sharedInstance].outputLatency);
+    const Float64 oldSampleRate = _linkData.sampleRate;
+    OSSpinLockUnlock(&lock);
+    Float64 sampleRate = [AVAudioSession sharedInstance].sampleRate;
+    if (sampleRate != oldSampleRate) {
+        [self stop];
+        [self deallocAudioEngine];
+        _linkData.sampleRate = sampleRate;
+        [self setupAudioEngine];
+        [self start];
+    }
+}
+
 # pragma mark - create and delete engine
 - (id)initWithTempo:(Float64)bpm {
     if ([super init]) {
         [self initLinkData:bpm];
         [self setupAudioEngine];
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(handleRouteChange:)
+                                                     name:AVAudioSessionRouteChangeNotification
+                                                   object:[AVAudioSession sharedInstance]];
     }
     return self;
 }
@@ -197,6 +232,9 @@ static OSStatus audioCallback(
             (int)result,
             (const char *)(&result));
     }
+    [[NSNotificationCenter defaultCenter] removeObserver:self
+                                                    name:@"AVAudioSessionRouteChangeNotification"
+                                                  object:[AVAudioSession sharedInstance]];
     ABLLinkDelete(_linkData.ablLink);
 }
 
@@ -233,10 +271,11 @@ static OSStatus audioCallback(
     mach_timebase_info_data_t timeInfo;
     mach_timebase_info(&timeInfo);
 
+    lock = OS_SPINLOCK_INIT;
     _linkData.ablLink = ABLLinkNew(bpm, 4); // quantize to 4 beats
     _linkData.sampleRate = [[AVAudioSession sharedInstance] sampleRate];
     _linkData.secondsToHostTime = (1.0e9 * timeInfo.denom) / (Float64)timeInfo.numer;
-    _linkData.outputLatency = (UInt64)(_linkData.secondsToHostTime * [AVAudioSession sharedInstance].outputLatency);
+    _linkData.outputLatency = (UInt32)(_linkData.secondsToHostTime * [AVAudioSession sharedInstance].outputLatency);
     _linkData.lastBeatTime = 0;
     _linkData.resetToBeatTime = INVALID_BEAT_TIME;
     _linkData.proposeBpm = INVALID_BPM;
@@ -321,6 +360,16 @@ static OSStatus audioCallback(
     NSCAssert2(
         result == noErr,
         @"Initializing Audio Unit failed. Error code: %d '%.4s'",
+        (int)result,
+        (const char *)(&result));
+}
+
+- (void)deallocAudioEngine {
+    // Uninitialize Audio Unit
+    OSStatus result = AudioUnitUninitialize(_ioUnit);
+    NSCAssert2(
+        result == noErr,
+        @"Uninitializing Audio Unit failed. Error code: %d '%.4s'",
         (int)result,
         (const char *)(&result));
 }
