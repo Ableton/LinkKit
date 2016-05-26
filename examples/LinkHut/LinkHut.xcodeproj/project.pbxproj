@@ -19,6 +19,7 @@
 		423E47981AA7B3DA00CDACEC /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 423E47971AA7B3DA00CDACEC /* AVFoundation.framework */; };
 		423E47991AA7B3E800CDACEC /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 423E47931AA7B3B600CDACEC /* Foundation.framework */; };
 		FD2510FD1BDA360C00706B00 /* libABLLink.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FD2510FC1BDA360C00706B00 /* libABLLink.a */; };
+		FD8F86C41CE3296300706B00 /* QuantumView.m in Sources */ = {isa = PBXBuildFile; fileRef = FD8F86C31CE3296300706B00 /* QuantumView.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -39,6 +40,8 @@
 		423E47951AA7B3D100CDACEC /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		423E47971AA7B3DA00CDACEC /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		FD2510FC1BDA360C00706B00 /* libABLLink.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libABLLink.a; path = ../output/libABLLink.a; sourceTree = "<group>"; };
+		FD8F86C21CE3296300706B00 /* QuantumView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QuantumView.h; sourceTree = "<group>"; };
+		FD8F86C31CE3296300706B00 /* QuantumView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QuantumView.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -80,6 +83,8 @@
 				423E47651AA7AECE00CDACEC /* AppDelegate.m */,
 				423E478E1AA7B35400CDACEC /* AudioEngine.h */,
 				423E478F1AA7B35400CDACEC /* AudioEngine.m */,
+				FD8F86C21CE3296300706B00 /* QuantumView.h */,
+				FD8F86C31CE3296300706B00 /* QuantumView.m */,
 				423E47671AA7AECE00CDACEC /* ViewController.h */,
 				423E47681AA7AECE00CDACEC /* ViewController.m */,
 				423E476A1AA7AECE00CDACEC /* Main.storyboard */,
@@ -139,7 +144,7 @@
 		423E47551AA7AECE00CDACEC /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0610;
+				LastUpgradeCheck = 0730;
 				ORGANIZATIONNAME = ableton;
 				TargetAttributes = {
 					423E475C1AA7AECE00CDACEC = {
@@ -190,6 +195,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				423E47901AA7B35400CDACEC /* AudioEngine.m in Sources */,
+				FD8F86C41CE3296300706B00 /* QuantumView.m in Sources */,
 				423E47691AA7AECE00CDACEC /* ViewController.m in Sources */,
 				423E47661AA7AECE00CDACEC /* AppDelegate.m in Sources */,
 				423E47631AA7AECE00CDACEC /* main.m in Sources */,
@@ -238,6 +244,7 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
