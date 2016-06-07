@@ -8,12 +8,12 @@
 
 #define INVALID_BEAT_TIME DBL_MIN
 #define INVALID_BPM DBL_MIN
-#define INVALID_SAMPLE_POSITION DBL_MAX
 
 static OSSpinLock lock;
 
 /*
- * Structure that stores the data needed by the audio the main thread.
+ * Structure that stores engine-related data that can be changed from
+ * the main thread.
  */
 typedef struct {
   UInt32 outputLatency; // Hardware output latency in HostTime
@@ -24,94 +24,109 @@ typedef struct {
 } EngineData;
 
 /*
- * Structure that stores the data needed by the audio callback.
+ * Structure that stores all data needed by the audio callback.
  */
 typedef struct {
     ABLLinkRef ablLink;
-    Float64 sampleRate; // Shared between threads. Only write when engine not running.
-    Float64 secondsToHostTime; // Shared between threads. Only write when engine not running.
-    Float64 metronomeSamplePosition; // Local to the audio thread.
-    Float64 metronomeFrequency; // Local to the audio thread.
-    EngineData sharedEngineData; // Shared between threads.
-    EngineData lockfreeEngineData; // Copy of sharedEngineData local to the audio thread.
+    // Shared between threads. Only write when engine not running.
+    Float64 sampleRate;
+    // Shared between threads. Only write when engine not running.
+    Float64 secondsToHostTime;
+    // Shared between threads. Written by the main thread and only
+    // read by the audio thread when doing so will not block.
+    EngineData sharedEngineData;
+    // Copy of sharedEngineData owned by audio thread.
+    EngineData localEngineData;
 } LinkData;
 
 /*
- * Pull data from the main thread to the audio thread if lock can be obtained.
+ * Pull data from the main thread to the audio thread if lock can be
+ * obtained. Otherwise, just use the local copy of the data.
  */
-static void pullEngineData(EngineData* shared, EngineData* lockfree) {
+static void pullEngineData(LinkData* linkData, EngineData* output) {
+    // Always reset the signaling members to their default state
+    output->resetToBeatTime = INVALID_BEAT_TIME;
+    output->proposeBpm = INVALID_BPM;
+
+    // Attempt to grab the lock guarding the shared engine data but
+    // don't block if we can't get it.
     if (OSSpinLockTry(&lock)) {
-        lockfree->outputLatency = shared->outputLatency;
-        if (shared->resetToBeatTime != INVALID_BEAT_TIME) {
-            lockfree->resetToBeatTime = shared->resetToBeatTime;
-            shared->resetToBeatTime = INVALID_BEAT_TIME;
-        }
-        lockfree->proposeBpm = shared->proposeBpm;
-        shared->proposeBpm = INVALID_BPM;
-        lockfree->quantum = shared->quantum;
-        lockfree->isPlaying = shared->isPlaying;
+        // Copy non-signaling members to the local thread cache
+        linkData->localEngineData.outputLatency =
+          linkData->sharedEngineData.outputLatency;
+        linkData->localEngineData.quantum = linkData->sharedEngineData.quantum;
+        linkData->localEngineData.isPlaying = linkData->sharedEngineData.isPlaying;
+
+        // Copy signaling members directly to the output and reset
+        output->resetToBeatTime = linkData->sharedEngineData.resetToBeatTime;
+        linkData->sharedEngineData.resetToBeatTime = INVALID_BEAT_TIME;
+
+        output->proposeBpm = linkData->sharedEngineData.proposeBpm;
+        linkData->sharedEngineData.proposeBpm = INVALID_BPM;
+
         OSSpinLockUnlock(&lock);
     }
+
+    // Copy from the thread local copy to the output. This happens
+    // whether or not we were able to grab the lock.
+    output->outputLatency = linkData->localEngineData.outputLatency;
+    output->quantum = linkData->localEngineData.quantum;
+    output->isPlaying = linkData->localEngineData.isPlaying;
 }
-
 /*
- * Subroutine to fill the audio-buffer with the metronome sound.
+ * Render a metronome sound into the given buffer according to the
+ * given timeline and quantum.
  */
-static void fillBuffer(
-    const UInt32 startFrame,
-    const UInt32 inNumberFrames,
-    AudioBufferList *buffers,
-    Float64 *samplePosition,
-    const Float64 frequency,
-    const Float64 sampleRate) {
-
-    for (UInt32 i = startFrame; i < inNumberFrames; ++i) {
-        Float64 amp = 0.;
-        // Simple cosine synth with a tick duration of 100ms.
-        if (*samplePosition <= sampleRate / 10) {
-            const Float64 osc = cos(2 * M_PI * (*samplePosition) / sampleRate * frequency);
-            amp = osc * (1 - sin(*samplePosition * 5 * M_PI / sampleRate));
-            (*samplePosition)++;
-        }
-        // Write metronome sound only to 1st channel and silence other channels
-        SInt16 *bufData = (SInt16 *)(buffers->mBuffers[0].mData);
-        bufData[i] = (SInt16)(32761. * amp);
-        for (UInt32 j = 1; j < buffers->mNumberBuffers; ++j) {
-            SInt16 *bufData = (SInt16 *)(buffers->mBuffers[j].mData);
-            bufData[i] = 0;
-        }
-    }
-}
-
-/*
- * Create an audible click in the given audio buffers for every half beat on
- * the song timeline.
- */
-static void clickInBuffer(
-    const Float64 positionAtBufferBegin,
-    const Float64 positionAtBufferEnd,
+static void renderMetronomeIntoBuffer(
+    const ABLLinkTimelineRef timeline,
     const Float64 quantum,
-    const UInt32 numSamples,
-    AudioBufferList *buffers,
+    const UInt64 beginHostTime,
     const Float64 sampleRate,
-    Float64 *metronomeSamplePosition,
-    Float64 *metronomeFrequency) {
+    const Float64 secondsToHostTime,
+    const UInt32 bufferSize,
+    SInt16* buffer)
+{
+    // Metronome frequencies
+    static const Float64 highTone = 1567.98;
+    static const Float64 lowTone = 1108.73;
+    // 100ms click duration
+    static const Float64 clickDurationInSeconds = 0.1;
 
-    static const Float64 beatsPerClick = 1.;
+    // The number of host ticks that elapse between samples
+    const Float64 hostTicksPerSample = secondsToHostTime / sampleRate;
+    // The metronome click duration in beats at the current tempo
+    const Float64 clickDurationInBeats =
+      clickDurationInSeconds / (60. / ABLLinkGetTempo(timeline));
 
-    const Float64 beatsInBuffer = positionAtBufferEnd - positionAtBufferBegin;
-    const Float64 samplesPerBeat = numSamples / beatsInBuffer;
-    Float64 clickAtPosition = positionAtBufferBegin - fmod(positionAtBufferBegin, beatsPerClick);
-
-    while (clickAtPosition < positionAtBufferEnd) {
-        const long offset = lround(samplesPerBeat * (clickAtPosition - positionAtBufferBegin));
-        if (offset >= 0 && offset < (long)(numSamples)) {
-            // Use a high pitch to emphasize the first beat of the quantum.
-            *metronomeFrequency = fmod(clickAtPosition, quantum) == 0 ? 1567.98 : 1108.73;
-            *metronomeSamplePosition = 0;
-            fillBuffer((UInt32)offset, numSamples, buffers, metronomeSamplePosition, *metronomeFrequency, sampleRate);
+    for (UInt32 i = 0; i < bufferSize; ++i) {
+        Float64 amplitude = 0.;
+        // Compute the host time for this sample.
+        const UInt64 hostTime = beginHostTime + llround(i * hostTicksPerSample);
+        // Only make sound for positive beat magnitudes. Negative beat
+        // magnitudes are count-in beats.
+        if (ABLLinkBeatTimeAtHostTime(timeline, hostTime, quantum) >= 0.) {
+            // Get the phase of this sample. The phase is a beat value in
+            // the range [0, quantum).
+            const Float64 phase = ABLLinkPhaseAtTime(timeline, hostTime, quantum);
+            const Float64 lastBeatPhase = floor(phase);
+            // The click phase represents where this sample falls in the
+            // click duration.
+            const Float64 clickPhase = (phase - lastBeatPhase) / clickDurationInBeats;
+            // If the clickPhase is less than 1, it means that the current
+            // sample is within a click duration from the previous beat, in
+            // which case we must render the click sound for this sample.
+            if (clickPhase < 1.) {
+                // If the phase of the last beat was zero, then it was at a
+                // quantum boundary and we want to use the high tone. For other
+                // beats within the quantum, use the low tone.
+                const Float64 freq = lastBeatPhase == 0. ? highTone : lowTone;
+                // Simple cosine synth
+                amplitude =
+                  cos(2 * M_PI * clickPhase * clickDurationInSeconds * freq) *
+                  (1 - sin(5 * M_PI * clickPhase * clickDurationInSeconds));
+            }
         }
-        clickAtPosition += beatsPerClick;
+        buffer[i] = (SInt16)(32761. * amplitude);
     }
 }
 
@@ -128,29 +143,32 @@ static OSStatus audioCallback(
     AudioBufferList *ioData) {
 #pragma unused(inBusNumber, flags)
 
+    // First clear buffers
+    for (UInt32 i = 0; i < ioData->mNumberBuffers; ++i) {
+      memset(ioData->mBuffers[i].mData, 0, inNumberFrames * sizeof(SInt16));
+    }
+
     LinkData *linkData = (LinkData *)inRefCon;
-    EngineData* engineData = &linkData->lockfreeEngineData;
 
-    pullEngineData(&linkData->sharedEngineData, engineData);
-
-    const Float64 sampleRate = linkData->sampleRate;
-    const Float64 secondsToHostTime = linkData->secondsToHostTime;
-
-    fillBuffer(0, inNumberFrames, ioData,
-      &linkData->metronomeSamplePosition, linkData->metronomeFrequency, sampleRate);
-
-    // The mHostTime member of the timestamp represents the time at which the buffer is
-    // delivered to the audio hardware. The output latency is the time from when the
-    // buffer is delivered to the audio hardware to when the beginning of the buffer
-    // starts reaching the output. We add those values to get the host time at which
-    // the first sample of this buffer will be reaching the output.
-    const UInt64 hostTimeAtBufferBegin = inTimeStamp->mHostTime + engineData->outputLatency;
-
+    // Get a copy of the current link timeline.
     const ABLLinkTimelineRef timeline =
-      ABLLinkCaptureAudioTimeline(linkData->ablLink);
+        ABLLinkCaptureAudioTimeline(linkData->ablLink);
+
+    // Get a copy of relevant engine parameters.
+    EngineData engineData;
+    pullEngineData(linkData, &engineData);
+
+    // The mHostTime member of the timestamp represents the time at
+    // which the buffer is delivered to the audio hardware. The output
+    // latency is the time from when the buffer is delivered to the
+    // audio hardware to when the beginning of the buffer starts
+    // reaching the output. We add those values to get the host time
+    // at which the first sample of this buffer will reach the output.
+    const UInt64 hostTimeAtBufferBegin =
+        inTimeStamp->mHostTime + engineData.outputLatency;
 
     // Handle a timeline reset
-    if (engineData->resetToBeatTime != INVALID_BEAT_TIME) {
+    if (engineData.resetToBeatTime != INVALID_BEAT_TIME) {
         // Reset the beat timeline so that the requested beat time
         // occurs near the beginning of this buffer. The requested beat
         // time may not occur exactly at the beginning of this buffer
@@ -160,40 +178,25 @@ static OSStatus audioCallback(
         // buffer, which therefore may be less than the requested beat
         // time by up to a quantum.
         ABLLinkRequestBeatAtTime(
-          timeline, engineData->resetToBeatTime, hostTimeAtBufferBegin, engineData->quantum);
-        engineData->resetToBeatTime = INVALID_BEAT_TIME;
+            timeline, engineData.resetToBeatTime, hostTimeAtBufferBegin,
+            engineData.quantum);
     }
 
     // Handle a tempo proposal
-    if (engineData->proposeBpm != INVALID_BPM) {
+    if (engineData.proposeBpm != INVALID_BPM) {
         // Propose that the new tempo takes effect at the beginning of
         // this buffer.
-        ABLLinkSetTempo(timeline, engineData->proposeBpm, hostTimeAtBufferBegin);
-        engineData->proposeBpm = INVALID_BPM;
+        ABLLinkSetTempo(timeline, engineData.proposeBpm, hostTimeAtBufferBegin);
     }
 
-    // Fill the buffer
-    if (engineData->isPlaying) {
-        // We use ABLLinkBeatTimeAtHostTime to query the beat time at the beginning of
-        // the buffer.
-        const Float64 beatTimeAtBufferBegin = ABLLinkBeatTimeAtHostTime(
-            timeline, hostTimeAtBufferBegin, engineData->quantum);
-
-        // To calculate the host time at buffer end we add the buffer duration to the host
-        // time at buffer begin.
-        const UInt64 bufferDurationHostTime =
-            (UInt64)(secondsToHostTime * inNumberFrames / sampleRate);
-
-        const Float64 beatTimeAtBufferEnd = ABLLinkBeatTimeAtHostTime(
-            timeline, hostTimeAtBufferBegin + bufferDurationHostTime, engineData->quantum);
-
-        // Add audible clicks to the buffer according to the portion of the song
-        // timeline represented by this buffer.
-        if (beatTimeAtBufferEnd >= 0.) {
-            clickInBuffer(beatTimeAtBufferBegin, beatTimeAtBufferEnd,
-                engineData->quantum, inNumberFrames, ioData, sampleRate,
-                &linkData->metronomeSamplePosition, &linkData->metronomeFrequency);
-        }
+    // When playing, render the metronome sound
+    if (engineData.isPlaying) {
+        // Only render the metronome sound to the first channel. This
+        // might help with source separate for timing analysis.
+        renderMetronomeIntoBuffer(
+            timeline, engineData.quantum, hostTimeAtBufferBegin, linkData->sampleRate,
+            linkData->secondsToHostTime, inNumberFrames,
+            (SInt16*)ioData->mBuffers[0].mData);
     }
 
     ABLLinkCommitAudioTimeline(linkData->ablLink, timeline);
@@ -243,8 +246,7 @@ static OSStatus audioCallback(
 }
 
 - (Float64)quantum {
-    const Float64 quantum = _linkData.sharedEngineData.quantum;
-    return quantum;
+    return _linkData.sharedEngineData.quantum;
 }
 
 - (void)setQuantum:(Float64)quantum {
@@ -368,15 +370,13 @@ static void StreamFormatCallback(
     _linkData.ablLink = ABLLinkNew(bpm);
     _linkData.sampleRate = [[AVAudioSession sharedInstance] sampleRate];
     _linkData.secondsToHostTime = (1.0e9 * timeInfo.denom) / (Float64)timeInfo.numer;
-    _linkData.metronomeSamplePosition = INVALID_SAMPLE_POSITION;
-    _linkData.metronomeFrequency = 0;
     _linkData.sharedEngineData.outputLatency =
         (UInt32)(_linkData.secondsToHostTime * [AVAudioSession sharedInstance].outputLatency);
     _linkData.sharedEngineData.resetToBeatTime = INVALID_BEAT_TIME;
     _linkData.sharedEngineData.proposeBpm = INVALID_BPM;
     _linkData.sharedEngineData.quantum = 4; // quantize to 4 beats
     _linkData.sharedEngineData.isPlaying = false;
-    _linkData.lockfreeEngineData = _linkData.sharedEngineData;
+    _linkData.localEngineData = _linkData.sharedEngineData;
 }
 
 - (void)setupAudioEngine {
