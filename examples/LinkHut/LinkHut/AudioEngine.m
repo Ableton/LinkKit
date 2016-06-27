@@ -104,7 +104,7 @@ static void renderMetronomeIntoBuffer(
         const UInt64 hostTime = beginHostTime + llround(i * hostTicksPerSample);
         // Only make sound for positive beat magnitudes. Negative beat
         // magnitudes are count-in beats.
-        if (ABLLinkBeatTimeAtHostTime(timeline, hostTime, quantum) >= 0.) {
+        if (ABLLinkBeatAtTime(timeline, hostTime, quantum) >= 0.) {
             // Get the phase of this sample. The phase is a beat value in
             // the range [0, quantum).
             const Float64 phase = ABLLinkPhaseAtTime(timeline, hostTime, quantum);
@@ -239,7 +239,7 @@ static OSStatus audioCallback(
 }
 
 - (Float64)beatTime {
-    return ABLLinkBeatTimeAtHostTime(
+    return ABLLinkBeatAtTime(
       ABLLinkCaptureAppTimeline(_linkData.ablLink),
       mach_absolute_time(),
       self.quantum);

@@ -113,7 +113,7 @@ extern "C"
    *  of the library changes.
    */
   void ABLLinkSetIsConnectedCallback(
-    ABLLinkRef ablLink,
+    ABLLinkRef,
     ABLLinkIsConnectedCallback callback,
     void* context);
 
@@ -126,7 +126,7 @@ extern "C"
    *
    *  @discussion This function is lockfree and should ONLY be called
    *  in the audio thread. It must not be accessed from any other
-   *  threads.  The returned reference refers to a snapshot of the
+   *  threads. The returned reference refers to a snapshot of the
    *  current Link state, so it should be captured and used in a local
    *  scope. Storing the Timeline for later use in a different context
    *  is not advised because it will provide an outdated view on the
@@ -139,7 +139,7 @@ extern "C"
    *
    *  @discussion This function is lockfree and should ONLY be called
    *  in the audio thread. The given timeline will replace the current
-   *  Link timeline.  Modifications to the session based on the new
+   *  Link timeline. Modifications to the session based on the new
    *  timeline will be communicated to other peers in the session.
    */
   void ABLLinkCommitAudioTimeline(ABLLinkRef, ABLLinkTimelineRef);
@@ -161,7 +161,7 @@ extern "C"
    *  application thread.
    *
    *  @discussion This function should ONLY be called in the main
-   *  thread.  The given timeline will replace the current Link
+   *  thread. The given timeline will replace the current Link
    *  timeline. Modifications to the session based on the new timeline
    *  will be communicated to other peers in the session.
    */
@@ -209,10 +209,10 @@ extern "C"
    *  unique to this Link instance, but its phase with respect to
    *  the provided quantum is shared among all session
    *  peers. For non-negative beat values, the following
-   *  property holds: fmod(ABLLinkBeatTimeAtHostTime(tl, ht, q), q) ==
-   *  ABLLinkPhaseAtTime(tl, ht, q)
+   *  property holds: fmod(ABLLinkBeatAtTime(tl, ht, q), q) ==
+   *  ABLLinkPhaseAtTime(tl, ht, q).
    */
-  double ABLLinkBeatTimeAtHostTime(
+  double ABLLinkBeatAtTime(
     ABLLinkTimelineRef,
     uint64_t hostTimeAtOutput,
     double quantum);
@@ -220,13 +220,12 @@ extern "C"
   /*! @brief Get the host time at which the sound corresponding to the
    *  given beat time and quantum reaches the device's audio output.
    *
-   *  @discussion: The inverse of ABLLinkBeatTimeAtHostTime, assuming
+   *  @discussion: The inverse of ABLLinkBeatAtTime, assuming
    *  a constant tempo.
    *
-   *  ABLLinkBeatTimeAtHostTime(tl,
-   *    ABLLinkHostTimeAtBeatTime(tl, b, q), q) == b.
+   *  ABLLinkBeatAtTime(tl, ABLLinkTimeAtBeat(tl, b, q), q) == b.
    */
-  uint64_t ABLLinkHostTimeAtBeatTime(
+  uint64_t ABLLinkTimeAtBeat(
     ABLLinkTimelineRef,
     double beatTime,
     double quantum);
