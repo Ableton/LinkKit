@@ -37,6 +37,8 @@ typedef struct {
     EngineData sharedEngineData;
     // Copy of sharedEngineData owned by audio thread.
     EngineData localEngineData;
+    // Owned by audio thread
+    UInt64 timeAtLastClick;
 } LinkData;
 
 /*
@@ -84,46 +86,52 @@ static void renderMetronomeIntoBuffer(
     const Float64 sampleRate,
     const Float64 secondsToHostTime,
     const UInt32 bufferSize,
+    UInt64* timeAtLastClick,
     SInt16* buffer)
 {
     // Metronome frequencies
     static const Float64 highTone = 1567.98;
     static const Float64 lowTone = 1108.73;
     // 100ms click duration
-    static const Float64 clickDurationInSeconds = 0.1;
+    static const Float64 clickDuration = 0.1;
 
     // The number of host ticks that elapse between samples
     const Float64 hostTicksPerSample = secondsToHostTime / sampleRate;
-    // The metronome click duration in beats at the current tempo
-    const Float64 clickDurationInBeats =
-      clickDurationInSeconds / (60. / ABLLinkGetTempo(timeline));
 
     for (UInt32 i = 0; i < bufferSize; ++i) {
         Float64 amplitude = 0.;
         // Compute the host time for this sample.
         const UInt64 hostTime = beginHostTime + llround(i * hostTicksPerSample);
+        const UInt64 lastSampleHostTime = hostTime - llround(hostTicksPerSample);
         // Only make sound for positive beat magnitudes. Negative beat
         // magnitudes are count-in beats.
         if (ABLLinkBeatAtTime(timeline, hostTime, quantum) >= 0.) {
-            // Get the phase of this sample. The phase is a beat value in
-            // the range [0, quantum).
-            const Float64 phase = ABLLinkPhaseAtTime(timeline, hostTime, quantum);
-            const Float64 lastBeatPhase = floor(phase);
-            // The click phase represents where this sample falls in the
-            // click duration.
-            const Float64 clickPhase = (phase - lastBeatPhase) / clickDurationInBeats;
-            // If the clickPhase is less than 1, it means that the current
-            // sample is within a click duration from the previous beat, in
-            // which case we must render the click sound for this sample.
-            if (clickPhase < 1.) {
-                // If the phase of the last beat was zero, then it was at a
-                // quantum boundary and we want to use the high tone. For other
-                // beats within the quantum, use the low tone.
-                const Float64 freq = lastBeatPhase == 0. ? highTone : lowTone;
+            // If the phase wraps around between the last sample and the
+            // current one with respect to a 1 beat quantum, then a click
+            // should occur.
+            if (ABLLinkPhaseAtTime(timeline, hostTime, 1) <
+                ABLLinkPhaseAtTime(timeline, lastSampleHostTime, 1)) {
+                *timeAtLastClick = hostTime;
+            }
+
+            const Float64 secondsAfterClick =
+                (hostTime - *timeAtLastClick) / secondsToHostTime;
+
+            // If we're within the click duration of the last beat, render
+            // the click tone into this sample
+            if (secondsAfterClick < clickDuration) {
+                // If the phase of the last beat with respect to the current
+                // quantum was zero, then it was at a quantum boundary and we
+                // want to use the high tone. For other beats within the
+                // quantum, use the low tone.
+                const Float64 freq =
+                    floor(ABLLinkPhaseAtTime(timeline, hostTime, quantum)) == 0
+                    ? highTone : lowTone;
+
                 // Simple cosine synth
                 amplitude =
-                  cos(2 * M_PI * clickPhase * clickDurationInSeconds * freq) *
-                  (1 - sin(5 * M_PI * clickPhase * clickDurationInSeconds));
+                    cos(2 * M_PI * secondsAfterClick * freq) *
+                    (1 - sin(5 * M_PI * secondsAfterClick));
             }
         }
         buffer[i] = (SInt16)(32761. * amplitude);
@@ -195,7 +203,7 @@ static OSStatus audioCallback(
         // might help with source separate for timing analysis.
         renderMetronomeIntoBuffer(
             timeline, engineData.quantum, hostTimeAtBufferBegin, linkData->sampleRate,
-            linkData->secondsToHostTime, inNumberFrames,
+            linkData->secondsToHostTime, inNumberFrames, &linkData->timeAtLastClick,
             (SInt16*)ioData->mBuffers[0].mData);
     }
 
@@ -377,6 +385,7 @@ static void StreamFormatCallback(
     _linkData.sharedEngineData.quantum = 4; // quantize to 4 beats
     _linkData.sharedEngineData.isPlaying = false;
     _linkData.localEngineData = _linkData.sharedEngineData;
+    _linkData.timeAtLastClick = 0;
 }
 
 - (void)setupAudioEngine {
