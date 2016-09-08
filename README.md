@@ -1,8 +1,10 @@
 LinkKit
 =========
 
-iOS SDK for [Ableton Link](https://ableton.com/link). All Link documentation, integration
-guidelines, and test plans can be found on the public
+iOS SDK for [Ableton Link](https://ableton.com/link).
+A discussion of general Link concepts can be found on the public
+[Link]((https://ableton.github.io/linkkit) page.
+The integration guidelines, and test plans for iOS apps can be found on the
 [LinkKit](https://ableton.github.io/linkkit) page.
 
 The LinkKit SDK is distributed as a zip file attached to a release in this repo. Please
