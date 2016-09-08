@@ -14,4 +14,4 @@ App Store. Official releases are those not marked "Pre-release."
 
 ##License
 Usage of LinkKit is governed by the [Ableton Link
-SDKlicense](Ableton_Link_SDK_License_v1.0.pdf).
+SDKlicense](Ableton_Link_SDK_License_v2.0.pdf).
