@@ -2,7 +2,7 @@
 
 #include "AudioEngine.h"
 #include <AudioToolbox/AudioToolbox.h>
-#include <AVFoundation/AVAudioSession.h>
+#include <AVFoundation/AVFoundation.h>
 #include <libkern/OSAtomic.h>
 #include <mach/mach_time.h>
 
