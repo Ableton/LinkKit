@@ -1,11 +1,15 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="10116" systemVersion="15E65" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="BYZ-38-t0r">
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="12121" systemVersion="16F73" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="10085"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="12089"/>
         <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
         <capability name="Constraints with non-1.0 multipliers" minToolsVersion="5.1"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
         <!--View Controller-->
@@ -27,7 +31,7 @@
                                 </constraints>
                                 <fontDescription key="fontDescription" type="system" pointSize="20"/>
                                 <state key="normal" image="Transport_Play">
-                                    <color key="titleColor" red="0.0" green="0.50196081399917603" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="titleColor" red="0.0" green="0.50196081399917603" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 </state>
                                 <state key="selected" image="Transport_Pause"/>
                                 <connections>
@@ -35,31 +39,13 @@
                                 </connections>
                             </button>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Quantum" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" minimumScaleFactor="0.5" translatesAutoresizingMaskIntoConstraints="NO" id="V7M-q3-gh5" userLabel="Quantum Label">
-                                <rect key="frame" x="79" y="318" width="150" height="40"/>
+                                <rect key="frame" x="49" y="318" width="150" height="40"/>
                                 <constraints>
                                     <constraint firstAttribute="width" secondItem="V7M-q3-gh5" secondAttribute="height" multiplier="150:40" id="p7E-DB-GaG"/>
                                 </constraints>
                                 <fontDescription key="fontDescription" name="HelveticaNeue-Light" family="Helvetica Neue" pointSize="24"/>
-                                <color key="textColor" red="0.25098039215686274" green="0.25098039215686274" blue="0.25098039215686274" alpha="1" colorSpace="calibratedRGB"/>
+                                <color key="textColor" red="0.25098039215686274" green="0.25098039215686274" blue="0.25098039215686274" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <nil key="highlightedColor"/>
-                                <variation key="heightClass=compact" misplaced="YES">
-                                    <rect key="frame" x="105" y="190.5" width="55" height="20"/>
-                                </variation>
-                                <variation key="widthClass=compact" misplaced="YES">
-                                    <rect key="frame" x="43" y="318" width="98.5" height="26"/>
-                                </variation>
-                                <variation key="widthClass=regular" misplaced="YES">
-                                    <rect key="frame" x="81.5" y="318" width="201.5" height="54"/>
-                                </variation>
-                                <variation key="heightClass=compact-widthClass=regular" misplaced="YES">
-                                    <rect key="frame" x="135" y="190" width="55" height="20"/>
-                                </variation>
-                                <variation key="heightClass=regular-widthClass=compact" misplaced="YES">
-                                    <rect key="frame" x="62.5" y="264" width="80" height="26.5"/>
-                                </variation>
-                                <variation key="heightClass=regular-widthClass=regular" misplaced="YES">
-                                    <rect key="frame" x="81.5" y="264" width="160" height="53.5"/>
-                                </variation>
                             </label>
                             <button opaque="NO" contentMode="topRight" contentHorizontalAlignment="fill" contentVerticalAlignment="fill" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="K4A-qs-qer" userLabel="Menu">
                                 <rect key="frame" x="552" y="20" width="28" height="22"/>
@@ -68,7 +54,7 @@
                                     <constraint firstAttribute="height" constant="22" id="MlR-uq-0zR"/>
                                 </constraints>
                                 <state key="normal" image="Settings">
-                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                    <color key="titleShadowColor" red="0.5" green="0.5" blue="0.5" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 </state>
                                 <connections>
                                     <action selector="showLinkSettings:" destination="BYZ-38-t0r" eventType="touchUpInside" id="nDi-Lt-Fqy"/>
@@ -80,50 +66,35 @@
                                     <constraint firstAttribute="width" secondItem="Req-bN-l6o" secondAttribute="height" multiplier="200:50" id="B6s-sh-rc8"/>
                                 </constraints>
                                 <fontDescription key="fontDescription" name="HelveticaNeue-Light" family="Helvetica Neue" pointSize="47"/>
-                                <color key="textColor" red="0.25098039215686274" green="0.25098039215686274" blue="0.25098039215686274" alpha="1" colorSpace="calibratedRGB"/>
+                                <color key="textColor" red="0.25098039215686274" green="0.25098039215686274" blue="0.25098039215686274" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="txn-pS-9Po" userLabel="Quantum Minus">
-                                <rect key="frame" x="60" y="369" width="29.5" height="30"/>
+                                <rect key="frame" x="30" y="369" width="30" height="30"/>
                                 <constraints>
                                     <constraint firstAttribute="width" secondItem="txn-pS-9Po" secondAttribute="height" multiplier="22:22" id="J22-m1-GOJ"/>
                                 </constraints>
                                 <state key="normal" image="Minus"/>
-                                <variation key="heightClass=compact-widthClass=regular" misplaced="YES">
-                                    <rect key="frame" x="40" y="234" width="40" height="42"/>
-                                </variation>
                                 <connections>
                                     <action selector="quantumDecreaseAction:" destination="BYZ-38-t0r" eventType="touchDown" id="aOY-Xz-T9d"/>
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Tga-re-Hg3" userLabel="Quantum Plus">
-                                <rect key="frame" x="219" y="369" width="28.5" height="30"/>
+                                <rect key="frame" x="189.5" y="369" width="28" height="30"/>
                                 <constraints>
                                     <constraint firstAttribute="width" secondItem="Tga-re-Hg3" secondAttribute="height" multiplier="22:23" id="uqD-nl-dca"/>
                                 </constraints>
                                 <state key="normal" image="Plus"/>
-                                <variation key="widthClass=regular" misplaced="YES">
-                                    <rect key="frame" x="265" y="384" width="38" height="40"/>
-                                </variation>
-                                <variation key="heightClass=compact-widthClass=regular" misplaced="YES">
-                                    <rect key="frame" x="245" y="234" width="40" height="42"/>
-                                </variation>
                                 <connections>
                                     <action selector="quantumIncreaseAction:" destination="BYZ-38-t0r" eventType="touchDown" id="C1I-Jg-UIh"/>
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" horizontalCompressionResistancePriority="250" verticalCompressionResistancePriority="250" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="voY-o7-ddy" userLabel="Bpm Minus">
-                                <rect key="frame" x="354" y="370" width="28" height="28"/>
+                                <rect key="frame" x="384" y="370.5" width="28" height="28"/>
                                 <constraints>
                                     <constraint firstAttribute="width" secondItem="voY-o7-ddy" secondAttribute="height" multiplier="22:22" id="ZKE-DS-Wa6"/>
                                 </constraints>
                                 <state key="normal" image="Minus"/>
-                                <variation key="heightClass=compact-widthClass=regular" misplaced="YES">
-                                    <rect key="frame" x="515" y="234" width="39" height="42"/>
-                                </variation>
-                                <variation key="heightClass=regular-widthClass=compact" misplaced="YES">
-                                    <rect key="frame" x="265" y="312.5" width="14.5" height="15.5"/>
-                                </variation>
                                 <connections>
                                     <action selector="bpmDecreaseTouchDownAction:" destination="BYZ-38-t0r" eventType="touchDown" id="7Ow-ug-Qwo"/>
                                     <action selector="bpmDecreaseTouchUpInsideAction:" destination="BYZ-38-t0r" eventType="touchUpInside" id="XnQ-0D-r44"/>
@@ -131,14 +102,11 @@
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" horizontalCompressionResistancePriority="250" verticalCompressionResistancePriority="250" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="WES-QY-qoy" userLabel="Bpm Plus">
-                                <rect key="frame" x="512" y="370" width="28" height="28"/>
+                                <rect key="frame" x="542" y="370.5" width="28" height="28"/>
                                 <constraints>
                                     <constraint firstAttribute="width" secondItem="WES-QY-qoy" secondAttribute="height" multiplier="22:22" id="Zfi-9c-2Eo"/>
                                 </constraints>
                                 <state key="normal" image="Plus"/>
-                                <variation key="heightClass=compact-widthClass=regular" misplaced="YES">
-                                    <rect key="frame" x="720" y="234" width="40" height="42"/>
-                                </variation>
                                 <connections>
                                     <action selector="bpmIncreaseTouchDownAction:" destination="BYZ-38-t0r" eventType="touchDown" id="H0G-Tk-q8V"/>
                                     <action selector="bpmIncreaseTouchUpInsideAction:" destination="BYZ-38-t0r" eventType="touchUpInside" id="Xdz-51-TaW"/>
@@ -146,80 +114,50 @@
                                 </connections>
                             </button>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" horizontalCompressionResistancePriority="1000" text="120.0" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" minimumScaleFactor="0.5" adjustsLetterSpacingToFitWidth="YES" translatesAutoresizingMaskIntoConstraints="NO" id="DiJ-tG-shs" userLabel="Bpm Display">
-                                <rect key="frame" x="387" y="364" width="120" height="40"/>
+                                <rect key="frame" x="417" y="364" width="120" height="40"/>
                                 <constraints>
                                     <constraint firstAttribute="width" secondItem="DiJ-tG-shs" secondAttribute="height" multiplier="120:40" id="Dme-fs-QOS"/>
                                 </constraints>
                                 <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="47"/>
-                                <color key="textColor" red="0.19215686274509805" green="0.19215686274509805" blue="0.19215686274509805" alpha="1" colorSpace="calibratedRGB"/>
+                                <color key="textColor" red="0.19215686274509805" green="0.19215686274509805" blue="0.19215686274509805" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <nil key="highlightedColor"/>
-                                <variation key="heightClass=compact-widthClass=regular" misplaced="YES">
-                                    <rect key="frame" x="557" y="227" width="160" height="55"/>
-                                </variation>
-                                <variation key="heightClass=regular-widthClass=compact" misplaced="YES">
-                                    <rect key="frame" x="282.5" y="308" width="60" height="20"/>
-                                </variation>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" horizontalCompressionResistancePriority="1000" text="4" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" minimumScaleFactor="0.5" adjustsLetterSpacingToFitWidth="YES" translatesAutoresizingMaskIntoConstraints="NO" id="rZP-NW-dYj" userLabel="Quantum Display">
-                                <rect key="frame" x="94" y="364" width="120" height="40"/>
+                                <rect key="frame" x="64.5" y="364" width="120" height="40"/>
                                 <constraints>
                                     <constraint firstAttribute="width" secondItem="rZP-NW-dYj" secondAttribute="height" multiplier="120:40" id="5xF-d1-r03"/>
                                 </constraints>
                                 <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="47"/>
-                                <color key="textColor" red="0.19215686269999999" green="0.19215686269999999" blue="0.19215686269999999" alpha="1" colorSpace="calibratedRGB"/>
+                                <color key="textColor" red="0.19215686269999999" green="0.19215686269999999" blue="0.19215686269999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <nil key="highlightedColor"/>
-                                <variation key="widthClass=regular" misplaced="YES">
-                                    <rect key="frame" x="102" y="377" width="160" height="53"/>
-                                </variation>
-                                <variation key="heightClass=compact-widthClass=regular" misplaced="YES">
-                                    <rect key="frame" x="82" y="221" width="160" height="55"/>
-                                </variation>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Tempo" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" minimumScaleFactor="0.5" translatesAutoresizingMaskIntoConstraints="NO" id="zic-jD-K4R" userLabel="Tempo Label">
-                                <rect key="frame" x="387" y="318" width="120" height="40"/>
+                                <rect key="frame" x="417" y="318" width="120" height="40"/>
                                 <constraints>
                                     <constraint firstAttribute="width" secondItem="zic-jD-K4R" secondAttribute="height" multiplier="120:40" id="T51-Ms-9La"/>
                                 </constraints>
                                 <fontDescription key="fontDescription" name="HelveticaNeue-Light" family="Helvetica Neue" pointSize="24"/>
-                                <color key="textColor" red="0.25098039220000001" green="0.25098039220000001" blue="0.25098039220000001" alpha="1" colorSpace="calibratedRGB"/>
+                                <color key="textColor" red="0.25098039220000001" green="0.25098039220000001" blue="0.25098039220000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <nil key="highlightedColor"/>
-                                <variation key="heightClass=compact" misplaced="YES">
-                                    <rect key="frame" x="440" y="190" width="55" height="20"/>
-                                </variation>
-                                <variation key="widthClass=compact" misplaced="YES">
-                                    <rect key="frame" x="269" y="318" width="79" height="26"/>
-                                </variation>
-                                <variation key="widthClass=regular" misplaced="YES">
-                                    <rect key="frame" x="539" y="318" width="161" height="54"/>
-                                </variation>
-                                <variation key="heightClass=compact-widthClass=regular" misplaced="YES">
-                                    <rect key="frame" x="610" y="190" width="55" height="20"/>
-                                </variation>
-                                <variation key="heightClass=regular-widthClass=compact" misplaced="YES">
-                                    <rect key="frame" x="252.5" y="257.5" width="120" height="40"/>
-                                </variation>
-                                <variation key="heightClass=regular-widthClass=regular" misplaced="YES">
-                                    <rect key="frame" x="559.5" y="263.5" width="160" height="53.5"/>
-                                </variation>
                             </label>
                             <view contentMode="scaleToFill" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="6cT-qz-P2J" userLabel="BeatTime" customClass="QuantumView">
                                 <rect key="frame" x="20" y="78" width="560" height="180"/>
-                                <color key="backgroundColor" white="0.33333333333333331" alpha="0.0" colorSpace="calibratedWhite"/>
+                                <color key="backgroundColor" red="0.3333333432674408" green="0.3333333432674408" blue="0.3333333432674408" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
                             </view>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="0.0" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumScaleFactor="0.5" translatesAutoresizingMaskIntoConstraints="NO" id="YBO-eg-6Dq" userLabel="currentBeatTime">
                                 <rect key="frame" x="104.5" y="266" width="24" height="20"/>
                                 <fontDescription key="fontDescription" name="HelveticaNeue-Light" family="Helvetica Neue" pointSize="17"/>
-                                <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Beat Time:" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="SwM-ro-fWv" userLabel="Beat Time Label">
                                 <rect key="frame" x="20" y="266" width="79.5" height="20"/>
                                 <fontDescription key="fontDescription" name="HelveticaNeue-Light" family="Helvetica Neue" pointSize="17"/>
-                                <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
                         </subviews>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
                             <constraint firstItem="rZP-NW-dYj" firstAttribute="height" secondItem="DiJ-tG-shs" secondAttribute="height" id="01s-gA-lUr"/>
                             <constraint firstItem="DiJ-tG-shs" firstAttribute="centerY" secondItem="rZP-NW-dYj" secondAttribute="centerY" id="3p3-R8-t5S"/>
@@ -311,6 +249,8 @@
                     </view>
                     <navigationItem key="navigationItem" id="zSP-dC-f7C"/>
                     <nil key="simulatedStatusBarMetrics"/>
+                    <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+                    <size key="freeformSize" width="600" height="600"/>
                     <connections>
                         <outlet property="beatTimeLabel" destination="YBO-eg-6Dq" id="8Jn-as-BGS"/>
                         <outlet property="bpmLabel" destination="DiJ-tG-shs" id="BTB-UX-Os9"/>
