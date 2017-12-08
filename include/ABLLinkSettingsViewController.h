@@ -20,6 +20,6 @@
     controller given an ABLLink instance. Clients must ensure that the
     ABLLink instance is not destroyed before the view controller.
 */
-+ (id)instance:(ABLLinkRef)ablLink;
++ (instancetype)instance:(ABLLinkRef)ablLink;
 
 @end
