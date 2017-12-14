@@ -12,7 +12,7 @@
 @property (readonly, nonatomic) BOOL isLinkEnabled;
 @property (readonly, nonatomic) ABLLinkRef linkRef;
 
-- (id)initWithTempo:(Float64)bpm;
+- (instancetype)initWithTempo:(Float64)bpm;
 - (void)start;
 - (void)stop;
 

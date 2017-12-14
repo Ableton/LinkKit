@@ -314,7 +314,7 @@ static void StreamFormatCallback(
 }
 
 # pragma mark - create and delete engine
-- (id)initWithTempo:(Float64)bpm {
+- (instancetype)initWithTempo:(Float64)bpm {
     if ([super init]) {
         [self initLinkData:bpm];
         [self setupAudioEngine];
