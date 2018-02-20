@@ -24,7 +24,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="zhj-32-wjX" userLabel="Playback">
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="zhj-32-wjX" userLabel="Playback" customClass="TransportButton">
                                 <rect key="frame" x="255" y="470" width="90" height="90"/>
                                 <constraints>
                                     <constraint firstAttribute="width" secondItem="zhj-32-wjX" secondAttribute="height" multiplier="1:1" id="MGY-zt-FEP"/>

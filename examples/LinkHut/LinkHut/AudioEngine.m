@@ -16,11 +16,12 @@ static OSSpinLock lock;
  * the main thread.
  */
 typedef struct {
-  UInt32 outputLatency; // Hardware output latency in HostTime
+  UInt64 outputLatency; // Hardware output latency in HostTime
   Float64 resetToBeatTime;
+  BOOL requestStart;
+  BOOL requestStop;
   Float64 proposeBpm;
   Float64 quantum;
-  BOOL isPlaying;
 } EngineData;
 
 /*
@@ -39,6 +40,8 @@ typedef struct {
     EngineData localEngineData;
     // Owned by audio thread
     UInt64 timeAtLastClick;
+    // Owned by audio thread
+    BOOL isPlaying;
 } LinkData;
 
 /*
@@ -49,6 +52,8 @@ static void pullEngineData(LinkData* linkData, EngineData* output) {
     // Always reset the signaling members to their default state
     output->resetToBeatTime = INVALID_BEAT_TIME;
     output->proposeBpm = INVALID_BPM;
+    output->requestStart = NO;
+    output->requestStop = NO;
 
     // Attempt to grab the lock guarding the shared engine data but
     // don't block if we can't get it.
@@ -57,11 +62,16 @@ static void pullEngineData(LinkData* linkData, EngineData* output) {
         linkData->localEngineData.outputLatency =
           linkData->sharedEngineData.outputLatency;
         linkData->localEngineData.quantum = linkData->sharedEngineData.quantum;
-        linkData->localEngineData.isPlaying = linkData->sharedEngineData.isPlaying;
 
         // Copy signaling members directly to the output and reset
         output->resetToBeatTime = linkData->sharedEngineData.resetToBeatTime;
         linkData->sharedEngineData.resetToBeatTime = INVALID_BEAT_TIME;
+
+        output->requestStart = linkData->sharedEngineData.requestStart;
+        linkData->sharedEngineData.requestStart = NO;
+
+        output->requestStop = linkData->sharedEngineData.requestStop;
+        linkData->sharedEngineData.requestStop = NO;
 
         output->proposeBpm = linkData->sharedEngineData.proposeBpm;
         linkData->sharedEngineData.proposeBpm = INVALID_BPM;
@@ -73,14 +83,13 @@ static void pullEngineData(LinkData* linkData, EngineData* output) {
     // whether or not we were able to grab the lock.
     output->outputLatency = linkData->localEngineData.outputLatency;
     output->quantum = linkData->localEngineData.quantum;
-    output->isPlaying = linkData->localEngineData.isPlaying;
 }
 /*
  * Render a metronome sound into the given buffer according to the
  * given timeline and quantum.
  */
 static void renderMetronomeIntoBuffer(
-    const ABLLinkTimelineRef timeline,
+    const ABLLinkSessionStateRef timeline,
     const Float64 quantum,
     const UInt64 beginHostTime,
     const Float64 sampleRate,
@@ -158,9 +167,9 @@ static OSStatus audioCallback(
 
     LinkData *linkData = (LinkData *)inRefCon;
 
-    // Get a copy of the current link timeline.
-    const ABLLinkTimelineRef timeline =
-        ABLLinkCaptureAudioTimeline(linkData->ablLink);
+    // Get a copy of the current link session state.
+    const ABLLinkSessionStateRef sessionState =
+        ABLLinkCaptureAudioSessionState(linkData->ablLink);
 
     // Get a copy of relevant engine parameters.
     EngineData engineData;
@@ -175,39 +184,47 @@ static OSStatus audioCallback(
     const UInt64 hostTimeAtBufferBegin =
         inTimeStamp->mHostTime + engineData.outputLatency;
 
-    // Handle a timeline reset
-    if (engineData.resetToBeatTime != INVALID_BEAT_TIME) {
-        // Reset the beat timeline so that the requested beat time
-        // occurs near the beginning of this buffer. The requested beat
-        // time may not occur exactly at the beginning of this buffer
-        // due to quantization, but it is guaranteed to occur within a
-        // quantum after the beginning of this buffer. The returned beat
-        // time is the actual beat time mapped to the beginning of this
-        // buffer, which therefore may be less than the requested beat
-        // time by up to a quantum.
-        ABLLinkRequestBeatAtTime(
-            timeline, engineData.resetToBeatTime, hostTimeAtBufferBegin,
-            engineData.quantum);
+    if (engineData.requestStart && !ABLLinkIsPlaying(sessionState)) {
+        // Request starting playback at the beginning of this buffer.
+        ABLLinkSetIsPlaying(sessionState, YES, hostTimeAtBufferBegin);
+    }
+
+    if (engineData.requestStop && ABLLinkIsPlaying(sessionState)) {
+        // Request stopping playback at the beginning of this buffer.
+        ABLLinkSetIsPlaying(sessionState, NO, hostTimeAtBufferBegin);
+    }
+
+    if (!linkData->isPlaying && ABLLinkIsPlaying(sessionState)) {
+        // Reset the session state's beat timeline so that the requested
+        // beat time corresponds to the time the transport will start playing.
+        // The returned beat time is the actual beat time mapped to the time
+        // playback will start, which therefore may be less than the requested
+        // beat time by up to a quantum.
+        ABLLinkRequestBeatAtStartPlayingTime(sessionState, 0., engineData.quantum);
+        linkData->isPlaying = YES;
+    }
+    else if(linkData->isPlaying && !ABLLinkIsPlaying(sessionState)) {
+        linkData->isPlaying = NO;
     }
 
     // Handle a tempo proposal
     if (engineData.proposeBpm != INVALID_BPM) {
         // Propose that the new tempo takes effect at the beginning of
         // this buffer.
-        ABLLinkSetTempo(timeline, engineData.proposeBpm, hostTimeAtBufferBegin);
+        ABLLinkSetTempo(sessionState, engineData.proposeBpm, hostTimeAtBufferBegin);
     }
 
+    ABLLinkCommitAudioSessionState(linkData->ablLink, sessionState);
+
     // When playing, render the metronome sound
-    if (engineData.isPlaying) {
+    if (linkData->isPlaying) {
         // Only render the metronome sound to the first channel. This
         // might help with source separate for timing analysis.
         renderMetronomeIntoBuffer(
-            timeline, engineData.quantum, hostTimeAtBufferBegin, linkData->sampleRate,
+            sessionState, engineData.quantum, hostTimeAtBufferBegin, linkData->sampleRate,
             linkData->secondsToHostTime, inNumberFrames, &linkData->timeAtLastClick,
             (SInt16*)ioData->mBuffers[0].mData);
     }
-
-    ABLLinkCommitAudioTimeline(linkData->ablLink, timeline);
 
     return noErr;
 }
@@ -224,20 +241,23 @@ static OSStatus audioCallback(
 
 # pragma mark - Transport
 - (BOOL)isPlaying {
-    return _linkData.sharedEngineData.isPlaying;
+    const ABLLinkSessionStateRef sessionState = ABLLinkCaptureAppSessionState(_linkData.ablLink);
+    return ABLLinkIsPlaying(sessionState);
 }
 
 - (void)setIsPlaying:(BOOL)isPlaying {
     OSSpinLockLock(&lock);
-    _linkData.sharedEngineData.isPlaying = isPlaying;
     if (isPlaying) {
-        _linkData.sharedEngineData.resetToBeatTime = 0;
+        _linkData.sharedEngineData.requestStart = YES;
+    }
+    else {
+        _linkData.sharedEngineData.requestStop = YES;
     }
     OSSpinLockUnlock(&lock);
 }
 
 - (Float64)bpm {
-    return ABLLinkGetTempo(ABLLinkCaptureAppTimeline(_linkData.ablLink));
+    return ABLLinkGetTempo(ABLLinkCaptureAppSessionState(_linkData.ablLink));
 }
 
 - (void)setBpm:(Float64)bpm {
@@ -248,7 +268,7 @@ static OSStatus audioCallback(
 
 - (Float64)beatTime {
     return ABLLinkBeatAtTime(
-      ABLLinkCaptureAppTimeline(_linkData.ablLink),
+      ABLLinkCaptureAppSessionState(_linkData.ablLink),
       mach_absolute_time(),
       self.quantum);
 }
@@ -274,8 +294,8 @@ static OSStatus audioCallback(
 # pragma mark - Handle AVAudioSession changes
 - (void)handleRouteChange:(NSNotification *)notification {
 #pragma unused(notification)
-    const UInt32 outputLatency =
-        (UInt32)(_linkData.secondsToHostTime * [AVAudioSession sharedInstance].outputLatency);
+    const UInt64 outputLatency =
+        _linkData.secondsToHostTime * [AVAudioSession sharedInstance].outputLatency;
     OSSpinLockLock(&lock);
     _linkData.sharedEngineData.outputLatency = outputLatency;
     OSSpinLockUnlock(&lock);
@@ -379,11 +399,12 @@ static void StreamFormatCallback(
     _linkData.sampleRate = [[AVAudioSession sharedInstance] sampleRate];
     _linkData.secondsToHostTime = (1.0e9 * timeInfo.denom) / (Float64)timeInfo.numer;
     _linkData.sharedEngineData.outputLatency =
-        (UInt32)(_linkData.secondsToHostTime * [AVAudioSession sharedInstance].outputLatency);
+        _linkData.secondsToHostTime * [AVAudioSession sharedInstance].outputLatency;
     _linkData.sharedEngineData.resetToBeatTime = INVALID_BEAT_TIME;
     _linkData.sharedEngineData.proposeBpm = INVALID_BPM;
+    _linkData.sharedEngineData.requestStart = NO;
+    _linkData.sharedEngineData.requestStop = NO;
     _linkData.sharedEngineData.quantum = 4; // quantize to 4 beats
-    _linkData.sharedEngineData.isPlaying = false;
     _linkData.localEngineData = _linkData.sharedEngineData;
     _linkData.timeAtLastClick = 0;
 }

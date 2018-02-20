@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "ABLLink.h"
+
 #ifdef __cplusplus
 extern "C"
 {
@@ -10,11 +12,11 @@ extern "C"
   /** Calculate the effective Beats Per Minute value for a range of beat values
       over the given number of samples at the given sample rate.
   */
-  static inline double ABLLinkBpmInRange(
-    const double fromBeat,
-    const double toBeat,
-    const uint32_t numSamples,
-    const double sampleRate) {
+  inline Float64 ABLLinkBpmInRange(
+    const Float64 fromBeat,
+    const Float64 toBeat,
+    const UInt32 numSamples,
+    const Float64 sampleRate) {
     return (toBeat - fromBeat) * sampleRate * 60 / numSamples;
   }
 

@@ -4,9 +4,17 @@
 #import "AudioEngine.h"
 #include "ABLLinkSettingsViewController.h"
 
+@implementation TransportButton
+- (BOOL)isHighlighted {
+    return NO;
+}
+@end
+
+
 @interface ViewController ()
 
 - (void)updateSessionTempo:(Float64)bpm;
+- (void)updateIsTransportOn:(BOOL)on;
 
 @end
 
@@ -15,9 +23,14 @@ static void onSessionTempoChanged(Float64 bpm, void* context) {
     [vc updateSessionTempo:bpm];
 }
 
+static void onStartStopStateChanged(bool on, void* context) {
+   ViewController* vc = (__bridge ViewController *)context;
+   [vc updateIsTransportOn:on];
+ }
+
+
 @implementation ViewController {
     AudioEngine *_audioEngine;
-    BOOL _isPlaying;
     Float64 _bpm;
     Float64 _quanta;
     UIViewController *_linkSettings;
@@ -30,12 +43,13 @@ static void onSessionTempoChanged(Float64 bpm, void* context) {
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    _isPlaying = false;
     _bpm = 120;
     _quanta = 4.;
     _audioEngine = [[AudioEngine alloc] initWithTempo:_bpm];
     ABLLinkSetSessionTempoCallback(
         _audioEngine.linkRef, onSessionTempoChanged, (__bridge void *)self);
+    ABLLinkSetStartStopCallback(
+         _audioEngine.linkRef, onStartStopStateChanged, (__bridge void *)self);
     _linkSettings = [ABLLinkSettingsViewController instance:_audioEngine.linkRef];
     [_audioEngine setQuantum:_quanta];
     [self.quantumView setQuantum:_quanta];
@@ -50,7 +64,7 @@ static void onSessionTempoChanged(Float64 bpm, void* context) {
 }
 
 - (BOOL)isPlaying {
-    return _isPlaying;
+    return _audioEngine.isPlaying;
 }
 
 - (ABLLinkRef)linkRef {
@@ -71,18 +85,17 @@ static void onSessionTempoChanged(Float64 bpm, void* context) {
 }
 
 - (void)updateUi {
-    self.transportButton.selected = _isPlaying;
+    self.transportButton.selected = _audioEngine.isPlaying;
     self.bpmLabel.text = [NSString stringWithFormat:@"%.1f", _bpm];
     self.quantumLabel.text = [NSString stringWithFormat:@"%.0f", _quanta];
     [self.quantumView setQuantum:_quanta];
+    [self.quantumView setIsPlaying:_audioEngine.isPlaying];
 }
 
 #pragma mark - UI Actions
-- (IBAction)transportButtonAction:(UIButton *)sender {
-    _isPlaying = !sender.selected;
-    _audioEngine.isPlaying = _isPlaying;
-    [self.quantumView setIsPlaying:_isPlaying];
-    [self updateUi];
+- (IBAction)transportButtonAction:(TransportButton *)sender {
+    #pragma unused(sender)
+    _audioEngine.isPlaying = !_audioEngine.isPlaying;
 }
 
 - (IBAction)bpmIncreaseTouchDownAction:(UIButton *)sender {
@@ -107,7 +120,6 @@ static void onSessionTempoChanged(Float64 bpm, void* context) {
 - (void)increaseBpm {
     ++_bpm;
     [_audioEngine setBpm:_bpm];
-    [self updateUi];
 }
 
 - (IBAction)bpmDecreaseTouchDownAction:(UIButton *)sender {
@@ -133,7 +145,6 @@ static void onSessionTempoChanged(Float64 bpm, void* context) {
 - (void)decreaseBpm {
     --_bpm;
     [_audioEngine setBpm:_bpm];
-    [self updateUi];
 }
 
 - (IBAction)quantumIncreaseAction:(UIButton *)sender {
@@ -156,6 +167,11 @@ static void onSessionTempoChanged(Float64 bpm, void* context) {
     _bpm = bpm;
     [self updateUi];
 }
+
+- (void)updateIsTransportOn:(BOOL)on {
+    #pragma unused(on)
+    [self updateUi];
+ }
 
 - (IBAction)showLinkSettings:(UIButton *)sender {
     UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:_linkSettings];

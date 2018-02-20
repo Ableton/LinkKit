@@ -1,34 +1,38 @@
 /*! @file ABLLink.h
  *  @copyright 2016, Ableton AG, Berlin. All rights reserved.
  *
- *  @brief Cross-device shared tempo and quantized beat grid API for iOS
+ *  @brief Cross-device shared tempo, quantized beat grid and start/stop
+ *  synchronization API for iOS
  *
  *  @discussion Provides zero configuration peer discovery on a local
  *  wired or wifi network between multiple instances running on
  *  multiple devices. When peers are connected in a link session, they
  *  share a common tempo and quantized beat grid.
  *
- *  Each instance of the library has its own beat timeline that starts
+ *  Each instance of the library has its own session state which represents
+ *  a beat timeline and a transport start/stop state. The timeline starts
  *  when the library is initialized and runs until the library
  *  instance is destroyed. Clients can reset the beat timeline in
  *  order to align it with an app's beat position when starting
  *  playback.
+ *  Synchronizing to the transport start/stop state of Link is optional
+ *  for every peer. The transport start/stop state is only shared with
+ *  other peers when start/stop synchronization is enabled.
  *
- *  The library provides one timeline capture/commit function pair for
+ *  The library provides one session state capture/commit function pair for
  *  use in the audio thread and one for the main application
- *  thread. In general, modifying the Link timeline should be done in
+ *  thread. In general, modifying the Link session state should be done in
  *  the audio thread for the most accurate timing results. The ability
- *  to modify the Link timeline from application threads should only
+ *  to modify the Link session state from application threads should only
  *  be used in cases where an application's audio thread is not
  *  actively running or if it doesn't generate audio at all. Modifying
- *  the Link timeline from both the audio thread and an application
+ *  the Link session state from both the audio thread and an application
  *  thread concurrently is not advised and will potentially lead to
  *  unexpected behavior.
  */
 
 #pragma once
 
-#include <stdbool.h>
 #include <stdint.h>
 
 #ifdef __cplusplus
@@ -65,6 +69,16 @@ extern "C"
 
   /*! @brief Is Link currently connected to other peers? */
   bool ABLLinkIsConnected(ABLLinkRef);
+  
+  /*! @brief Is Start Stop Sync currently enabled by the user?
+   *
+   *  @discussion The Start Stop Sync Enabled status is only controllable
+   *  by the user via the Link settings dialog and is not controllable
+   *  programmatically.
+   *  To allow the user to enable Start Stop Sync a Boolean entry YES under
+   *  the key ABLLinkStartStopSyncSupported must be added to Info.plist.
+   */
+  bool ABLLinkIsStartStopSyncEnabled(ABLLinkRef);
 
   /*! @brief Called if Session Tempo changes.
    *
@@ -77,11 +91,27 @@ extern "C"
     double sessionTempo,
     void *context);
 
+  /*! @brief Called if Session transport start/stop state changes.
+   *
+   *  @param the new start/stop state
+   */
+  typedef void (*ABLLinkStartStopCallback)(
+    bool isPlaying,
+    void *context);
+
   /*! @brief Called if isEnabled state changes.
    *
    *  @param isEnabled Whether Link is currently enabled
    */
   typedef void (*ABLLinkIsEnabledCallback)(
+    bool isEnabled,
+    void *context);
+
+  /*! @brief Called if IsStartStopSyncEnabled state changes.
+   *
+   *  @param isEnabled Whether Start Stop Sync is currently enabled.
+   */
+  typedef void (*ABLLinkIsStartStopSyncEnabledCallback)(
     bool isEnabled,
     void *context);
 
@@ -102,12 +132,28 @@ extern "C"
     ABLLinkSessionTempoCallback callback,
     void* context);
 
+  /*! @brief Invoked on the main thread when the Start/stop state of
+   *  the Link session changes.
+   */
+  void ABLLinkSetStartStopCallback(
+    ABLLinkRef,
+    ABLLinkStartStopCallback callback,
+    void* context);
+
   /*! @brief Invoked on the main thread when the user changes the
    *  enabled state of the library via the Link settings view.
    */
   void ABLLinkSetIsEnabledCallback(
     ABLLinkRef,
     ABLLinkIsEnabledCallback callback,
+    void* context);
+
+  /*! @brief Invoked on the main thread when the user changes the
+   *  start stop sync enabled state via the Link settings view.
+   */
+  void ABLLinkSetIsStartStopSyncEnabledCallback(
+    ABLLinkRef,
+    ABLLinkIsStartStopSyncEnabledCallback callback,
     void* context);
 
   /*! @brief Invoked on the main thread when the isConnected state
@@ -118,62 +164,75 @@ extern "C"
     ABLLinkIsConnectedCallback callback,
     void* context);
 
-  /*! @brief A reference to a representation of a mapping between time
-   *  and beats for varying quanta.
+  /*! @brief A reference to a representation of Link's session state.
+   *
+   *  @discussion A session state represents a timeline and the start/stop
+   *  state. The timeline is a representation of a mapping between time and
+   *  beats for varying quanta. The start/stop state represents the user
+   *  intention to start or stop transport at a specific time. Start stop
+   *  synchronization is an optional feature that allows to share the user
+   *  request to start or stop transport between a subgroup of peers in a
+   *  Link session. When observing a change of start/stop state, audio
+   *  playback of a peer should be started or stopped the same way it would
+   *  have happened if the user had requested that change at the according
+   *  time locally. The start/stop state can only be changed by the user.
+   *  This means that the current local start/stop state persists when
+   *  joining or leaving a Link session. After joining a Link session
+   *  start/stop change requests will be communicated to all connected peers.
    */
-  typedef struct ABLLinkTimeline* ABLLinkTimelineRef;
+  typedef struct ABLLinkSessionState* ABLLinkSessionStateRef;
 
-  /*! @brief Capture the current Link timeline from the audio thread.
+  /*! @brief Capture the current Link session state from the audio thread.
    *
    *  @discussion This function is lockfree and should ONLY be called
    *  in the audio thread. It must not be accessed from any other
    *  threads. The returned reference refers to a snapshot of the
-   *  current Link state, so it should be captured and used in a local
-   *  scope. Storing the Timeline for later use in a different context
+   *  current session state, so it should be captured and used in a local
+   *  scope. Storing the session state for later use in a different context
    *  is not advised because it will provide an outdated view on the
    *  Link state.
    */
-  ABLLinkTimelineRef ABLLinkCaptureAudioTimeline(ABLLinkRef);
+  ABLLinkSessionStateRef ABLLinkCaptureAudioSessionState(ABLLinkRef);
 
-  /*! @brief Commit the given timeline to the Link session from the
+  /*! @brief Commit the given session state to the Link session from the
    *  audio thread.
    *
    *  @discussion This function is lockfree and should ONLY be called
-   *  in the audio thread. The given timeline will replace the current
-   *  Link timeline. Modifications to the session based on the new
-   *  timeline will be communicated to other peers in the session.
+   *  in the audio thread. The given session state will replace the current
+   *  Link session state. Modifications to the session based on the new
+   *  session state will be communicated to other peers in the session.
    */
-  void ABLLinkCommitAudioTimeline(ABLLinkRef, ABLLinkTimelineRef);
+  void ABLLinkCommitAudioSessionState(ABLLinkRef, ABLLinkSessionStateRef);
 
-  /*! @brief Capture the current Link timeline from the main
+  /*! @brief Capture the current Link session state from the main
    *  application thread.
    *
    *  @discussion This function provides the ability to query the Link
-   *  timeline from the main application thread and should only be
-   *  used from that thread. The returned Timeline stores a snapshot
+   *  session state from the main application thread and should only be
+   *  used from that thread. The returned session state stores a snapshot
    *  of the current Link state, so it should be captured and used in
-   *  a local scope. Storing the Timeline for later use in a different
+   *  a local scope. Storing the session state for later use in a different
    *  context is not advised because it will provide an outdated view
    *  on the Link state.
    */
-  ABLLinkTimelineRef ABLLinkCaptureAppTimeline(ABLLinkRef);
+  ABLLinkSessionStateRef ABLLinkCaptureAppSessionState(ABLLinkRef);
 
-  /*! @brief Commit the timeline to the Link session from the main
+  /*! @brief Commit the session state to the Link session from the main
    *  application thread.
    *
    *  @discussion This function should ONLY be called in the main
-   *  thread. The given timeline will replace the current Link
-   *  timeline. Modifications to the session based on the new timeline
-   *  will be communicated to other peers in the session.
+   *  thread. The given session state will replace the current Link
+   *  session state. Modifications to the session based on the new session
+   *  state will be communicated to other peers in the session.
    */
-  void ABLLinkCommitAppTimeline(ABLLinkRef, ABLLinkTimelineRef);
+  void ABLLinkCommitAppSessionState(ABLLinkRef, ABLLinkSessionStateRef);
 
 
-  /*! @section ABLLinkTimeline functions
+  /*! @section ABLLinkSessionState functions
    *
    *  The following functions all query or modify aspects of a
-   *  captured timeline. Modifications made to a timeline will never
-   *  be seen by other peers in a session until they are committed
+   *  captured session state. Modifications made to a session state will
+   *  never be seen by other peers in a session until they are committed
    *  using the appropriate function above.
    *
    *  Time value parameters for the following functions are specified
@@ -187,19 +246,19 @@ extern "C"
    *  introduced by the software.
    */
 
-  /*! @brief The tempo of the given timeline, in Beats Per Minute.
+  /*! @brief The tempo of the given session state, in Beats Per Minute.
    *
    *  @discussion This is a stable value that is appropriate for display
    *  to the user. Beat time progress will not necessarily match this tempo
    *  exactly because of clock drift compensation.
    */
-  double ABLLinkGetTempo(ABLLinkTimelineRef);
+  double ABLLinkGetTempo(ABLLinkSessionStateRef);
 
-  /*! @brief Set the timeline tempo to the given bpm value, taking
+  /*! @brief Set the session state tempo to the given bpm value, taking
    *  effect at the given host time.
    */
   void ABLLinkSetTempo(
-    ABLLinkTimelineRef,
+    ABLLinkSessionStateRef,
     double bpm,
     uint64_t hostTimeAtOutput);
 
@@ -214,7 +273,7 @@ extern "C"
    *  ABLLinkPhaseAtTime(tl, ht, q).
    */
   double ABLLinkBeatAtTime(
-    ABLLinkTimelineRef,
+    ABLLinkSessionStateRef,
     uint64_t hostTimeAtOutput,
     double quantum);
 
@@ -227,7 +286,7 @@ extern "C"
    *  ABLLinkBeatAtTime(tl, ABLLinkTimeAtBeat(tl, b, q), q) == b.
    */
   uint64_t ABLLinkTimeAtBeat(
-    ABLLinkTimelineRef,
+    ABLLinkSessionStateRef,
     double beatTime,
     double quantum);
 
@@ -239,7 +298,7 @@ extern "C"
    *  The returned value will be in the range [0, quantum).
    */
   double ABLLinkPhaseAtTime(
-    ABLLinkTimelineRef,
+    ABLLinkSessionStateRef,
     uint64_t hostTimeAtOutput,
     double quantum);
 
@@ -270,7 +329,7 @@ extern "C"
    *  the number of peers.
    */
   void ABLLinkRequestBeatAtTime(
-    ABLLinkTimelineRef,
+    ABLLinkSessionStateRef,
     double beatTime,
     uint64_t hostTimeAtOutput,
     double quantum);
@@ -297,9 +356,40 @@ extern "C"
    *  join.
    */
   void ABLLinkForceBeatAtTime(
-    ABLLinkTimelineRef,
+    ABLLinkSessionStateRef,
     double beatTime,
     uint64_t hostTimeAtOutput,
+    double quantum);
+
+  /*! @brief: Set if transport should be playing or stopped at the given time. */
+  void ABLLinkSetIsPlaying(
+    ABLLinkSessionStateRef,
+    bool isPlaying,
+    uint64_t hostTimeAtOutput);
+
+  /*! @brief: Is transport playing? */
+  bool ABLLinkIsPlaying(ABLLinkSessionStateRef);
+
+  /*! @brief: Get the time at which a transport start/stop occurs */
+  uint64_t ABLLinkTimeForIsPlaying(ABLLinkSessionStateRef);
+
+  /*! @brief: Convenience function to attempt to map the given beat to the time
+   *  when transport is starting to play in context to the given quantum.
+   *  This function evaluates to a no-op if ABLLinkIsPlaying() equals false.
+   */
+  void ABLLinkRequestBeatAtStartPlayingTime(
+    ABLLinkSessionStateRef,
+    double beatTime,
+    double quantum);
+
+  /*! @brief: Convenience function to start or stop transport at a given time and
+   *  attempt to map the given beat to this time in context of the given quantum.
+   */
+  void ABLLinkSetIsPlayingAndRequestBeatAtTime(
+    ABLLinkSessionStateRef,
+    bool isPlaying,
+    uint64_t hostTimeAtOutput,
+    double beatTime,
     double quantum);
 
 #ifdef __cplusplus
