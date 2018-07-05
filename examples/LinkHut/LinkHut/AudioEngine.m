@@ -1,10 +1,10 @@
-// Copyright: 2015, Ableton AG, Berlin. All rights reserved.
+// Copyright: 2018, Ableton AG, Berlin. All rights reserved.
 
-#include "AudioEngine.h"
 #include <AudioToolbox/AudioToolbox.h>
 #include <AVFoundation/AVFoundation.h>
 #include <libkern/OSAtomic.h>
 #include <mach/mach_time.h>
+#include "AudioEngine.h"
 
 #define INVALID_BEAT_TIME DBL_MIN
 #define INVALID_BPM DBL_MIN
@@ -86,10 +86,10 @@ static void pullEngineData(LinkData* linkData, EngineData* output) {
 }
 /*
  * Render a metronome sound into the given buffer according to the
- * given timeline and quantum.
+ * given session state and quantum.
  */
 static void renderMetronomeIntoBuffer(
-    const ABLLinkSessionStateRef timeline,
+    const ABLLinkSessionStateRef sessionState,
     const Float64 quantum,
     const UInt64 beginHostTime,
     const Float64 sampleRate,
@@ -114,12 +114,12 @@ static void renderMetronomeIntoBuffer(
         const UInt64 lastSampleHostTime = hostTime - llround(hostTicksPerSample);
         // Only make sound for positive beat magnitudes. Negative beat
         // magnitudes are count-in beats.
-        if (ABLLinkBeatAtTime(timeline, hostTime, quantum) >= 0.) {
+        if (ABLLinkBeatAtTime(sessionState, hostTime, quantum) >= 0.) {
             // If the phase wraps around between the last sample and the
             // current one with respect to a 1 beat quantum, then a click
             // should occur.
-            if (ABLLinkPhaseAtTime(timeline, hostTime, 1) <
-                ABLLinkPhaseAtTime(timeline, lastSampleHostTime, 1)) {
+            if (ABLLinkPhaseAtTime(sessionState, hostTime, 1) <
+                ABLLinkPhaseAtTime(sessionState, lastSampleHostTime, 1)) {
                 *timeAtLastClick = hostTime;
             }
 
@@ -134,7 +134,7 @@ static void renderMetronomeIntoBuffer(
                 // want to use the high tone. For other beats within the
                 // quantum, use the low tone.
                 const Float64 freq =
-                    floor(ABLLinkPhaseAtTime(timeline, hostTime, quantum)) == 0
+                    floor(ABLLinkPhaseAtTime(sessionState, hostTime, quantum)) == 0
                     ? highTone : lowTone;
 
                 // Simple cosine synth
@@ -346,6 +346,14 @@ static void StreamFormatCallback(
     return self;
 }
 
+_Pragma("clang diagnostic push")
+_Pragma("clang diagnostic ignored \"-Wobjc-designated-initializers\"")
+-(instancetype)init {
+  NSAssert(NO, @"init is not the designated initializer for instances of AudioEngine.");
+  return nil;
+}
+_Pragma("clang diagnostic pop")
+
 - (void)dealloc {
     if (_ioUnit) {
         OSStatus result = AudioComponentInstanceDispose(_ioUnit);
@@ -396,7 +404,7 @@ static void StreamFormatCallback(
 
     lock = OS_SPINLOCK_INIT;
     _linkData.ablLink = ABLLinkNew(bpm);
-    _linkData.sampleRate = [[AVAudioSession sharedInstance] sampleRate];
+    _linkData.sampleRate = [AVAudioSession sharedInstance].sampleRate;
     _linkData.secondsToHostTime = (1.0e9 * timeInfo.denom) / (Float64)timeInfo.numer;
     _linkData.sharedEngineData.outputLatency =
         _linkData.secondsToHostTime * [AVAudioSession sharedInstance].outputLatency;
@@ -416,7 +424,7 @@ static void StreamFormatCallback(
                                                     withOptions:AVAudioSessionCategoryOptionMixWithOthers
                                                           error:&sessionError];
     if(!success) {
-        NSLog(@"Error setting category Audio Session: %@", [sessionError localizedDescription]);
+        NSLog(@"Error setting category Audio Session: %@", sessionError.localizedDescription);
     }
 
     // Create Audio Unit

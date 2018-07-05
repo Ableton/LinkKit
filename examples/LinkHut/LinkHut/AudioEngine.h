@@ -1,4 +1,4 @@
-// Copyright: 2015, Ableton AG, Berlin. All rights reserved.
+// Copyright: 2018, Ableton AG, Berlin. All rights reserved.
 
 #include <Foundation/Foundation.h>
 #include "ABLLink.h"
@@ -12,7 +12,7 @@
 @property (readonly, nonatomic) BOOL isLinkEnabled;
 @property (readonly, nonatomic) ABLLinkRef linkRef;
 
-- (instancetype)initWithTempo:(Float64)bpm;
+- (instancetype)initWithTempo:(Float64)bpm NS_DESIGNATED_INITIALIZER;
 - (void)start;
 - (void)stop;
 

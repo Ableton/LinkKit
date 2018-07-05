@@ -1,5 +1,5 @@
 /*! @file ABLLink.h
- *  @copyright 2016, Ableton AG, Berlin. All rights reserved.
+ *  @copyright 2018, Ableton AG, Berlin. All rights reserved.
  *
  *  @brief Cross-device shared tempo, quantized beat grid and start/stop
  *  synchronization API for iOS
@@ -69,7 +69,7 @@ extern "C"
 
   /*! @brief Is Link currently connected to other peers? */
   bool ABLLinkIsConnected(ABLLinkRef);
-  
+
   /*! @brief Is Start Stop Sync currently enabled by the user?
    *
    *  @discussion The Start Stop Sync Enabled status is only controllable

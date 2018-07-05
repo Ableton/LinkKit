@@ -1,9 +1,8 @@
-// Copyright: 2015, Ableton AG, Berlin. All rights reserved.
+// Copyright: 2018, Ableton AG, Berlin. All rights reserved.
 
-
-#import <UIKit/UIKit.h>
-#import "QuantumView.h"
+#include <UIKit/UIKit.h>
 #include "ABLLink.h"
+#include "QuantumView.h"
 
 @interface TransportButton : UIButton
 @end
@@ -29,6 +28,6 @@
 - (IBAction)showLinkSettings:(UIButton *)sender;
 
 - (void)enableAudioEngine:(BOOL)enable;
-- (BOOL)isPlaying;
+@property (nonatomic, getter=isPlaying, readonly) BOOL playing;
 
 @end

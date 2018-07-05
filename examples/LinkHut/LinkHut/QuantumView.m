@@ -1,10 +1,8 @@
-// Copyright: 2016, Ableton AG, Berlin. All rights reserved.
+// Copyright: 2018, Ableton AG, Berlin. All rights reserved.
 
-#import "QuantumView.h"
-
+#include "QuantumView.h"
 
 static const CGFloat kSpacing = 3;
-
 
 @implementation QuantumView {
     NSMutableArray *_tiles;
@@ -58,12 +56,12 @@ static const CGFloat kSpacing = 3;
         NSUInteger currentQuanta;
         if (beatTime >= 0) {
             currentQuanta = (NSUInteger)(floor(fmod(beatTime, _quantum)));
-            tile = [_tiles objectAtIndex:currentQuanta];
+            tile = _tiles[currentQuanta];
             tile.backgroundColor = currentQuanta == 0 ? _activeBeginColor : _activeColor;
         }
         else {
             currentQuanta = (NSUInteger)(floor(fmod(_quantum + beatTime, _quantum)));
-            tile = [_tiles objectAtIndex:currentQuanta];
+            tile = _tiles[currentQuanta];
             tile.backgroundColor = _inactiveColor;
         }
     }

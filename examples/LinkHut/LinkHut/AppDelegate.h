@@ -1,6 +1,6 @@
-// Copyright: 2015, Ableton AG, Berlin. All rights reserved.
+// Copyright: 2018, Ableton AG, Berlin. All rights reserved.
 
-#import <UIKit/UIKit.h>
+#include <UIKit/UIKit.h>
 
 @interface AppDelegate : UIResponder <UIApplicationDelegate>
 

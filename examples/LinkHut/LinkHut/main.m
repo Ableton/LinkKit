@@ -1,7 +1,7 @@
-// Copyright: 2015, Ableton AG, Berlin. All rights reserved.
+// Copyright: 2018, Ableton AG, Berlin. All rights reserved.
 
-#import <UIKit/UIKit.h>
-#import "AppDelegate.h"
+#include <UIKit/UIKit.h>
+#include "AppDelegate.h"
 
 int main(int argc, char * argv[]) {
   @autoreleasepool {

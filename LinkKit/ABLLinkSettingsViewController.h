@@ -1,11 +1,11 @@
 /*! @file ABLSettingsViewController.h
-    @copyright 2016, Ableton AG, Berlin. All rights reserved.
+    @copyright 2018, Ableton AG, Berlin. All rights reserved.
 */
 
 #pragma once
 
-#import <UIKit/UIKit.h>
-#import "ABLLink.h"
+#include <UIKit/UIKit.h>
+#include "ABLLink.h"
 
 /*! @brief Link settings view controller
     @discussion Settings view controller that provides users with the

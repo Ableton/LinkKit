@@ -1,8 +1,8 @@
-// Copyright: 2015, Ableton AG, Berlin. All rights reserved.
+// Copyright: 2018, Ableton AG, Berlin. All rights reserved.
 
-#import "ViewController.h"
-#import "AudioEngine.h"
 #include "ABLLinkSettingsViewController.h"
+#include "AudioEngine.h"
+#include "ViewController.h"
 
 @implementation TransportButton
 - (BOOL)isHighlighted {
@@ -51,7 +51,7 @@ static void onStartStopStateChanged(bool on, void* context) {
     ABLLinkSetStartStopCallback(
          _audioEngine.linkRef, onStartStopStateChanged, (__bridge void *)self);
     _linkSettings = [ABLLinkSettingsViewController instance:_audioEngine.linkRef];
-    [_audioEngine setQuantum:_quanta];
+    _audioEngine.quantum = _quanta;
     [self.quantumView setQuantum:_quanta];
 
     _updateBeatTimeTimer = [NSTimer scheduledTimerWithTimeInterval:0.1
@@ -119,7 +119,7 @@ static void onStartStopStateChanged(bool on, void* context) {
 
 - (void)increaseBpm {
     ++_bpm;
-    [_audioEngine setBpm:_bpm];
+    _audioEngine.bpm = _bpm;
 }
 
 - (IBAction)bpmDecreaseTouchDownAction:(UIButton *)sender {
@@ -144,13 +144,13 @@ static void onStartStopStateChanged(bool on, void* context) {
 
 - (void)decreaseBpm {
     --_bpm;
-    [_audioEngine setBpm:_bpm];
+    _audioEngine.bpm = _bpm;
 }
 
 - (IBAction)quantumIncreaseAction:(UIButton *)sender {
     #pragma unused(sender)
     ++_quanta;
-    [_audioEngine setQuantum: _quanta];
+    _audioEngine.quantum = _quanta;
     [self updateUi];
 }
 
@@ -158,7 +158,7 @@ static void onStartStopStateChanged(bool on, void* context) {
     #pragma unused(sender)
     if (_quanta > 1) {
         --_quanta;
-        [_audioEngine setQuantum: _quanta];
+        _audioEngine.quantum = _quanta;
         [self updateUi];
     }
 }
@@ -185,7 +185,7 @@ static void onStartStopStateChanged(bool on, void* context) {
 
     UIPopoverPresentationController *popC = navController.popoverPresentationController;
     popC.permittedArrowDirections = UIPopoverArrowDirectionAny;
-    popC.sourceRect = [sender frame];
+    popC.sourceRect = sender.frame;
 
     // we recommend using a size of 320x400 for the display in a popover
     _linkSettings.preferredContentSize = CGSizeMake(320., 400.);

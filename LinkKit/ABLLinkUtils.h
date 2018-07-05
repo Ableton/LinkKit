@@ -1,7 +1,10 @@
-// Copyright: 2015, Ableton AG, Berlin. All rights reserved.
+/*! @file ABLLinkUtils.h
+ *  @copyright 2018, Ableton AG, Berlin. All rights reserved.
+ */
 
 #pragma once
 
+#include <Foundation/Foundation.h>
 #include "ABLLink.h"
 
 #ifdef __cplusplus
@@ -9,9 +12,9 @@ extern "C"
 {
 #endif
 
-  /** Calculate the effective Beats Per Minute value for a range of beat values
-      over the given number of samples at the given sample rate.
-  */
+  /*! @brief Calculate the effective Beats Per Minute value for a range of beat values
+   *  over the given number of samples at the given sample rate.
+   */
   inline Float64 ABLLinkBpmInRange(
     const Float64 fromBeat,
     const Float64 toBeat,
