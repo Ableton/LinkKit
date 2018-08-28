@@ -1,5 +1,5 @@
 @Library([
-  'ableton-utils@0.9',
+  'ableton-utils@0.10',
   'groovylint@0.4',
 ]) _
 
