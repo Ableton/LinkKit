@@ -1,7 +1,6 @@
-@SuppressWarnings('VariableTypeRequired') // For the _ variable
 @Library([
   'ableton-utils@0.9',
-  'groovylint@0.3',
+  'groovylint@0.4',
 ]) _
 
 import groovy.transform.Field
