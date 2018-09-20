@@ -17,9 +17,10 @@
     #pragma unused(application)
 
     ViewController *controller = (ViewController*)window.rootViewController;
-    if (!controller.isPlaying) {
-        // Deactivate Link if the app is not playing so that it won't
-        // continue to browse for connections while in the background.
+  if (!(controller.isPlaying || ABLLinkIsStartStopSyncEnabled(controller.linkRef))) {
+        // Deactivate Link if the app is not playing and it can not be started from
+        // Start Stop Sync, so that it won't continue to browse for connections
+        // while in the background.
         ABLLinkSetActive(controller.linkRef, false);
         [controller enableAudioEngine:NO];
     }
