@@ -118,6 +118,7 @@ _Pragma("clang diagnostic pop")
 
 -(void)deinit
 {
+  [self.tableView removeObserver:self forKeyPath:@"layoutMargins" ];
   _ablLink = nil;
 }
 
