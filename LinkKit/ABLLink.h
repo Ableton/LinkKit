@@ -254,8 +254,10 @@ extern "C"
    */
   double ABLLinkGetTempo(ABLLinkSessionStateRef);
 
-  /*! @brief Set the session state tempo to the given bpm value, taking
-   *  effect at the given host time.
+  /*! @brief Set the tempo to the given bpm value at the given time.
+   *
+   * @discussion The change is applied immediately and sent to the network after
+   * committing the session state.
    */
   void ABLLinkSetTempo(
     ABLLinkSessionStateRef,
