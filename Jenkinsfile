@@ -1,7 +1,5 @@
-@Library([
-  'ableton-utils@0.10',
-  'groovylint@0.4',
-]) _
+library 'ableton-utils@0.10'
+library 'groovylint@0.4'
 
 import groovy.transform.Field
 
