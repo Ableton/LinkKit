@@ -3,7 +3,7 @@ if (env.HEAD_REF || env.BASE_REF) {
   return
 }
 
-library 'ableton-utils@0.10'
+library 'ableton-utils@0.12'
 library 'groovylint@0.4'
 
 import groovy.transform.Field
@@ -14,9 +14,9 @@ import groovy.transform.Field
 
 
 void addCheckStages() {
-  eager.timedStage('Check') {
-    eager.timedNode('generic-linux') {
-      checkout scm
+  eventRecorder.timedStage('Check') {
+    eventRecorder.timedNode('generic-linux') {
+      doCheckout()
       groovylint.check('./Jenkinsfile')
     }
   }
@@ -24,10 +24,10 @@ void addCheckStages() {
 
 
 void addBuildStages(Map args) {
-  eager.timedNode("generic-mac-${args.xcode}") {
-    eager.timedStage('Checkout') {
+  eventRecorder.timedNode("generic-mac-${args.xcode}") {
+    eventRecorder.timedStage('Checkout') {
       sh 'env' // Print out all environment variables for debugging purposes
-      checkout scm
+      doCheckout()
 
       sh "git clone ${LINK_ORIGIN}"
       dir('link') {
@@ -36,7 +36,7 @@ void addBuildStages(Map args) {
       }
     }
 
-    eager.timedStage('Make Bundle') {
+    eventRecorder.timedStage('Make Bundle') {
       sh 'make link_dir=link'
       archiveArtifacts 'build/output/LinkKit.zip'
     }
@@ -44,16 +44,14 @@ void addBuildStages(Map args) {
 }
 
 
-runTheBuilds.withBranches(branches: ['master'], acceptPullRequests: true) {
-  try {
-    runTheBuilds.report('pending', env.CALLBACK_URL)
-    addCheckStages()
-    addBuildStages(xcode: 'xcode9.3')
-  }
-  catch (error) {
-    runTheBuilds.report('failure', env.CALLBACK_URL)
-    throw error
-  }
-
-  runTheBuilds.report('success', env.CALLBACK_URL)
+void doCheckout() {
+  gitRepo.checkoutRevision(
+    credentialsId: 'build-ssh-key',
+    revision: env.JENKINS_COMMIT,
+    url: 'git@github.com:AbletonAppDev/link-ios.git',
+  )
 }
+
+
+addCheckStages()
+addBuildStages(xcode: 'xcode9.3')
