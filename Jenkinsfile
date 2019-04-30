@@ -4,7 +4,7 @@ if (env.HEAD_REF || env.BASE_REF) {
 }
 
 library 'ableton-utils@0.12'
-library 'groovylint@0.4'
+library 'groovylint@0.6'
 
 import groovy.transform.Field
 
