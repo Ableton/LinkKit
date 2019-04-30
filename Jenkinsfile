@@ -1,3 +1,8 @@
+// TODO: when the "AbletonAppDev-link-ios" job has been retired, remove this block.
+if (env.HEAD_REF || env.BASE_REF) {
+  return
+}
+
 library 'ableton-utils@0.10'
 library 'groovylint@0.4'
 
