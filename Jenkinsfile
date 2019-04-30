@@ -14,8 +14,8 @@ import groovy.transform.Field
 
 
 void addCheckStages() {
-  eventRecorder.timedStage('Check') {
-    eventRecorder.timedNode('generic-linux') {
+  eventRecorder.timedNode('generic-linux') {
+    eventRecorder.timedStage('Check') {
       doCheckout()
       groovylint.check('./Jenkinsfile')
     }
