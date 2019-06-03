@@ -51,7 +51,7 @@ bundle: release
 	mkdir -p $(LINK_KIT_OUTPUT)/lib
 	cp -a $(OUTPUT)/libABLLink.a $(LINK_KIT_OUTPUT)/lib
 	rsync -R $$(git ls-files examples/LinkHut) $(LINK_KIT_OUTPUT)
-	cp -a Ableton_Link_SDK_License_v2.0.pdf $(LINK_KIT_OUTPUT)
+	cp -a LICENSE.md $(LINK_KIT_OUTPUT)
 	cp -a docs/Ableton_Link_Promotion.pdf $(LINK_KIT_OUTPUT)
 	cp -a docs/Ableton_Link_UI_Guidelines.pdf $(LINK_KIT_OUTPUT)
 	rsync -rv assets $(LINK_KIT_OUTPUT)
