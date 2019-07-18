@@ -1,4 +1,4 @@
-library 'ableton-utils@0.12'
+library 'ableton-utils@0.13'
 library 'groovylint@0.6'
 
 import groovy.transform.Field
