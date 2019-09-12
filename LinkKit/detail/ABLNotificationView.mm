@@ -58,11 +58,6 @@
                              initWithForwardedAutorotateVC:forwardedRootVC];
 }
 
--(UIViewController*)rootViewController
-{
-  return self.forwardedRootVC;
-}
-
 @end
 
 // Appearance constants
