@@ -1,14 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="12121" systemVersion="16F73" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
-    <device id="retina4_7" orientation="portrait">
-        <adaptation id="fullscreen"/>
-    </device>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14865.1" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
+    <device id="ipad9_7" orientation="portrait" layout="fullscreen" appearance="dark"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="12089"/>
-        <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
-        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
-        <capability name="Constraints with non-1.0 multipliers" minToolsVersion="5.1"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14819.2"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -30,6 +25,7 @@
                                     <constraint firstAttribute="width" secondItem="zhj-32-wjX" secondAttribute="height" multiplier="1:1" id="MGY-zt-FEP"/>
                                 </constraints>
                                 <fontDescription key="fontDescription" type="system" pointSize="20"/>
+                                <color key="tintColor" systemColor="labelColor" cocoaTouchSystemColor="darkTextColor"/>
                                 <state key="normal" image="Transport_Play">
                                     <color key="titleColor" red="0.0" green="0.50196081399917603" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 </state>
@@ -39,12 +35,11 @@
                                 </connections>
                             </button>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Quantum" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" minimumScaleFactor="0.5" translatesAutoresizingMaskIntoConstraints="NO" id="V7M-q3-gh5" userLabel="Quantum Label">
-                                <rect key="frame" x="49" y="318" width="150" height="40"/>
+                                <rect key="frame" x="80" y="318" width="150" height="40"/>
                                 <constraints>
                                     <constraint firstAttribute="width" secondItem="V7M-q3-gh5" secondAttribute="height" multiplier="150:40" id="p7E-DB-GaG"/>
                                 </constraints>
                                 <fontDescription key="fontDescription" name="HelveticaNeue-Light" family="Helvetica Neue" pointSize="24"/>
-                                <color key="textColor" red="0.25098039215686274" green="0.25098039215686274" blue="0.25098039215686274" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <button opaque="NO" contentMode="topRight" contentHorizontalAlignment="fill" contentVerticalAlignment="fill" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="K4A-qs-qer" userLabel="Menu">
@@ -53,6 +48,7 @@
                                     <constraint firstAttribute="width" constant="28" id="9cH-Z0-gJW"/>
                                     <constraint firstAttribute="height" constant="22" id="MlR-uq-0zR"/>
                                 </constraints>
+                                <color key="tintColor" systemColor="labelColor" cocoaTouchSystemColor="darkTextColor"/>
                                 <state key="normal" image="Settings">
                                     <color key="titleShadowColor" red="0.5" green="0.5" blue="0.5" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 </state>
@@ -66,34 +62,36 @@
                                     <constraint firstAttribute="width" secondItem="Req-bN-l6o" secondAttribute="height" multiplier="200:50" id="B6s-sh-rc8"/>
                                 </constraints>
                                 <fontDescription key="fontDescription" name="HelveticaNeue-Light" family="Helvetica Neue" pointSize="47"/>
-                                <color key="textColor" red="0.25098039215686274" green="0.25098039215686274" blue="0.25098039215686274" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="txn-pS-9Po" userLabel="Quantum Minus">
-                                <rect key="frame" x="30" y="369" width="30" height="30"/>
+                                <rect key="frame" x="60" y="369" width="30" height="30"/>
                                 <constraints>
                                     <constraint firstAttribute="width" secondItem="txn-pS-9Po" secondAttribute="height" multiplier="22:22" id="J22-m1-GOJ"/>
                                 </constraints>
+                                <color key="tintColor" systemColor="labelColor" cocoaTouchSystemColor="darkTextColor"/>
                                 <state key="normal" image="Minus"/>
                                 <connections>
                                     <action selector="quantumDecreaseAction:" destination="BYZ-38-t0r" eventType="touchDown" id="aOY-Xz-T9d"/>
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Tga-re-Hg3" userLabel="Quantum Plus">
-                                <rect key="frame" x="189.5" y="369" width="28" height="30"/>
+                                <rect key="frame" x="220" y="369" width="28.5" height="30"/>
                                 <constraints>
                                     <constraint firstAttribute="width" secondItem="Tga-re-Hg3" secondAttribute="height" multiplier="22:23" id="uqD-nl-dca"/>
                                 </constraints>
+                                <color key="tintColor" systemColor="labelColor" cocoaTouchSystemColor="darkTextColor"/>
                                 <state key="normal" image="Plus"/>
                                 <connections>
                                     <action selector="quantumIncreaseAction:" destination="BYZ-38-t0r" eventType="touchDown" id="C1I-Jg-UIh"/>
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" horizontalCompressionResistancePriority="250" verticalCompressionResistancePriority="250" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="voY-o7-ddy" userLabel="Bpm Minus">
-                                <rect key="frame" x="384" y="370.5" width="28" height="28"/>
+                                <rect key="frame" x="354" y="370" width="28" height="28"/>
                                 <constraints>
                                     <constraint firstAttribute="width" secondItem="voY-o7-ddy" secondAttribute="height" multiplier="22:22" id="ZKE-DS-Wa6"/>
                                 </constraints>
+                                <color key="tintColor" systemColor="labelColor" cocoaTouchSystemColor="darkTextColor"/>
                                 <state key="normal" image="Minus"/>
                                 <connections>
                                     <action selector="bpmDecreaseTouchDownAction:" destination="BYZ-38-t0r" eventType="touchDown" id="7Ow-ug-Qwo"/>
@@ -102,10 +100,11 @@
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" horizontalCompressionResistancePriority="250" verticalCompressionResistancePriority="250" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="WES-QY-qoy" userLabel="Bpm Plus">
-                                <rect key="frame" x="542" y="370.5" width="28" height="28"/>
+                                <rect key="frame" x="512" y="370" width="28" height="28"/>
                                 <constraints>
                                     <constraint firstAttribute="width" secondItem="WES-QY-qoy" secondAttribute="height" multiplier="22:22" id="Zfi-9c-2Eo"/>
                                 </constraints>
+                                <color key="tintColor" systemColor="labelColor" cocoaTouchSystemColor="darkTextColor"/>
                                 <state key="normal" image="Plus"/>
                                 <connections>
                                     <action selector="bpmIncreaseTouchDownAction:" destination="BYZ-38-t0r" eventType="touchDown" id="H0G-Tk-q8V"/>
@@ -114,50 +113,46 @@
                                 </connections>
                             </button>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" horizontalCompressionResistancePriority="1000" text="120.0" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" minimumScaleFactor="0.5" adjustsLetterSpacingToFitWidth="YES" translatesAutoresizingMaskIntoConstraints="NO" id="DiJ-tG-shs" userLabel="Bpm Display">
-                                <rect key="frame" x="417" y="364" width="120" height="40"/>
+                                <rect key="frame" x="387" y="364" width="120" height="40"/>
                                 <constraints>
                                     <constraint firstAttribute="width" secondItem="DiJ-tG-shs" secondAttribute="height" multiplier="120:40" id="Dme-fs-QOS"/>
                                 </constraints>
                                 <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="47"/>
-                                <color key="textColor" red="0.19215686274509805" green="0.19215686274509805" blue="0.19215686274509805" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" horizontalCompressionResistancePriority="1000" text="4" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" minimumScaleFactor="0.5" adjustsLetterSpacingToFitWidth="YES" translatesAutoresizingMaskIntoConstraints="NO" id="rZP-NW-dYj" userLabel="Quantum Display">
-                                <rect key="frame" x="64.5" y="364" width="120" height="40"/>
+                                <rect key="frame" x="95" y="364" width="120" height="40"/>
                                 <constraints>
                                     <constraint firstAttribute="width" secondItem="rZP-NW-dYj" secondAttribute="height" multiplier="120:40" id="5xF-d1-r03"/>
                                 </constraints>
                                 <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="47"/>
-                                <color key="textColor" red="0.19215686269999999" green="0.19215686269999999" blue="0.19215686269999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Tempo" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" minimumScaleFactor="0.5" translatesAutoresizingMaskIntoConstraints="NO" id="zic-jD-K4R" userLabel="Tempo Label">
-                                <rect key="frame" x="417" y="318" width="120" height="40"/>
+                                <rect key="frame" x="387" y="318" width="120" height="40"/>
                                 <constraints>
                                     <constraint firstAttribute="width" secondItem="zic-jD-K4R" secondAttribute="height" multiplier="120:40" id="T51-Ms-9La"/>
                                 </constraints>
                                 <fontDescription key="fontDescription" name="HelveticaNeue-Light" family="Helvetica Neue" pointSize="24"/>
-                                <color key="textColor" red="0.25098039220000001" green="0.25098039220000001" blue="0.25098039220000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <view contentMode="scaleToFill" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="6cT-qz-P2J" userLabel="BeatTime" customClass="QuantumView">
                                 <rect key="frame" x="20" y="78" width="560" height="180"/>
-                                <color key="backgroundColor" red="0.3333333432674408" green="0.3333333432674408" blue="0.3333333432674408" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
+                                <color key="backgroundColor" systemColor="tertiarySystemFillColor" red="0.46274509800000002" green="0.46274509800000002" blue="0.50196078430000002" alpha="0.12" colorSpace="custom" customColorSpace="sRGB"/>
+                                <color key="tintColor" systemColor="tertiarySystemFillColor" red="0.46274509800000002" green="0.46274509800000002" blue="0.50196078430000002" alpha="0.12" colorSpace="custom" customColorSpace="sRGB"/>
                             </view>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="0.0" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumScaleFactor="0.5" translatesAutoresizingMaskIntoConstraints="NO" id="YBO-eg-6Dq" userLabel="currentBeatTime">
                                 <rect key="frame" x="104.5" y="266" width="24" height="20"/>
                                 <fontDescription key="fontDescription" name="HelveticaNeue-Light" family="Helvetica Neue" pointSize="17"/>
-                                <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Beat Time:" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="SwM-ro-fWv" userLabel="Beat Time Label">
                                 <rect key="frame" x="20" y="266" width="79.5" height="20"/>
                                 <fontDescription key="fontDescription" name="HelveticaNeue-Light" family="Helvetica Neue" pointSize="17"/>
-                                <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
                         </subviews>
-                        <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                         <constraints>
                             <constraint firstItem="rZP-NW-dYj" firstAttribute="height" secondItem="DiJ-tG-shs" secondAttribute="height" id="01s-gA-lUr"/>
                             <constraint firstItem="DiJ-tG-shs" firstAttribute="centerY" secondItem="rZP-NW-dYj" secondAttribute="centerY" id="3p3-R8-t5S"/>
@@ -225,8 +220,8 @@
                         <variation key="widthClass=compact">
                             <mask key="constraints">
                                 <include reference="zgq-jK-PWU"/>
-                                <include reference="MCn-eJ-B3h"/>
                                 <include reference="T8D-EW-sZh"/>
+                                <include reference="MCn-eJ-B3h"/>
                                 <include reference="O1r-wT-sY7"/>
                                 <include reference="mrV-ux-jaL"/>
                             </mask>

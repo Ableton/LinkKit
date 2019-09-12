@@ -19,7 +19,11 @@ static const CGFloat kSpacing = 3;
       _quantum = 4;
       _isPlaying = NO;
       _tiles = [[NSMutableArray alloc] init];
+    if (@available(iOS 13.0, *)) {
+      _backgroundColor = [UIColor tertiarySystemFillColor];
+    } else {
       _backgroundColor = [UIColor colorWithRed:(CGFloat)0.25 green:(CGFloat)0.25 blue:(CGFloat)0.25 alpha:(CGFloat)1];
+    }
       _activeColor = [UIColor colorWithRed:(CGFloat)1 green:(CGFloat)0.835 blue:(CGFloat)0 alpha:(CGFloat)1];
       _activeBeginColor = [UIColor colorWithRed:(CGFloat)1 green:(CGFloat)0.416 blue:(CGFloat)0 alpha:(CGFloat)1];
       _inactiveColor = [UIColor colorWithRed:(CGFloat)0.7 green:(CGFloat)0.7 blue:(CGFloat)0.7 alpha:(CGFloat)1];
