@@ -6,35 +6,51 @@
 #include "ABLNotificationView.h"
 #include "../detail/ABLSettingsViewController.h"
 
-// UIViewController subclass which forwards the shouldAutorotate call to
-// the forwardedAutorotateVC view controller.
-@interface _ABLAutorotateForwardVC: UIViewController
--(instancetype)initWithForwardedAutorotateVC:(UIViewController*)viewController;
+// UIViewController subclass which forwards status bar appearance
+// methods and the shouldAutorotate call to the forwardedVC view controller.
+@interface _ABLForwardingVC: UIViewController
+-(instancetype)initWithForwardedVC:(UIViewController*)viewController;
 @end
 
-@implementation _ABLAutorotateForwardVC
+@implementation _ABLForwardingVC
 {
-  __weak UIViewController* _forwardedAutorotateVC;
+  __weak UIViewController* _forwardedVC;
 }
 
--(instancetype)initWithForwardedAutorotateVC:(UIViewController*)viewController
+-(instancetype)initWithForwardedVC:(UIViewController*)viewController
 {
   if (self = [super init])
   {
-    _forwardedAutorotateVC = viewController;
+    _forwardedVC = viewController;
   }
   return self;
 }
 
 -(BOOL)shouldAutorotate
 {
-  UIViewController* topVC = _forwardedAutorotateVC;
+  UIViewController* topVC = _forwardedVC;
   while (topVC.presentedViewController)
   {
     topVC = topVC.presentedViewController;
   }
   return [topVC shouldAutorotate];
 }
+
+- (BOOL)prefersStatusBarHidden
+{
+  return [_forwardedVC prefersStatusBarHidden];
+}
+
+- (UIStatusBarStyle)preferredStatusBarStyle
+{
+  return [_forwardedVC preferredStatusBarStyle];
+}
+
+- (UIStatusBarAnimation)preferredStatusBarUpdateAnimation
+{
+  return [_forwardedVC preferredStatusBarUpdateAnimation];
+}
+
 @end
 
 // UIWindow subclass which exposes forwardedRootVC as its own root VC. It's useful
@@ -54,8 +70,8 @@
 -(void)setForwardedRootVC:(UIViewController *)forwardedRootVC
 {
   _forwardedRootVC = forwardedRootVC;
-  self.rootViewController = [[_ABLAutorotateForwardVC alloc]
-                             initWithForwardedAutorotateVC:forwardedRootVC];
+  self.rootViewController = [[_ABLForwardingVC alloc]
+                             initWithForwardedVC:forwardedRootVC];
 }
 
 @end
