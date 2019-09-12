@@ -100,7 +100,16 @@ _Pragma("clang diagnostic pop")
     self.title = kTitleString;
 
     self.tableView.backgroundView = [UIView new];
-    self.tableView.backgroundView.backgroundColor = [UIColor groupTableViewBackgroundColor];
+    if (@available(iOS 13.0, *))
+    {
+      self.tableView.backgroundView.backgroundColor = [UIColor systemGroupedBackgroundColor];
+    }
+    else
+    {
+      #pragma clang diagnostic ignored "-Wdeprecated-declarations"
+      self.tableView.backgroundView.backgroundColor = [UIColor groupTableViewBackgroundColor];
+      #pragma clang diagnostic pop
+    }
 
     // Set up default values
     initUserDefaultFlag(ABLLinkEnabledKey, NO);
@@ -316,7 +325,14 @@ _Pragma("clang diagnostic pop")
   [toolbar setShadowImage:[UIImage new]
        forToolbarPosition:UIToolbarPositionAny];
 
-  [toolbar setBackgroundColor:[UIColor groupTableViewBackgroundColor]];
+  if (@available(iOS 13.0, *))
+  {
+    [toolbar setBackgroundColor:[UIColor systemGroupedBackgroundColor]];
+  }
+  else
+  {
+    [toolbar setBackgroundColor:[UIColor groupTableViewBackgroundColor]];
+  }
   [toolbar addSubview:moreInfoLinkTextView];
 
   UIBarButtonItem* item = [[UIBarButtonItem alloc] initWithCustomView:moreInfoLinkTextView];
@@ -402,7 +418,14 @@ _Pragma("clang diagnostic pop")
     [_connectedAppsFooterView addSubview:label];
 
     UIActivityIndicatorView *activityIndicator;
-    activityIndicator = [[UIActivityIndicatorView alloc]initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+    if (@available(iOS 13.0, *))
+    {
+      activityIndicator = [[UIActivityIndicatorView alloc]initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleMedium];
+    }
+    else
+    {
+      activityIndicator = [[UIActivityIndicatorView alloc]initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+    }
     [activityIndicator startAnimating];
 
     // Resizing through CoreGraphics because the size is fixed
