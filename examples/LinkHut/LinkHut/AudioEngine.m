@@ -5,11 +5,12 @@
 #include <libkern/OSAtomic.h>
 #include <mach/mach_time.h>
 #include "AudioEngine.h"
+#include <os/lock.h>
 
 #define INVALID_BEAT_TIME DBL_MIN
 #define INVALID_BPM DBL_MIN
 
-static OSSpinLock lock;
+static struct os_unfair_lock_s lock;
 
 /*
  * Structure that stores engine-related data that can be changed from
@@ -57,7 +58,7 @@ static void pullEngineData(LinkData* linkData, EngineData* output) {
 
     // Attempt to grab the lock guarding the shared engine data but
     // don't block if we can't get it.
-    if (OSSpinLockTry(&lock)) {
+    if (os_unfair_lock_trylock(&lock)) {
         // Copy non-signaling members to the local thread cache
         linkData->localEngineData.outputLatency =
           linkData->sharedEngineData.outputLatency;
@@ -76,7 +77,7 @@ static void pullEngineData(LinkData* linkData, EngineData* output) {
         output->proposeBpm = linkData->sharedEngineData.proposeBpm;
         linkData->sharedEngineData.proposeBpm = INVALID_BPM;
 
-        OSSpinLockUnlock(&lock);
+        os_unfair_lock_unlock(&lock);
     }
 
     // Copy from the thread local copy to the output. This happens
@@ -246,14 +247,14 @@ static OSStatus audioCallback(
 }
 
 - (void)setIsPlaying:(BOOL)isPlaying {
-    OSSpinLockLock(&lock);
+    os_unfair_lock_lock(&lock);
     if (isPlaying) {
         _linkData.sharedEngineData.requestStart = YES;
     }
     else {
         _linkData.sharedEngineData.requestStop = YES;
     }
-    OSSpinLockUnlock(&lock);
+    os_unfair_lock_unlock(&lock);
 }
 
 - (Float64)bpm {
@@ -261,9 +262,9 @@ static OSStatus audioCallback(
 }
 
 - (void)setBpm:(Float64)bpm {
-    OSSpinLockLock(&lock);
+    os_unfair_lock_lock(&lock);
     _linkData.sharedEngineData.proposeBpm = bpm;
-    OSSpinLockUnlock(&lock);
+    os_unfair_lock_unlock(&lock);
 }
 
 - (Float64)beatTime {
@@ -278,9 +279,9 @@ static OSStatus audioCallback(
 }
 
 - (void)setQuantum:(Float64)quantum {
-    OSSpinLockLock(&lock);
+    os_unfair_lock_lock(&lock);
     _linkData.sharedEngineData.quantum = quantum;
-    OSSpinLockUnlock(&lock);
+    os_unfair_lock_unlock(&lock);
 }
 
 - (BOOL)isLinkEnabled {
@@ -296,9 +297,9 @@ static OSStatus audioCallback(
 #pragma unused(notification)
     const UInt64 outputLatency =
         _linkData.secondsToHostTime * [AVAudioSession sharedInstance].outputLatency;
-    OSSpinLockLock(&lock);
+    os_unfair_lock_lock(&lock);
     _linkData.sharedEngineData.outputLatency = outputLatency;
-    OSSpinLockUnlock(&lock);
+    os_unfair_lock_unlock(&lock);
 }
 
 static void StreamFormatCallback(
@@ -402,7 +403,6 @@ _Pragma("clang diagnostic pop")
     mach_timebase_info_data_t timeInfo;
     mach_timebase_info(&timeInfo);
 
-    lock = OS_SPINLOCK_INIT;
     _linkData.ablLink = ABLLinkNew(bpm);
     _linkData.sampleRate = [AVAudioSession sharedInstance].sampleRate;
     _linkData.secondsToHostTime = (1.0e9 * timeInfo.denom) / (Float64)timeInfo.numer;
