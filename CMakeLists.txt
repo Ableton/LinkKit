@@ -73,6 +73,10 @@ set(
   ${link_hut_DIR}/Info.plist
 )
 
+set(
+  link_hut_ENTITLEMENTS
+  ${link_hut_DIR}/LinkHut.entitlements
+)
 
 #  _     _       _    _  ___ _
 # | |   (_)_ __ | | _| |/ (_) |_
@@ -142,6 +146,7 @@ set_target_properties(
   XCODE_ATTRIBUTE_CLANG_ENABLE_OBJC_ARC YES
   XCODE_ATTRIBUTE_IPHONEOS_DEPLOYMENT_TARGET "8.0"
   XCODE_ATTRIBUTE_SUPPORTS_UIKITFORMAC "YES"
+  XCODE_ATTRIBUTE_CODE_SIGN_ENTITLEMENTS "${link_hut_ENTITLEMENTS}"
   RESOURCE "${link_hut_RESOURCES}"
   MACOSX_BUNDLE_INFO_PLIST "${link_hut_PLIST}"
 )
