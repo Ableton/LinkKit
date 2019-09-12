@@ -44,12 +44,16 @@ release:
 	make linkkit config=Release dest="'generic/platform=iOS Simulator'" platform=iphonesimulator
 	make linkkit config=Release dest="'platform=macOS,variant=Mac Catalyst'" platform=maccatalyst
 	libtool $(OUTPUT)/Release-iphoneos/libLinkKit.a $(OUTPUT)/Release-iphonesimulator/libLinkKit.a -o $(OUTPUT)/libABLLink.a
+	mkdir -p $(OUTPUT)/Headers
+	cp LinkKit/*.h $(OUTPUT)/Headers/
+	xcodebuild -create-xcframework -library $(OUTPUT)/Release-iphoneos/libLinkKit.a -headers $(OUTPUT)/Headers -library $(OUTPUT)/Release-iphonesimulator/libLinkKit.a -headers $(OUTPUT)/Headers -library $(OUTPUT)/Release-maccatalyst/libLinkKit.a -headers $(OUTPUT)/Headers -output $(OUTPUT)/LinkKit.xcframework
 
 bundle: release
 	mkdir -p $(LINK_KIT_OUTPUT)/include
 	cp -a ./LinkKit/ABLLink.h ./LinkKit/ABLLinkSettingsViewController.h ./LinkKit/ABLLinkUtils.h $(LINK_KIT_OUTPUT)/include
 	mkdir -p $(LINK_KIT_OUTPUT)/lib
 	cp -a $(OUTPUT)/libABLLink.a $(LINK_KIT_OUTPUT)/lib
+	cp -a $(OUTPUT)/LinkKit.xcframework $(LINK_KIT_OUTPUT)
 	rsync -R $$(git ls-files examples/LinkHut) $(LINK_KIT_OUTPUT)
 	cp -a LICENSE.md $(LINK_KIT_OUTPUT)
 	cp -a docs/Ableton_Link_Promotion.pdf $(LINK_KIT_OUTPUT)
