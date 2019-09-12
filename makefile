@@ -42,6 +42,7 @@ linkkit: configure
 release:
 	make linkkit config=Release dest="'generic/platform=iOS'" platform=iphoneos
 	make linkkit config=Release dest="'generic/platform=iOS Simulator'" platform=iphonesimulator
+	make linkkit config=Release dest="'platform=macOS,variant=Mac Catalyst'" platform=maccatalyst
 	libtool $(OUTPUT)/Release-iphoneos/libLinkKit.a $(OUTPUT)/Release-iphonesimulator/libLinkKit.a -o $(OUTPUT)/libABLLink.a
 
 bundle: release
