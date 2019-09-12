@@ -22,7 +22,7 @@ PLATFORM_OUTPUT = $(OUTPUT)/$(PLATFORM_CONFIG)
 LINK_KIT = LinkKit
 LINK_KIT_OUTPUT = $(OUTPUT)/$(LINK_KIT)
 
-BUILD_CMD = /usr/bin/xcodebuild -project build/LinkKit.xcodeproj -scheme "LinkKit" -destination $(dest) -configuration $(config) CONFIGURATION_BUILD_DIR=$(PLATFORM_OUTPUT)
+BUILD_CMD = /usr/bin/xcodebuild -project build/LinkKit.xcodeproj -scheme "LinkKit" -destination $(dest) -configuration $(config) -UseModernBuildSystem=YES CONFIGURATION_BUILD_DIR=$(PLATFORM_OUTPUT)
 
 #  _____                    _
 # |_   _|_ _ _ __ __ _  ___| |_ ___
