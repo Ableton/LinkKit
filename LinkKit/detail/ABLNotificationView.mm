@@ -167,15 +167,48 @@ NSTimer* _notificationDurationTimer;
   _currentlyVisibleNotification.messageLabel.text = text;
 }
 
++(UIWindow *)notificationWindow
+{
+    if (@available(iOS 13.0, *))
+    {
+      for (UIScene *scene in UIApplication.sharedApplication.connectedScenes)
+      {
+        if (scene != nil && scene.activationState == UISceneActivationStateForegroundActive && [scene isKindOfClass:[UIWindowScene class]])
+        {
+          for (UIWindow* window in ((UIWindowScene *)scene).windows)
+          {
+            if (window.isKeyWindow)
+            {
+              return window;
+            }
+          }
+        }
+      }
+      return nil;
+    }
+    else
+    {
+      #pragma clang diagnostic ignored "-Wdeprecated-declarations"
+      return UIApplication.sharedApplication.keyWindow;
+      #pragma clang diagnostic pop
+    }
+}
+
 +(void)createAndAnimateNotificationIn
 {
   [self prepareNotificationWindowIfNeeded];
 
   _ABLNotificationWindow* window = _notificationOverlayWindow;
-  window.frame = UIApplication.sharedApplication.keyWindow.frame;
+  UIWindow* keyWindow = [self notificationWindow];
+  if (keyWindow == nil)
+  {
+      return;
+  }
+    
+  window.frame = keyWindow.frame;
 
   // Assign forwarded root VC to properly handle status bar updates
-  window.forwardedRootVC = UIApplication.sharedApplication.keyWindow.rootViewController;
+  window.forwardedRootVC = keyWindow.rootViewController;
 
   ABLNotificationView* notification = [ABLNotificationView new];
   notification.userInteractionEnabled = NO;
@@ -288,9 +321,14 @@ NSTimer* _notificationDurationTimer;
 +(CGFloat)preferredNotificationHeight
 {
   CGFloat notificationHeight = kNotificationHeight;
-  if (@available(iOS 11.0, *)) {
-    // Add the top area inset to the notification height
-    notificationHeight += UIApplication.sharedApplication.keyWindow.safeAreaInsets.top;
+  if (@available(iOS 11.0, *))
+  {
+    UIWindow* keyWindow = [self notificationWindow];
+    if (keyWindow != nil)
+    {
+      // Add the top area inset to the notification height
+      notificationHeight += keyWindow.safeAreaInsets.top;
+    }
   }
 
   return notificationHeight;
