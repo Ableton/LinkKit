@@ -7,7 +7,6 @@
 
 platform = iphoneos
 config = Debug
-linking = static
 wordsize = 64
 
 ifneq ($(MAKECMDGOALS),clean)
@@ -16,14 +15,14 @@ $(error link_dir must be defined)
 endif
 endif
 
-PLATFORM_CONFIG = $(platform)_$(wordsize)_$(linking)
+PLATFORM_CONFIG = $(config)-$(platform)
 PROJECT_DIR=build
 OUTPUT = $(PROJECT_DIR)/output
-PLATFORM_OUTPUT = $(OUTPUT)/$(PLATFORM_CONFIG)/$(config)
+PLATFORM_OUTPUT = $(OUTPUT)/$(PLATFORM_CONFIG)
 LINK_KIT = LinkKit
 LINK_KIT_OUTPUT = $(OUTPUT)/$(LINK_KIT)
 
-BUILD_CMD = /usr/bin/xcodebuild -project build/LinkKit.xcodeproj -target LinkKit -sdk $(platform) PLATFORM_NAME=$(platform) -configuration $(config) CONFIGURATION_BUILD_DIR=$(PLATFORM_OUTPUT)
+BUILD_CMD = /usr/bin/xcodebuild -project build/LinkKit.xcodeproj -scheme "LinkKit" -destination $(dest) -configuration $(config) CONFIGURATION_BUILD_DIR=$(PLATFORM_OUTPUT)
 
 #  _____                    _
 # |_   _|_ _ _ __ __ _  ___| |_ ___
@@ -41,9 +40,9 @@ linkkit: configure
 	$(BUILD_CMD)
 
 release:
-	make linkkit platform=iphoneos config=Release
-	make linkkit platform=iphonesimulator config=Release
-	libtool $(OUTPUT)/iphoneos_64_static/Release/libLinkKit.a $(OUTPUT)/iphonesimulator_64_static/Release/libLinkKit.a -o $(OUTPUT)/libABLLink.a
+	make linkkit config=Release dest="'generic/platform=iOS'" platform=iphoneos
+	make linkkit config=Release dest="'generic/platform=iOS Simulator'" platform=iphonesimulator
+	libtool $(OUTPUT)/Release-iphoneos/libLinkKit.a $(OUTPUT)/Release-iphonesimulator/libLinkKit.a -o $(OUTPUT)/libABLLink.a
 
 bundle: release
 	mkdir -p $(LINK_KIT_OUTPUT)/include
