@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 46;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -18,7 +18,7 @@
 		423E47961AA7B3D100CDACEC /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 423E47951AA7B3D100CDACEC /* UIKit.framework */; };
 		423E47981AA7B3DA00CDACEC /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 423E47971AA7B3DA00CDACEC /* AVFoundation.framework */; };
 		423E47991AA7B3E800CDACEC /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 423E47931AA7B3B600CDACEC /* Foundation.framework */; };
-		FD2510FD1BDA360C00706B00 /* libABLLink.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FD2510FC1BDA360C00706B00 /* libABLLink.a */; };
+		FD3CF9BF23190BA8008FF4C5 /* LinkKit.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = FD3CF9BE23190BA8008FF4C5 /* LinkKit.xcframework */; };
 		FD8F86C41CE3296300706B00 /* QuantumView.m in Sources */ = {isa = PBXBuildFile; fileRef = FD8F86C31CE3296300706B00 /* QuantumView.m */; };
 /* End PBXBuildFile section */
 
@@ -39,9 +39,11 @@
 		423E47931AA7B3B600CDACEC /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		423E47951AA7B3D100CDACEC /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		423E47971AA7B3DA00CDACEC /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
-		FD2510FC1BDA360C00706B00 /* libABLLink.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libABLLink.a; path = ../output/libABLLink.a; sourceTree = "<group>"; };
+		FD0F113A23223FDE00D8D889 /* LinkKit.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = LinkKit.xcframework; path = ../../../LinkKit.xcframework; sourceTree = "<group>"; };
+		FD3CF9BE23190BA8008FF4C5 /* LinkKit.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = LinkKit.xcframework; path = ../../LinkKit.xcframework; sourceTree = "<group>"; };
 		FD8F86C21CE3296300706B00 /* QuantumView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QuantumView.h; sourceTree = "<group>"; };
 		FD8F86C31CE3296300706B00 /* QuantumView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QuantumView.m; sourceTree = "<group>"; };
+		FDB607CB22E5EC4D007E62D8 /* LinkHut.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = LinkHut.entitlements; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -49,11 +51,11 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FD3CF9BF23190BA8008FF4C5 /* LinkKit.xcframework in Frameworks */,
 				423E47991AA7B3E800CDACEC /* Foundation.framework in Frameworks */,
 				423E47981AA7B3DA00CDACEC /* AVFoundation.framework in Frameworks */,
 				423E47961AA7B3D100CDACEC /* UIKit.framework in Frameworks */,
 				423E47921AA7B38100CDACEC /* AudioToolbox.framework in Frameworks */,
-				FD2510FD1BDA360C00706B00 /* libABLLink.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -65,6 +67,7 @@
 			children = (
 				423E475F1AA7AECE00CDACEC /* LinkHut */,
 				423E475E1AA7AECE00CDACEC /* Products */,
+				FD3CF9BD23190BA8008FF4C5 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -79,6 +82,7 @@
 		423E475F1AA7AECE00CDACEC /* LinkHut */ = {
 			isa = PBXGroup;
 			children = (
+				FDB607CB22E5EC4D007E62D8 /* LinkHut.entitlements */,
 				423E47641AA7AECE00CDACEC /* AppDelegate.h */,
 				423E47651AA7AECE00CDACEC /* AppDelegate.m */,
 				423E478E1AA7B35400CDACEC /* AudioEngine.h */,
@@ -108,7 +112,7 @@
 		423E479A1AA7B5E800CDACEC /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				FD2510FC1BDA360C00706B00 /* libABLLink.a */,
+				FD0F113A23223FDE00D8D889 /* LinkKit.xcframework */,
 				423E47971AA7B3DA00CDACEC /* AVFoundation.framework */,
 				423E47951AA7B3D100CDACEC /* UIKit.framework */,
 				423E47931AA7B3B600CDACEC /* Foundation.framework */,
@@ -116,6 +120,14 @@
 			);
 			name = Frameworks;
 			path = ..;
+			sourceTree = "<group>";
+		};
+		FD3CF9BD23190BA8008FF4C5 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				FD3CF9BE23190BA8008FF4C5 /* LinkKit.xcframework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -144,12 +156,11 @@
 		423E47551AA7AECE00CDACEC /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0920;
+				LastUpgradeCheck = 1100;
 				ORGANIZATIONNAME = ableton;
 				TargetAttributes = {
 					423E475C1AA7AECE00CDACEC = {
 						CreatedOnToolsVersion = 6.1;
-						DevelopmentTeam = MWR434WD94;
 						SystemCapabilities = {
 							com.apple.BackgroundModes = {
 								enabled = 1;
@@ -160,7 +171,7 @@
 			};
 			buildConfigurationList = 423E47581AA7AECE00CDACEC /* Build configuration list for PBXProject "LinkHut" */;
 			compatibilityVersion = "Xcode 3.2";
-			developmentRegion = English;
+			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
@@ -236,12 +247,14 @@
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
@@ -288,12 +301,14 @@
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
@@ -326,20 +341,27 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_CXX_LANGUAGE_STANDARD = "compiler-default";
+				CODE_SIGN_ENTITLEMENTS = LinkHut/LinkHut.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
+				DERIVE_UIKITFORMAC_PRODUCT_BUNDLE_IDENTIFIER = YES;
 				GCC_C_LANGUAGE_STANDARD = "compiler-default";
 				INFOPLIST_FILE = LinkHut/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/../../lib",
 				);
 				OTHER_LDFLAGS = "-lc++";
-				PRODUCT_BUNDLE_IDENTIFIER = com.ableton.linkhut;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.ableton.link.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = LinkHut;
 				PROVISIONING_PROFILE = "";
-				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../../include\"";
+				SUPPORTS_UIKITFORMAC = YES;
+				USER_HEADER_SEARCH_PATHS = "";
 			};
 			name = Debug;
 		};
@@ -348,20 +370,27 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_CXX_LANGUAGE_STANDARD = "compiler-default";
+				CODE_SIGN_ENTITLEMENTS = LinkHut/LinkHut.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
+				DERIVE_UIKITFORMAC_PRODUCT_BUNDLE_IDENTIFIER = YES;
 				GCC_C_LANGUAGE_STANDARD = "compiler-default";
 				INFOPLIST_FILE = LinkHut/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/../../lib",
 				);
 				OTHER_LDFLAGS = "-lc++";
-				PRODUCT_BUNDLE_IDENTIFIER = com.ableton.linkhut;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.ableton.link.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = LinkHut;
 				PROVISIONING_PROFILE = "";
-				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../../include\"";
+				SUPPORTS_UIKITFORMAC = YES;
+				USER_HEADER_SEARCH_PATHS = "";
 			};
 			name = Release;
 		};
