@@ -1,0 +1,22 @@
+// Copyright: 2020, Ableton AG, Berlin. All rights reserved.
+
+"DescriptionLong" = "Link le permite reproducir de forma sincronizada con otros colegas que tengan habilitado Link y que estén en la misma red.\n \nPara crear o unirse a una sesión, active Link.";
+"LinkHyperlink" = "Aprenda más en ";
+
+"Browsing" = "Buscando colegas...";
+
+"InAppNotificationTitle" = "Notificaciones dentro de la aplicación";
+"InAppNotificationSubtitle" = "Se le notificará cuando los colegas se unan o se vayan";
+
+"SyncStartStopTitle" = "Iniciar/detener sincronización";
+"SyncStartStopSubtitle" = "Enviar y escuchar comandos de Iniciar/Detener";
+
+"ConnectedPeersSectionTitle" = "COLEGAS CONECTADOS";
+
+"PeersConnectedZero" = "No hay colegas conectados";
+"PeersConnectedOne" = "Conectado a 1 colega";
+"PeersConnectedMany" = "Conectado a %zu colegas";
+
+"LinkZero" = "Sin Links";
+"LinkOne" = "1 Link";
+"LinkOther" = "%u Links";

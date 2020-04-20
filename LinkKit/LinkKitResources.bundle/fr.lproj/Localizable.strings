@@ -1,0 +1,22 @@
+// Copyright: 2020, Ableton AG, Berlin. All rights reserved.
+
+"DescriptionLong" = "Link vous permet de jouer en mesure avec d'autres pairs équipés de Link qui se trouvent sur le même réseau.\n \nPour créer ou rejoindre une session, activez Link.";
+"LinkHyperlink" = "Apprenez-en plus sur ";
+
+"Browsing" = "Découverte des pairs...";
+
+"InAppNotificationTitle" = "Notifications dans l'appli";
+"InAppNotificationSubtitle" = "Être informé quand des pairs se connectent ou se déconnectent";
+
+"SyncStartStopTitle" = "Synchro de démarrage/arrêt";
+"SyncStartStopSubtitle" = "Envoi et réception de commandes de démarrage/arrêt";
+
+"ConnectedPeersSectionTitle" = "PAIRS CONNECTÉS";
+
+"PeersConnectedZero" = "Aucun pair connecté";
+"PeersConnectedOne" = "Connecté à 1 pair";
+"PeersConnectedMany" = "Connecté à %zu pairs";
+
+"LinkZero" = "Aucun Link";
+"LinkOne" = "1 Link";
+"LinkOther" = "%u Links";

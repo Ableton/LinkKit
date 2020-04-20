@@ -45,6 +45,8 @@ set(link_kit_SOURCES
   ${link_kit_DIR}/detail/ABLObjCUtils.h
   ${link_kit_DIR}/detail/ABLSettingsViewController.h
   ${link_kit_DIR}/detail/ABLSettingsViewController.mm
+  ${link_kit_DIR}/detail/LocalizableString.h
+  ${link_kit_DIR}/detail/LocalizableString.mm
 )
 
 set(link_hut_DIR ${CMAKE_CURRENT_SOURCE_DIR}/examples/LinkHut/LinkHut)
@@ -66,6 +68,7 @@ set(
   ${link_hut_DIR}/Base.lproj/LaunchScreen.xib
   ${link_hut_DIR}/Base.lproj/Main.storyboard
   ${link_hut_DIR}/Images.xcassets
+  ${link_kit_DIR}/LinkKitResources.bundle
 )
 
 set(

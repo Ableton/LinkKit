@@ -7,6 +7,7 @@
 #include "ABLSettingsViewController.h"
 #include "detail/ABLObjCUtils.h"
 #include "detail/ABLLinkAggregate.h"
+#include "detail/LocalizableString.h"
 
 namespace
 {
@@ -30,23 +31,45 @@ BOOL isStartStopSyncSupported()
 
 // String constants
 static NSString* const kTitleString = @"Ableton Link";
-static NSString* const kDescriptionLongString = @"Link allows you to play in time with other Link-enabled apps that are on the same network.\n \nTo create or join a session, enable Link.";
-static NSString* const kLinkHyperlinkString = @"Learn more at ";
+static NSString* const kDescriptionLongString =
+[LocalizedString resourcesLocalizedString: @"DescriptionLong" comment: @""]
+?: @"Link allows you to play in time with other Link-enabled peers that are on the same network.\n \nTo create or join a session, enable Link.";
+static NSString* const kLinkHyperlinkString =
+[LocalizedString resourcesLocalizedString: @"LinkHyperlink" comment: @""]
+?: @"Learn more at ";
 static NSString* const kLinkHyperlinkLink = @"www.ableton.com/link";
 
-static NSString* const kBrowsingString = @"Browsing for Link-enabled peers...";
+static NSString* const kBrowsingString =
+[LocalizedString resourcesLocalizedString: @"Browsing" comment: @""]
+?: @"Browsing for Link-enabled peers...";
 
-static NSString* const kInAppNotificationTitleString = @"In-app notifications";
-static NSString* const kInAppNotificationSubtitleString = @"Get notified when peers join or leave";
+static NSString* const kInAppNotificationTitleString =
+[LocalizedString resourcesLocalizedString: @"InAppNotificationTitle" comment: @""]
+?: @"In-app notifications";
+static NSString* const kInAppNotificationSubtitleString =
+[LocalizedString resourcesLocalizedString: @"InAppNotificationSubtitle" comment: @""]
+?: @"Get notified when apps join or leave";
 
-static NSString* const kSyncStartStopTitleString = @"Sync Start/Stop";
-static NSString* const kSyncStartStopSubtitleString = @"Send and listen to Start/Stop commands";
+static NSString* const kSyncStartStopTitleString =
+[LocalizedString resourcesLocalizedString: @"SyncStartStopTitle" comment: @""]
+?: @"Sync Start/Stop";
+static NSString* const kSyncStartStopSubtitleString =
+[LocalizedString resourcesLocalizedString: @"SyncStartStopSubtitle" comment: @""]
+?: @"Send and listen to Start/Stop commands";
 
-static NSString* const kConnectedPeersSectionTitleString = @"CONNECTED PEERS";
+static NSString* const kConnectedPeersSectionTitleString =
+[LocalizedString resourcesLocalizedString: @"ConnectedPeersSectionTitle" comment: @""]
+?: @"CONNECTED PEERS";
 
-static NSString* const kPeersConnectedZeroString = @"No peers connected";
-static NSString* const kPeersConnectedOneString = @"Connected to 1 peer";
-static NSString* const kPeersConnectedManyString = @"Connected to %zu peers";
+static NSString* const kPeersConnectedZeroString =
+[LocalizedString resourcesLocalizedString: @"PeersConnectedZero" comment: @""]
+?: @"No peers connected";
+static NSString* const kPeersConnectedOneString =
+[LocalizedString resourcesLocalizedString: @"PeersConnectedOne" comment: @""]
+?: @"Connected to 1 peer";
+static NSString* const kPeersConnectedManyString =
+[LocalizedString resourcesLocalizedString: @"PeersConnectedMany" comment: @""]
+?: @"Connected to %zu peers";
 
 
 // Section indices

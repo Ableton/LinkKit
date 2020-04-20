@@ -1,0 +1,22 @@
+// Copyright: 2020, Ableton AG, Berlin. All rights reserved.
+
+"DescriptionLong" = "Link ermöglicht Ihnen mit anderen Link-fähigen Peers im gleichen Netzwerk zusammenzuspielen.\n \nUm eine Session zu starten oder bei einer Session teilzunehmen, aktivieren Sie einfach Link.";
+"LinkHyperlink" = "Mehr erfahren unter ";
+
+"Browsing" = "Suche nach Peers...";
+
+"InAppNotificationTitle" = "In-App Benachrichtigungen";
+"InAppNotificationSubtitle" = "Werden Sie benachrichtigt, sobald Peers teilnehmen oder die Session verlassen";
+
+"SyncStartStopTitle" = "Sync Start/Stop";
+"SyncStartStopSubtitle" = "Senden von und warten auf Start/Stopp-Befehle(n)";
+
+"ConnectedPeersSectionTitle" = "VERBUNDENE PEERS";
+
+"PeersConnectedZero" = "Mit keinen Peers verbunden";
+"PeersConnectedOne" = "Verbunden mit 1 Peer";
+"PeersConnectedMany" = "Verbunden mit %zu Peers";
+
+"LinkZero" = "Keine Links";
+"LinkOne" = "1 Link";
+"LinkOther" = "%u Links";

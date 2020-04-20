@@ -1,0 +1,22 @@
+// Copyright: 2020, Ableton AG, Berlin. All rights reserved.
+
+"DescriptionLong" = "Link allows you to play in time with other Link-enabled apps that are on the same network.\n \nTo create or join a session, enable Link.";
+"LinkHyperlink" = "Learn more at ";
+
+"Browsing" = "Browsing for Link-enabled peers...";
+
+"InAppNotificationTitle" = "In-app notifications";
+"InAppNotificationSubtitle" = "Get notified when peers join or leave";
+
+"SyncStartStopTitle" = "Sync Start/Stop";
+"SyncStartStopSubtitle" = "Send and listen to Start/Stop commands";
+
+"ConnectedPeersSectionTitle" = "CONNECTED PEERS";
+
+"PeersConnectedZero" = "No peers connected";
+"PeersConnectedOne" = "Connected to 1 peer";
+"PeersConnectedMany" = "Connected to %zu peers";
+
+"LinkZero" = "No Links";
+"LinkOne" = "1 Link";
+"LinkOther" = "%u Links";

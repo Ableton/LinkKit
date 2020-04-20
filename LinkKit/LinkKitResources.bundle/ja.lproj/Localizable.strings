@@ -1,0 +1,22 @@
+// Copyright: 2020, Ableton AG, Berlin. All rights reserved.
+
+"DescriptionLong" = "Linkを使用すると、同一ネットワーク内の他のLink対応ユーザーに合わせて演奏できます。\n \nセッションを作成またはセッションに参加するには、Linkを有効にします。";
+"LinkHyperlink" = "さらに詳しく ";
+
+"Browsing" = "ユーザーをブラウズ…";
+
+"InAppNotificationTitle" = "アプリ内通知";
+"InAppNotificationSubtitle" = "ユーザーの参加または退出を通知";
+
+"SyncStartStopTitle" = "同期開始/停止";
+"SyncStartStopSubtitle" = "開始/停止コマンドを送信してリッスン";
+
+"ConnectedPeersSectionTitle" = "接続中のユーザー";
+
+"PeersConnectedZero" = "接続中のユーザーなし";
+"PeersConnectedOne" = "1 名のユーザーに接続中";
+"PeersConnectedMany" = "%zu 名のユーザーに接続中";
+
+"LinkZero" = "Linkなし";
+"LinkOne" = "1 つのLink";
+"LinkOther" = "%u つのLink";

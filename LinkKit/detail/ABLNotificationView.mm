@@ -5,6 +5,7 @@
 #include <string>
 #include "ABLNotificationView.h"
 #include "../detail/ABLSettingsViewController.h"
+#include "../detail/LocalizableString.h"
 
 // UIViewController subclass which forwards status bar appearance
 // methods and the shouldAutorotate call to the forwardedVC view controller.
@@ -87,9 +88,12 @@ static CGFloat const kNotificationHeight = 34;
 
 
 // String constants
-static NSString* const kLinkZeroString = @"No Links";
-static NSString* const kLinkOneString = @"1 Link";
-static NSString* const kLinkOtherString = @"%u Links";
+static NSString* const kLinkZeroString =
+[LocalizedString resourcesLocalizedString: @"LinkZero" comment: @""] ?: @"No Links";
+static NSString* const kLinkOneString =
+[LocalizedString resourcesLocalizedString: @"LinkOne" comment: @""] ?: @"1 Link";
+static NSString* const kLinkOtherString =
+[LocalizedString resourcesLocalizedString: @"LinkOther" comment: @""] ?: @"%u Links";
 
 
 // The window for showing notification views. We need this to be able

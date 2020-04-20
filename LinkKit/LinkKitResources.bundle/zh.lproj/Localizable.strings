@@ -1,0 +1,22 @@
+// Copyright: 2020, Ableton AG, Berlin. All rights reserved.
+
+"DescriptionLong" = "通过 Link，你可以和其他具有 Link 功能的应用程序在同一网络环境中联机并同步速度。\n \n如需创建或加入一个工程，请打开 Link。";
+"LinkHyperlink" = "了解更多 ";
+
+"Browsing" = "正在浏览应用程序...";
+
+"InAppNotificationTitle" = "应用程序内通知";
+"InAppNotificationSubtitle" = "当其他应用程序加入或离开时收到通知";
+
+"SyncStartStopTitle" = "开始/结束同步";
+"SyncStartStopSubtitle" = "发送并听到开始/结束指令";
+
+"ConnectedPeersSectionTitle" = "已连接的应用程序";
+
+"PeersConnectedZero" = "没有可连接的应用程序";
+"PeersConnectedOne" = "已连接1个应用程序";
+"PeersConnectedMany" = "已连接%zu个应用程序";
+
+"LinkZero" = "无 Links";
+"LinkOne" = "1 Link";
+"LinkOther" = "%u Links";
