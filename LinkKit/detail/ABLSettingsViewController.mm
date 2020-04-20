@@ -181,11 +181,11 @@ _Pragma("clang diagnostic pop")
                           initWithStyle:UITableViewCellStyleDefault reuseIdentifier:nil];
 
     _enableDisableCell.textLabel.text = kTitleString;
-    UISwitch *switchview = [[UISwitch alloc] initWithFrame:CGRectZero];
+    UISwitch *switchView = [[UISwitch alloc] initWithFrame:CGRectZero];
     BOOL enabled = [self isEnabled];
-    switchview.on = enabled;
-    [switchview addTarget:self action:@selector(enableLink:) forControlEvents:UIControlEventValueChanged];
-    _enableDisableCell.accessoryView = switchview;
+    switchView.on = enabled;
+    [switchView addTarget:self action:@selector(enableLink:) forControlEvents:UIControlEventValueChanged];
+    _enableDisableCell.accessoryView = switchView;
 
   }
   return _enableDisableCell;
@@ -202,11 +202,11 @@ _Pragma("clang diagnostic pop")
     _notificationsCell.detailTextLabel.text = kInAppNotificationSubtitleString;
     _notificationsCell.detailTextLabel.textColor = [UIColor grayColor];
 
-    UISwitch *switchview = [[UISwitch alloc] initWithFrame:CGRectZero];
-    switchview.on = [[NSUserDefaults standardUserDefaults] boolForKey:ABLNotificationEnabledKey];
-    [switchview addTarget:self action:@selector(enableNotifications:) forControlEvents:UIControlEventValueChanged];
+    UISwitch *switchView = [[UISwitch alloc] initWithFrame:CGRectZero];
+    switchView.on = [[NSUserDefaults standardUserDefaults] boolForKey:ABLNotificationEnabledKey];
+    [switchView addTarget:self action:@selector(enableNotifications:) forControlEvents:UIControlEventValueChanged];
 
-    _notificationsCell.accessoryView = switchview;
+    _notificationsCell.accessoryView = switchView;
 
   }
   return _notificationsCell;
@@ -223,11 +223,11 @@ _Pragma("clang diagnostic pop")
     _syncStartStopCell.detailTextLabel.text = kSyncStartStopSubtitleString;
     _syncStartStopCell.detailTextLabel.textColor = [UIColor grayColor];
 
-    UISwitch *switchview = [[UISwitch alloc] initWithFrame:CGRectZero];
-    switchview.on = [self isStartStopSyncEnabled];
-    [switchview addTarget:self action:@selector(enableStartStopSync:) forControlEvents:UIControlEventValueChanged];
+    UISwitch *switchView = [[UISwitch alloc] initWithFrame:CGRectZero];
+    switchView.on = [self isStartStopSyncEnabled];
+    [switchView addTarget:self action:@selector(enableStartStopSync:) forControlEvents:UIControlEventValueChanged];
 
-    _syncStartStopCell.accessoryView = switchview;
+    _syncStartStopCell.accessoryView = switchView;
 
   }
   return _syncStartStopCell;
@@ -359,7 +359,7 @@ _Pragma("clang diagnostic pop")
     // Setting textView.dataDetectorTypes = UIDataDetectorTypeLink blocks the audio thread,
     // when a debugger is attached. This leads to audio dropouts when initializing the view
     // controller. As a workaround the URL is set manually.
-    // This can lead to audio droputs when tapping the link while running with a debugger
+    // This can lead to audio dropouts when tapping the link while running with a debugger
     // attached - which is less prominent during debugging.
     NSMutableAttributedString *text = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@%@", kLinkHyperlinkString, kLinkHyperlinkLink]];
     [text addAttribute:NSForegroundColorAttributeName value:[UIColor lightGrayColor] range:NSMakeRange(0, [kLinkHyperlinkString length])];
