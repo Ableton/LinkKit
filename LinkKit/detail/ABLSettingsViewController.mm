@@ -32,27 +32,27 @@ BOOL isStartStopSyncSupported()
 static NSString* const kTitleString = @"Ableton Link";
 static NSString* const kDescriptionLongString = @"Link allows you to play in time with other Link-enabled apps that are on the same network.\n \nTo create or join a session, enable Link.";
 static NSString* const kLinkHyperlinkString = @"Learn more at ";
-static NSString* const kLinkHyperlinkLink = @"www.Ableton.com/Link";
+static NSString* const kLinkHyperlinkLink = @"www.ableton.com/link";
 
-static NSString* const kBrowsingString = @"Browsing for Link-enabled apps...";
+static NSString* const kBrowsingString = @"Browsing for Link-enabled peers...";
 
 static NSString* const kInAppNotificationTitleString = @"In-app notifications";
-static NSString* const kInAppNotificationSubtitleString = @"Get notified when apps join or leave";
+static NSString* const kInAppNotificationSubtitleString = @"Get notified when peers join or leave";
 
 static NSString* const kSyncStartStopTitleString = @"Sync Start/Stop";
 static NSString* const kSyncStartStopSubtitleString = @"Send and listen to Start/Stop commands";
 
-static NSString* const kConnectedAppsSectionTitleString = @"CONNECTED APPS";
+static NSString* const kConnectedPeersSectionTitleString = @"CONNECTED PEERS";
 
-static NSString* const kAppConnectedZeroString = @"No apps connected";
-static NSString* const kAppConnectedOneString = @"Connected to 1 app";
-static NSString* const kAppConnectedManyString = @"Connected to %zu apps";
+static NSString* const kPeersConnectedZeroString = @"No peers connected";
+static NSString* const kPeersConnectedOneString = @"Connected to 1 peer";
+static NSString* const kPeersConnectedManyString = @"Connected to %zu peers";
 
 
 // Section indices
 static NSInteger const kLinkEnableDisableSection = 0;
 static NSInteger const kDetailSettingsSection = 1;
-static NSInteger const kConnectedAppsSection = 2;
+static NSInteger const kConnectedPeersSection = 2;
 
 
 @implementation ABLSettingsViewController
@@ -249,7 +249,7 @@ _Pragma("clang diagnostic pop")
 {
   NSMutableIndexSet* indexSet = [NSMutableIndexSet indexSet];
   [indexSet addIndex:kDetailSettingsSection];
-  [indexSet addIndex:kConnectedAppsSection];
+  [indexSet addIndex:kConnectedPeersSection];
 
   [self.tableView beginUpdates];
 
@@ -273,15 +273,15 @@ _Pragma("clang diagnostic pop")
   switch (count)
   {
     case 0:
-      rawString = kAppConnectedZeroString;
+      rawString = kPeersConnectedZeroString;
       break;
 
     case 1:
-      rawString = kAppConnectedOneString;
+      rawString = kPeersConnectedOneString;
       break;
 
     default:
-      rawString = kAppConnectedManyString;
+      rawString = kPeersConnectedManyString;
   }
 
   NSString* finalText = [NSString stringWithFormat:rawString, count];
@@ -480,7 +480,7 @@ _Pragma("clang diagnostic pop")
     case kDetailSettingsSection:
       return isStartStopSyncSupported() ? 2 : 1;
 
-    case kConnectedAppsSection:
+    case kConnectedPeersSection:
       return 1;
 
     default:
@@ -505,7 +505,7 @@ _Pragma("clang diagnostic pop")
         return [self syncStartStopCell];
       }
 
-    case kConnectedAppsSection:
+    case kConnectedPeersSection:
       return [self statusCell];
 
     default:
@@ -517,9 +517,9 @@ _Pragma("clang diagnostic pop")
 
 -(NSString*)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
 {
-  if (section == kConnectedAppsSection)
+  if (section == kConnectedPeersSection)
   {
-    return kConnectedAppsSectionTitleString;
+    return kConnectedPeersSectionTitleString;
   }
   return nil;
 }
@@ -540,7 +540,7 @@ _Pragma("clang diagnostic pop")
     case kLinkEnableDisableSection:
       return [self enableDisableCellFooter];
 
-    case kConnectedAppsSection:
+    case kConnectedPeersSection:
       return [self connectedAppsFooterView];
 
     default:
@@ -569,7 +569,7 @@ _Pragma("clang diagnostic pop")
       }
     }
 
-    case kConnectedAppsSection:
+    case kConnectedPeersSection:
       return 44.; // Similar to the cell default height
 
     default:
