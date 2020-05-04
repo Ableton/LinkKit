@@ -20,6 +20,7 @@
 		423E47991AA7B3E800CDACEC /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 423E47931AA7B3B600CDACEC /* Foundation.framework */; };
 		FD3CF9BF23190BA8008FF4C5 /* LinkKit.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = FD3CF9BE23190BA8008FF4C5 /* LinkKit.xcframework */; };
 		FD8F86C41CE3296300706B00 /* QuantumView.m in Sources */ = {isa = PBXBuildFile; fileRef = FD8F86C31CE3296300706B00 /* QuantumView.m */; };
+		FDCD59FE24607F4300A42F3D /* LinkKitResources.bundle in Resources */ = {isa = PBXBuildFile; fileRef = FDCD59FD24607F4300A42F3D /* LinkKitResources.bundle */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -44,6 +45,7 @@
 		FD8F86C21CE3296300706B00 /* QuantumView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QuantumView.h; sourceTree = "<group>"; };
 		FD8F86C31CE3296300706B00 /* QuantumView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QuantumView.m; sourceTree = "<group>"; };
 		FDB607CB22E5EC4D007E62D8 /* LinkHut.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = LinkHut.entitlements; sourceTree = "<group>"; };
+		FDCD59FD24607F4300A42F3D /* LinkKitResources.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; name = LinkKitResources.bundle; path = ../../LinkKitResources.bundle; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -65,6 +67,7 @@
 		423E47541AA7AECE00CDACEC = {
 			isa = PBXGroup;
 			children = (
+				FDCD59FD24607F4300A42F3D /* LinkKitResources.bundle */,
 				423E475F1AA7AECE00CDACEC /* LinkHut */,
 				423E475E1AA7AECE00CDACEC /* Products */,
 				FD3CF9BD23190BA8008FF4C5 /* Frameworks */,
@@ -192,6 +195,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FDCD59FE24607F4300A42F3D /* LinkKitResources.bundle in Resources */,
 				423E476C1AA7AECE00CDACEC /* Main.storyboard in Resources */,
 				423E47711AA7AECE00CDACEC /* LaunchScreen.xib in Resources */,
 				423E476E1AA7AECE00CDACEC /* Images.xcassets in Resources */,
