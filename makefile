@@ -59,6 +59,7 @@ bundle: release
 	cp -a docs/Ableton_Link_Promotion.pdf $(LINK_KIT_OUTPUT)
 	cp -a docs/Ableton_Link_UI_Guidelines.pdf $(LINK_KIT_OUTPUT)
 	rsync -rv assets $(LINK_KIT_OUTPUT)
+	cp -a LinkKit/LinkKitResources.bundle $(LINK_KIT_OUTPUT)
 	echo "Zipping LinkKit..."
 	cd $(OUTPUT) && zip -r -9 $(LINK_KIT).zip $(LINK_KIT)
 
