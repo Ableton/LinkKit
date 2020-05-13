@@ -1,0 +1,22 @@
+// Copyright: 2020, Ableton AG, Berlin. All rights reserved.
+
+"DescriptionLong" = "Link (ссылка) позволяет вам играть во времени с другими устройствами с поддержкой ссылки, которые находятся в той же сети.\n \nЧтобы начать или присоединиться к конференции, включите ссылку.";
+"LinkHyperlink" = "Узнать больше можно по ссылке ";
+
+"Browsing" = "Поиск для другого устройства...";
+
+"InAppNotificationTitle" = "In-app сообщение";
+"InAppNotificationSubtitle" = "Получать сообщение, когда другие устройства присоединяются или оставляют конференцию";
+
+"SyncStartStopTitle" = "Синхронизация Начало/Стоп";
+"SyncStartStopSubtitle" = "Отправка и ожидание команд Начало/Стоп";
+
+"ConnectedPeersSectionTitle" = "связанные устройства";
+
+"PeersConnectedZero" = "Нет связи с другим устройством";
+"PeersConnectedOne" = "Подключён к одному устройству";
+"PeersConnectedMany" = "Подключён к другим устройствам из %zu";
+
+"LinkZero" = "Нет ссылок";
+"LinkOne" = "Oдна ссылка";
+"LinkOther" = "%u Ссылки";
