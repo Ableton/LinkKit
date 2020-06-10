@@ -211,6 +211,11 @@ NSTimer* _notificationDurationTimer;
     
   window.frame = keyWindow.frame;
 
+  if (@available(iOS 13.0, *))
+  {
+    window.windowScene = keyWindow.windowScene;
+  }
+
   // Assign forwarded root VC to properly handle status bar updates
   window.forwardedRootVC = keyWindow.rootViewController;
 
