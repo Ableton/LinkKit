@@ -1,0 +1,23 @@
+clone_depth: 50
+
+branches:
+  only:
+    - master
+
+image: macos-bigsur
+
+environment:
+  XCODE_VERSION: 13
+
+install:
+  - git clone https://github.com/Ableton/link.git --recursive $APPVEYOR_BUILD_FOLDER/../link
+  - sudo xcode-select -s /Applications/Xcode-$XCODE_VERSION.app
+  - LINK_HASH=$(git -C $APPVEYOR_BUILD_FOLDER/../link rev-parse HEAD) && echo "Link Hash $LINK_HASH"
+  - SELECTED_XCODE_VERSION=$(xcodebuild -version) && echo "Xcode Version $SELECTED_XCODE_VERSION"
+
+build_script:
+  - make link_dir=../link
+
+artifacts:
+  - path: build/output/LinkKit.zip
+    name: LinkKit.zip
