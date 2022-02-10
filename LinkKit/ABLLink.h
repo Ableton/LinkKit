@@ -83,7 +83,7 @@ extern "C"
 
   /*! @brief Called if Session Tempo changes.
    *
-   *  @param the new session tempo in bpm
+   *  @param sessionTempo New session tempo in bpm
    *
    *  @discussion This is a stable value that is appropriate for display
    *  to the user.
@@ -94,7 +94,7 @@ extern "C"
 
   /*! @brief Called if Session transport start/stop state changes.
    *
-   *  @param the new start/stop state
+   *  @param isPlaying New start/stop state
    */
   typedef void (*ABLLinkStartStopCallback)(
     bool isPlaying,
