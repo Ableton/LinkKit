@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0)
-project(LinkKit)
+project(LinkKit LANGUAGES C CXX Swift)
 
 if(NOT DEFINED LINK_DIR)
   message(FATAL_ERROR "LINK_DIR must be defined!")
@@ -52,23 +52,23 @@ set(link_kit_SOURCES
 set(link_hut_DIR ${CMAKE_CURRENT_SOURCE_DIR}/examples/LinkHut/LinkHut)
 
 set(link_hut_SOURCES
-  ${link_hut_DIR}/AppDelegate.h
-  ${link_hut_DIR}/AppDelegate.m
   ${link_hut_DIR}/AudioEngine.h
   ${link_hut_DIR}/AudioEngine.m
-  ${link_hut_DIR}/main.m
-  ${link_hut_DIR}/QuantumView.h
-  ${link_hut_DIR}/QuantumView.m
-  ${link_hut_DIR}/ViewController.h
-  ${link_hut_DIR}/ViewController.m
+  ${link_hut_DIR}/AudioEngineController.swift
+  ${link_hut_DIR}/ContentView.swift
+  ${link_hut_DIR}/LinkHutApp.swift
+  ${link_hut_DIR}/LinkHut-Bridging-Header.h
 )
 
 set(
   link_hut_RESOURCES
-  ${link_hut_DIR}/Base.lproj/LaunchScreen.xib
-  ${link_hut_DIR}/Base.lproj/Main.storyboard
-  ${link_hut_DIR}/Images.xcassets
+  ${link_hut_DIR}/Assets.xcassets
   ${link_kit_DIR}/LinkKitResources.bundle
+)
+
+set(
+  link_hut_BRIDGING_HEADER
+  "${link_hut_DIR}/LinkHut-Bridging-Header.h"
 )
 
 set(
@@ -105,7 +105,7 @@ set_target_properties(
   PROPERTIES
   XCODE_ATTRIBUTE_ARCHS "$(ARCHS_STANDARD)"
   XCODE_ATTRIBUTE_CLANG_ENABLE_OBJC_ARC YES
-  XCODE_ATTRIBUTE_IPHONEOS_DEPLOYMENT_TARGET "8.0"
+  XCODE_ATTRIBUTE_IPHONEOS_DEPLOYMENT_TARGET "15.0"
   XCODE_ATTRIBUTE_BITCODE_GENERATION_MODE bitcode
   XCODE_ATTRIBUTE_SUPPORTS_UIKITFORMAC "YES"
 )
@@ -121,7 +121,7 @@ set_target_properties(
 add_executable(
     LinkHut
     ${link_hut_SOURCES}
-    ${link_hut_STORYBOARD}
+    ${link_hut_BRIDGING_HEADER}
     ${link_hut_RESOURCES}
 )
 
@@ -145,12 +145,16 @@ set_target_properties(
   LinkHut
   PROPERTIES
   MACOSX_BUNDLE YES
-  XCODE_ATTRIBUTE_TARGETED_DEVICE_FAMILY "1,2"
-  XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "iPhone Developer"
-  XCODE_ATTRIBUTE_CLANG_ENABLE_OBJC_ARC YES
-  XCODE_ATTRIBUTE_IPHONEOS_DEPLOYMENT_TARGET "9.0"
-  XCODE_ATTRIBUTE_SUPPORTS_UIKITFORMAC "YES"
-  XCODE_ATTRIBUTE_CODE_SIGN_ENTITLEMENTS "${link_hut_ENTITLEMENTS}"
-  RESOURCE "${link_hut_RESOURCES}"
   MACOSX_BUNDLE_INFO_PLIST "${link_hut_PLIST}"
+  RESOURCE "${link_hut_RESOURCES}"
+  XCODE_ATTRIBUTE_ASSETCATALOG_COMPILER_APPICON_NAME "AppIcon"
+  XCODE_ATTRIBUTE_CLANG_ENABLE_OBJC_ARC YES
+  XCODE_ATTRIBUTE_CODE_SIGN_ENTITLEMENTS "${link_hut_ENTITLEMENTS}"
+  XCODE_ATTRIBUTE_IPHONEOS_DEPLOYMENT_TARGET "15.0"
+  XCODE_ATTRIBUTE_PRODUCT_BUNDLE_IDENTIFIER "com.ableton.link.LinkHut"
+  XCODE_ATTRIBUTE_SUPPORTS_UIKITFORMAC "YES"
+  XCODE_ATTRIBUTE_SWIFT_OBJC_BRIDGING_HEADER "${link_hut_BRIDGING_HEADER}"
+  XCODE_ATTRIBUTE_SWIFT_OPTIMIZATION_LEVEL "-Onone"
+  XCODE_ATTRIBUTE_SWIFT_VERSION "5.0"
+  XCODE_ATTRIBUTE_TARGETED_DEVICE_FAMILY "1,2"
 )

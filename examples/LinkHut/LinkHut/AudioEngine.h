@@ -5,15 +5,13 @@
 
 @interface AudioEngine : NSObject
 
-@property (nonatomic) Float64 bpm;
-@property (readonly, nonatomic) Float64 beatTime;
-@property (nonatomic) Float64 quantum;
-@property (nonatomic) BOOL isPlaying;
-@property (readonly, nonatomic) BOOL isLinkEnabled;
-@property (readonly, nonatomic) ABLLinkRef linkRef;
-
 - (instancetype)initWithTempo:(Float64)bpm NS_DESIGNATED_INITIALIZER;
 - (void)start;
 - (void)stop;
+- (void)proposeTempo:(Float64)bpm;
+- (void)setQuantum:(Float64)quantum;
+- (void)requestTransportStart;
+- (void)requestTransportStop;
+- (ABLLinkRef)linkRef;
 
 @end
