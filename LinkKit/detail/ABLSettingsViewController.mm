@@ -182,8 +182,6 @@ _Pragma("clang diagnostic pop")
 
   _originalToolbarHidden = self.navigationController.toolbarHidden;
   [self.navigationController setToolbarHidden:NO];
-
-  [self updateToolbar];
 }
 
 -(void)viewWillDisappear:(BOOL)animated
@@ -267,7 +265,6 @@ _Pragma("clang diagnostic pop")
   return _statusCell;
 }
 
-
 -(void)animatedEnabledChange:(BOOL)enabled
 {
   NSMutableIndexSet* indexSet = [NSMutableIndexSet indexSet];
@@ -334,68 +331,8 @@ _Pragma("clang diagnostic pop")
   [self enableDisableCellFooter].hidden = [self isEnabled];
 }
 
--(void)updateToolbar
-{
-  UITextView* moreInfoLinkTextView = [self moreInfoLinkTextView];
-  [moreInfoLinkTextView sizeToFit];
-
-  UIToolbar* toolbar = self.navigationController.toolbar;
-
-  [toolbar setBackgroundImage:[UIImage new]
-           forToolbarPosition:UIBarPositionAny
-                   barMetrics:UIBarMetricsDefault];
-
-  [toolbar setShadowImage:[UIImage new]
-       forToolbarPosition:UIToolbarPositionAny];
-
-  if (@available(iOS 13.0, *))
-  {
-    [toolbar setBackgroundColor:[UIColor systemGroupedBackgroundColor]];
-  }
-  else
-  {
-    [toolbar setBackgroundColor:[UIColor groupTableViewBackgroundColor]];
-  }
-  [toolbar addSubview:moreInfoLinkTextView];
-
-  UIBarButtonItem* item = [[UIBarButtonItem alloc] initWithCustomView:moreInfoLinkTextView];
-
-  [self setToolbarItems:@[item]];
-}
-
-// ========================= Headers & Footers ========================= //
-#pragma mark - Headers & Footers
-
--(UITextView*)moreInfoLinkTextView
-{
-  if (_moreInfoLinkTextView == nil)
-  {
-    UITextView* textView = [UITextView new];
-    textView.editable = NO;
-    textView.scrollEnabled = NO;
-    textView.selectable = YES;
-    textView.font = [UIFont systemFontOfSize:13];
-    textView.textColor = [UIColor lightGrayColor];
-    textView.backgroundColor = [UIColor clearColor];
-    textView.textContainer.lineFragmentPadding = 0;
-
-    // Setting textView.dataDetectorTypes = UIDataDetectorTypeLink blocks the audio thread,
-    // when a debugger is attached. This leads to audio dropouts when initializing the view
-    // controller. As a workaround the URL is set manually.
-    // This can lead to audio dropouts when tapping the link while running with a debugger
-    // attached - which is less prominent during debugging.
-    NSMutableAttributedString *text = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@%@", kLinkHyperlinkString, kLinkHyperlinkLink]];
-    [text addAttribute:NSForegroundColorAttributeName value:[UIColor lightGrayColor] range:NSMakeRange(0, [kLinkHyperlinkString length])];
-    [text addAttribute:NSForegroundColorAttributeName value:[UIColor blueColor] range:NSMakeRange([kLinkHyperlinkString length], [kLinkHyperlinkLink length])];
-    NSURL *url = [NSURL URLWithString:@"http://www.ableton.com/link"];
-    [text addAttribute: NSLinkAttributeName value:url range: NSMakeRange([kLinkHyperlinkString length], [kLinkHyperlinkLink length])];
-    textView.attributedText = text;
-    
-    _moreInfoLinkTextView = textView;
-  }
-
-  return _moreInfoLinkTextView;
-}
+// ========================= Footer ==================================== //
+#pragma mark - Footer
 
 -(UITextView*)enableDisableCellFooter
 {
@@ -404,9 +341,8 @@ _Pragma("clang diagnostic pop")
     UITextView* textView = [UITextView new];
     textView.editable = NO;
     textView.scrollEnabled = NO;
-    textView.selectable = NO;
+    textView.selectable = YES;
     textView.font = [UIFont systemFontOfSize:13];
-    textView.textColor = [UIColor lightGrayColor];
     textView.backgroundColor = [UIColor clearColor];
     textView.textContainer.lineFragmentPadding = 0;
 
@@ -419,7 +355,19 @@ _Pragma("clang diagnostic pop")
     textView.textContainerInset = textContainerInsets;
 
     textView.hidden = [self isEnabled];
-    textView.text = kDescriptionLongString;
+    
+    // Setting textView.dataDetectorTypes = UIDataDetectorTypeLink blocks the audio thread,
+    // when a debugger is attached. This leads to audio dropouts when initializing the view
+    // controller. As a workaround the URL is set manually.
+    // This can lead to audio dropouts when tapping the link while running with a debugger
+    // attached - which is less prominent during debugging.
+    NSMutableAttributedString *text = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@\n\n%@%@", kDescriptionLongString, kLinkHyperlinkString, kLinkHyperlinkLink]];
+    CGFloat hyperlinkBegin = [kDescriptionLongString length] + 2 + [kLinkHyperlinkString length];
+    [text addAttribute:NSForegroundColorAttributeName value:[UIColor grayColor] range:NSMakeRange(0, hyperlinkBegin)];
+    [text addAttribute:NSForegroundColorAttributeName value:[UIColor blueColor] range:NSMakeRange(hyperlinkBegin, [kLinkHyperlinkLink length])];
+    NSURL *url = [NSURL URLWithString:@"http://www.ableton.com/link"];
+    [text addAttribute: NSLinkAttributeName value:url range: NSMakeRange(hyperlinkBegin, [kLinkHyperlinkLink length])];
+    textView.attributedText = text;
 
     _enableDisableCellFooter = textView;
   }
@@ -607,7 +555,6 @@ _Pragma("clang diagnostic pop")
 {
   return NO;
 }
-
 
 // ========================= Link ========================= //
 #pragma mark - Link
