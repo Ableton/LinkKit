@@ -4,10 +4,10 @@ branches:
   only:
     - master
 
-image: macos-bigsur
+image: macos-monterey
 
 environment:
-  XCODE_VERSION: 13
+  XCODE_VERSION: 13.2.1
 
 install:
   - git clone https://github.com/Ableton/link.git --recursive $APPVEYOR_BUILD_FOLDER/../link
