@@ -8,11 +8,16 @@ image: macos-monterey
 
 environment:
   XCODE_VERSION: 13.2.1
+  LINK_HASH: d03361f3e0752f244193faebbca7b5869524a1aa
 
 install:
-  - git clone https://github.com/Ableton/link.git --recursive $APPVEYOR_BUILD_FOLDER/../link
+  - git clone https://github.com/Ableton/link.git $APPVEYOR_BUILD_FOLDER/../link
+  - cd $APPVEYOR_BUILD_FOLDER/../link
+  - git checkout $LINK_HASH
+  - git submodule update --init --recursive
+  - cd $APPVEYOR_BUILD_FOLDER
   - sudo xcode-select -s /Applications/Xcode-$XCODE_VERSION.app
-  - LINK_HASH=$(git -C $APPVEYOR_BUILD_FOLDER/../link rev-parse HEAD) && echo "Link Hash $LINK_HASH"
+  - echo "Link Hash $LINK_HASH"
   - SELECTED_XCODE_VERSION=$(xcodebuild -version) && echo "Xcode Version $SELECTED_XCODE_VERSION"
 
 build_script:
