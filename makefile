@@ -1,13 +1,6 @@
-#  ____                                _
-# |  _ \ __ _ _ __ __ _ _ __ ___   ___| |_ ___ _ __ ___
-# | |_) / _` | '__/ _` | '_ ` _ \ / _ \ __/ _ \ '__/ __|
-# |  __/ (_| | | | (_| | | | | | |  __/ ||  __/ |  \__ \
-# |_|   \__,_|_|  \__,_|_| |_| |_|\___|\__\___|_|  |___/
-#
-
 platform = iphoneos
 config = Debug
-wordsize = 64
+dest = 'generic/platform=iOS'
 
 ifneq ($(MAKECMDGOALS),clean)
 ifndef link_dir
@@ -22,37 +15,24 @@ PLATFORM_OUTPUT = $(OUTPUT)/$(PLATFORM_CONFIG)
 LINK_KIT = LinkKit
 LINK_KIT_OUTPUT = $(OUTPUT)/$(LINK_KIT)
 
-BUILD_CMD = /usr/bin/xcodebuild -project build/LinkKit.xcodeproj -scheme "LinkKit" -destination $(dest) -configuration $(config) -UseModernBuildSystem=YES CONFIGURATION_BUILD_DIR=$(PLATFORM_OUTPUT)
-
-#  _____                    _
-# |_   _|_ _ _ __ __ _  ___| |_ ___
-#   | |/ _` | '__/ _` |/ _ \ __/ __|
-#   | | (_| | | | (_| |  __/ |_\__ \
-#   |_|\__,_|_|  \__, |\___|\__|___/
-#                |___/
-
 all: bundle
 
 configure:
 	mkdir -p $(PROJECT_DIR) && cd $(PROJECT_DIR) && cmake -G Xcode -DLINK_DIR=${link_dir} ..
 
 linkkit: configure
-	$(BUILD_CMD)
+	xcodebuild -project build/LinkKit.xcodeproj -scheme "LinkKit" -destination $(dest) -configuration $(config) -UseModernBuildSystem=YES CONFIGURATION_BUILD_DIR=$(PLATFORM_OUTPUT)
 
 release:
 	make linkkit config=Release dest="'generic/platform=iOS'" platform=iphoneos
 	make linkkit config=Release dest="'generic/platform=iOS Simulator'" platform=iphonesimulator
 	make linkkit config=Release dest="'generic/platform=macOS,variant=Mac Catalyst,name=Any Mac'" platform=maccatalyst
-	libtool $(OUTPUT)/Release-iphoneos/libLinkKit.a $(OUTPUT)/Release-iphonesimulator/libLinkKit.a -o $(OUTPUT)/libABLLink.a
 	mkdir -p $(OUTPUT)/Headers
 	cp LinkKit/*.h $(OUTPUT)/Headers/
 	xcodebuild -create-xcframework -library $(OUTPUT)/Release-iphoneos/libLinkKit.a -headers $(OUTPUT)/Headers -library $(OUTPUT)/Release-iphonesimulator/libLinkKit.a -headers $(OUTPUT)/Headers -library $(OUTPUT)/Release-maccatalyst/libLinkKit.a -headers $(OUTPUT)/Headers -output $(OUTPUT)/LinkKit.xcframework
 
 bundle: release
-	mkdir -p $(LINK_KIT_OUTPUT)/include
-	cp -a ./LinkKit/ABLLink.h ./LinkKit/ABLLinkSettingsViewController.h ./LinkKit/ABLLinkUtils.h $(LINK_KIT_OUTPUT)/include
-	mkdir -p $(LINK_KIT_OUTPUT)/lib
-	cp -a $(OUTPUT)/libABLLink.a $(LINK_KIT_OUTPUT)/lib
+	mkdir -p $(LINK_KIT_OUTPUT)
 	cp -a $(OUTPUT)/LinkKit.xcframework $(LINK_KIT_OUTPUT)
 	rsync -R $$(git ls-files examples/LinkHut) $(LINK_KIT_OUTPUT)
 	cp -a LICENSE.md $(LINK_KIT_OUTPUT)
