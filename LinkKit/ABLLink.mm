@@ -140,6 +140,27 @@ extern "C"
     return ablLink->mLink.isEnabled() && ablLink->mLink.numPeers() > 0;
   }
 
+  void ABLLinkSetNumPeersCallback(
+    ABLLinkRef ablLink,
+    ABLLinkNumPeersCallback callback,
+    void* context)
+  {
+    ablLink->mpCallbacks->mPeerCountCallback = [=](const std::size_t peers){
+      
+      if(ablLink->mLink.isEnabled()){
+        const size_t oldNumPeers = ablLink->mpSettingsViewController.numberOfPeers;
+        if (oldNumPeers == 0 && peers > 0) {
+          ablLink->mpCallbacks->mIsConnectedCallback(true);
+        }else if (oldNumPeers > 0 && peers == 0) {
+          ablLink->mpCallbacks->mIsConnectedCallback(false);
+        }
+        callback(int(peers), context);
+        [ablLink->mpSettingsViewController setNumberOfPeers:peers];
+      }
+    
+    };
+  }
+
   void ABLLinkSetSessionTempoCallback(
     ABLLinkRef ablLink,
     ABLLinkSessionTempoCallback callback,

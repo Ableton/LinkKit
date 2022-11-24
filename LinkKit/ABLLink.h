@@ -81,6 +81,17 @@ extern "C"
    */
   bool ABLLinkIsStartStopSyncEnabled(ABLLinkRef);
 
+  /*! @brief Called if number of peers changes.
+   *
+   *  @param numPeers New amount of peers
+   *
+   *  @discussion This is a stable value that is appropriate for display
+   *  to the user.
+   */
+  typedef void (*ABLLinkNumPeersCallback)(
+    int numPeers,
+    void *context);
+
   /*! @brief Called if Session Tempo changes.
    *
    *  @param sessionTempo New session tempo in bpm
@@ -124,6 +135,13 @@ extern "C"
   typedef void (*ABLLinkIsConnectedCallback)(
     bool isConnected,
     void *context);
+
+  /*! @brief Called when the amount of peers changes.
+   */
+  void ABLLinkSetNumPeersCallback(
+    ABLLinkRef,
+    ABLLinkNumPeersCallback callback,
+    void* context);
 
   /*! @brief Invoked on the main thread when the tempo of the Link
    *  session changes.
