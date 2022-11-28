@@ -98,6 +98,9 @@ extern "C"
         }
         [ABLNotificationView showNotificationMessage:peers];
         [ablLink->mpSettingsViewController setNumberOfPeers:peers];
+        
+        [[NSNotificationCenter defaultCenter] postNotification:
+            [NSNotification notificationWithName:@"ABLLink.NumberOfPeersChanged" object:[NSNumber numberWithUnsignedLongLong:peers]]];
       }
     };
     return ablLink;
