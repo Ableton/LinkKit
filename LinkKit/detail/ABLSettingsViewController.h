@@ -8,6 +8,7 @@
 #define ABLNotificationEnabledKey @"ABLNotificationEnabled"
 #define ABLLinkStartStopSyncSupportedKey @"ABLLinkStartStopSyncSupported"
 #define ABLLinkStartStopSyncEnabledKey @"ABLStartStopSyncEnabled"
+#define ABLLinkSuppressNotificationsKey @"ABLLinkSuppressNotifications"
 
 struct ABLLink;
 

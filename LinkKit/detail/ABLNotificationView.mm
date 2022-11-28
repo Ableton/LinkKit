@@ -7,6 +7,15 @@
 #include "../detail/ABLSettingsViewController.h"
 #include "../detail/LocalizableString.h"
 
+namespace {
+BOOL suppressNotifications()
+{
+  NSBundle* mainBundle = [NSBundle mainBundle];
+  return [[mainBundle objectForInfoDictionaryKey:ABLLinkSuppressNotificationsKey] boolValue];
+}
+
+} // unnamed
+
 // UIViewController subclass which forwards status bar appearance
 // methods and the shouldAutorotate call to the forwardedVC view controller.
 @interface _ABLForwardingVC: UIViewController
@@ -123,10 +132,12 @@ NSTimer* _notificationDurationTimer;
 
 // ========================= Static methods ========================= //
 
+
 +(void)showNotificationMessage:(size_t)numberOfPeers
 {
-  if([[NSUserDefaults standardUserDefaults] boolForKey:ABLNotificationEnabledKey] &&
-     [UIApplication sharedApplication].applicationState == UIApplicationStateActive)
+  if(!suppressNotifications()
+     && [[NSUserDefaults standardUserDefaults] boolForKey:ABLNotificationEnabledKey]
+     && [UIApplication sharedApplication].applicationState == UIApplicationStateActive)
   {
     [self flashNotificationInIfNeeded];
     NSString* text = [self createNotificationTextForNumberOfPeers:numberOfPeers];
