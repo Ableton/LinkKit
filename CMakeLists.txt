@@ -97,7 +97,6 @@ target_link_libraries(
     LinkKit
     "-framework UIKit"
     "-framework CoreText"
-    libc++.a
 )
 
 set_target_properties(
@@ -138,7 +137,6 @@ target_link_libraries(
   "-framework AudioToolbox"
   "-framework CoreText"
   "-framework CoreGraphics"
-  libc++.a
 )
 
 set_target_properties(
