@@ -8,7 +8,7 @@ image: macos-monterey
 
 environment:
   XCODE_VERSION: 13.2.1
-  LINK_HASH: d03361f3e0752f244193faebbca7b5869524a1aa
+  LINK_HASH: e55789a3f665de4416dc4809e4a8934266110ffd
 
 install:
   - git clone https://github.com/Ableton/link.git $APPVEYOR_BUILD_FOLDER/../link
