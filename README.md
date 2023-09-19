@@ -9,6 +9,9 @@ The LinkKit SDK is distributed as a zip file attached to a release in this repo.
 ## iOS 14 Compatibility
 Link uses UDP multicast messages on the local area network to find other peers. Apple added security measures to iOS 14, that require a special entitlement for the app to be able to send those messages. You can find more information in the [LinkKit documentation](https://ableton.github.io/linkkit/#ios-14-compatibility).
 
+## iOS 17 Compatibility
+Apple enforces entitlements more strictly since iOS 17. To be able to detect other Link peers on the LAN your application needs the `com.apple.developer.multicast` entitlement.
+
 ## Building
 It is strongly recommended to use the pre-built version of LinkKit. For debugging and accommodation of exceptional requirements, it is possible to build LinkKit as described below.
 
