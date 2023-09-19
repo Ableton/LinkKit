@@ -7,7 +7,7 @@ branches:
 image: macos-monterey
 
 environment:
-  XCODE_VERSION: 13.2.1
+  XCODE_VERSION: 14.1
   LINK_HASH: e55789a3f665de4416dc4809e4a8934266110ffd
 
 install:
