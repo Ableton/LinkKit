@@ -19,6 +19,7 @@ all: bundle
 
 configure:
 	cmake -B ${PROJECT_DIR} -G Xcode -DLINK_DIR=${link_dir}
+	sed -i '' '/LIBRARY_SEARCH_PATHS/d' $(PROJECT_DIR)/LinkKit.xcodeproj/project.pbxproj # workaround to prevent a linker error in LinkHut caused by default generated LIBRARY_SEARCH_PATHS
 
 linkkit: configure
 	xcodebuild -project build/LinkKit.xcodeproj -scheme "LinkKit" -destination $(dest) -configuration $(config) -UseModernBuildSystem=YES CONFIGURATION_BUILD_DIR=$(PLATFORM_OUTPUT)
