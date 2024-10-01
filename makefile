@@ -18,7 +18,7 @@ LINK_KIT_OUTPUT = $(OUTPUT)/$(LINK_KIT)
 all: bundle
 
 configure:
-	mkdir -p $(PROJECT_DIR) && cd $(PROJECT_DIR) && cmake -G Xcode -DLINK_DIR=${link_dir} ..
+	cmake -B ${PROJECT_DIR} -G Xcode -DLINK_DIR=${link_dir}
 
 linkkit: configure
 	xcodebuild -project build/LinkKit.xcodeproj -scheme "LinkKit" -destination $(dest) -configuration $(config) -UseModernBuildSystem=YES CONFIGURATION_BUILD_DIR=$(PLATFORM_OUTPUT)
