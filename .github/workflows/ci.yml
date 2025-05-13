@@ -1,0 +1,44 @@
+name: Build LinkKit
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    env:
+      LINK_HASH: 41d9aa111f702e78b6fbaee9d3e06dda1db6420d
+
+    steps:
+      - name: Checkout Link
+        uses: actions/checkout@v4
+        with:
+          repository: Ableton/link
+          path: link
+          ref: ${{ env.LINK_HASH }}
+          submodules: recursive
+
+      - name: Checkout LinkKit
+        uses: actions/checkout@v4
+        with:
+          path: link_kit
+
+      - name: Print Link Hash and Xcode Version
+        run: |
+          echo "Link Hash $LINK_HASH"
+          SELECTED_XCODE_VERSION=$(xcodebuild -version) && echo "Xcode Version $SELECTED_XCODE_VERSION"
+
+      - name: Build LinkKit
+        run: |
+          cd link_kit
+          make link_dir=../link
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: LinkKit.zip
+          path: link_kit/build/output/LinkKit.zip
