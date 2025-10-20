@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    runs-on: macos-latest
+    runs-on: macos-26
 
     env:
       LINK_HASH: 4c0893746cd19b7ea411799f4bb3fec7be2f5f2f
