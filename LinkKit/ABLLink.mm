@@ -4,9 +4,35 @@
 #include <ableton/util/Injected.hpp>
 #include "ABLLink.h"
 #include "ABLLinkUtils.h"
+#include "ABLLinkUtils.h"
 #include "detail/ABLLinkAggregate.h"
 #include "detail/ABLNotificationView.h"
 #include "detail/ABLSettingsViewController.h"
+#include "detail/BufferConversion.hpp"
+
+// C API implementations for buffer conversion functions in ABLLinkUtils.h
+extern "C"
+{
+  int16_t ABLConvertInt16(int16_t input) {
+    return ableton::link_kit::ConvertInt16(input);
+  }
+
+  int16_t ABLConvertUInt16(uint16_t input) {
+    return ableton::link_kit::ConvertUInt16(input);
+  }
+
+  int16_t ABLConvertInt32(int32_t input) {
+    return ableton::link_kit::ConvertInt32(input);
+  }
+
+  int16_t ABLConvertUInt32(uint32_t input) {
+    return ableton::link_kit::ConvertUInt32(input);
+  }
+
+  int16_t ABLConvertFloat(float input) {
+    return ableton::link_kit::ConvertFloat(input);
+  }
+}
 
 
 extern "C"

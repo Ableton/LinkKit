@@ -47,5 +47,11 @@ bundle: release
 xcode: configure
 	open $(PROJECT_DIR)/LinkKit.xcodeproj
 
+test-build: configure
+	xcodebuild build -project $(PROJECT_DIR)/LinkKit.xcodeproj -target LinkKitTests -configuration Debug -sdk macosx CONFIGURATION_BUILD_DIR=$(PROJECT_DIR)/bin
+
+test: test-build
+	$(PROJECT_DIR)/bin/LinkKitTests
+
 clean:
 	rm -rf ${PROJECT_DIR}

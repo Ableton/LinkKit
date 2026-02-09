@@ -23,6 +23,21 @@ extern "C"
     return (toBeat - fromBeat) * sampleRate * 60 / numSamples;
   }
 
+  /*! @brief Convert int16_t sample to int16_t (passthrough) */
+  int16_t ABLConvertInt16(int16_t input);
+
+  /*! @brief Convert uint16_t sample to int16_t (subtract DC offset) */
+  int16_t ABLConvertUInt16(uint16_t input);
+
+  /*! @brief Convert int32_t sample to int16_t (shift to 16-bit range) */
+  int16_t ABLConvertInt32(int32_t input);
+
+  /*! @brief Convert uint32_t sample to int16_t (subtract DC offset and shift) */
+  int16_t ABLConvertUInt32(uint32_t input);
+
+  /*! @brief Convert float sample to int16_t (range: -1.0 to 1.0) */
+  int16_t ABLConvertFloat(float input);
+
 #ifdef __cplusplus
 }
 #endif

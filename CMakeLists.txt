@@ -45,6 +45,7 @@ set(link_kit_SOURCES
   ${link_kit_DIR}/detail/ABLObjCUtils.h
   ${link_kit_DIR}/detail/ABLSettingsViewController.h
   ${link_kit_DIR}/detail/ABLSettingsViewController.mm
+  ${link_kit_DIR}/detail/BufferConversion.hpp
   ${link_kit_DIR}/detail/LocalizableString.h
   ${link_kit_DIR}/detail/LocalizableString.mm
 )
@@ -97,6 +98,7 @@ target_link_libraries(
     LinkKit
     "-framework UIKit"
     "-framework CoreText"
+    "-framework AudioToolbox"
 )
 
 set_target_properties(
@@ -156,4 +158,29 @@ set_target_properties(
   XCODE_ATTRIBUTE_SWIFT_VERSION "5.0"
   XCODE_ATTRIBUTE_TARGETED_DEVICE_FAMILY "1,2"
   XCODE_ATTRIBUTE_SUPPORTS_MACCATALYST YES
+)
+
+
+#  _     _       _    _  ___ _  _____         _
+# | |   (_)_ __ | | _| |/ (_) ||_   _|__  ___| |_ ___
+# | |   | | '_ \| |/ / ' /| | __|| |/ _ \/ __| __/ __|
+# | |___| | | | |   <| . \| | |_ | |  __/\__ \ |_\__ \
+# |_____|_|_| |_|_|\_\_|\_\_|\__||_|\___||___/\__|___/
+#
+
+add_executable(LinkKitTests
+  ${LINK_DIR}/src/ableton/test/catch/CatchMain.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/LinkKit/detail/tst_BufferConversion.cpp
+)
+
+target_include_directories(
+  LinkKitTests
+  PRIVATE
+  ${LINK_DIR}/third_party/catch
+)
+
+target_link_libraries(
+  LinkKitTests
+  "-framework Foundation"
+  "-framework AudioToolbox"
 )
