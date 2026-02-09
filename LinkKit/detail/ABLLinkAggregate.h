@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <optional>
 #include <memory>
 #include <ableton/LinkAudio.hpp>
 #include "detail/ABLSettingsViewController.h"
@@ -14,6 +15,7 @@ extern "C"
   using TempoCallback = std::function<void (double)>;
   using StartStopCallback = std::function<void (bool)>;
   using IsStartStopSyncEnabledCallback = std::function<void (bool)>;
+  using IsAudioEnabledCallback = std::function<void (bool)>;
 
   struct ABLLinkCallbacks
   {
@@ -23,13 +25,15 @@ extern "C"
       PeerCountCallback peerCount,
       TempoCallback tempo,
       StartStopCallback startStop,
-      IsStartStopSyncEnabledCallback startStopSyncEnabled)
+      IsStartStopSyncEnabledCallback startStopSyncEnabled,
+      IsAudioEnabledCallback audioEnabled)
       : mIsConnectedCallback(std::move(connected))
       , mIsEnabledCallback(std::move(enabled))
       , mPeerCountCallback(std::move(peerCount))
       , mTempoCallback(std::move(tempo))
       , mStartStopCallback(std::move(startStop))
       , mIsStartStopSyncEnabledCallback(std::move(startStopSyncEnabled))
+      , mIsAudioEnabledCallback(std::move(audioEnabled))
     {
     }
 
@@ -39,6 +43,7 @@ extern "C"
     TempoCallback mTempoCallback;
     StartStopCallback mStartStopCallback;
     IsStartStopSyncEnabledCallback mIsStartStopSyncEnabledCallback;
+    IsAudioEnabledCallback mIsAudioEnabledCallback;
   };
 
   struct ABLLinkSessionState
@@ -54,13 +59,27 @@ extern "C"
     void updateEnabled();
     void enableStartStopSync(bool);
     bool isStartStopSyncEnabled();
+    void enableLinkAudio(bool);
+    bool isLinkAudioEnabled();
 
     std::shared_ptr<ABLLinkCallbacks> mpCallbacks;
     bool mActive;
     std::atomic<bool> mEnabled;
-    ableton::Link mImpl;
+    ableton::LinkAudio mImpl;
     ABLSettingsViewController *mpSettingsViewController;
     ABLLinkSessionState mAudioSessionState;
     ABLLinkSessionState mAppSessionState;
+  };
+
+  struct ABLLinkAudioSinkBufferHandle {
+    std::optional<ableton::LinkAudioSink::BufferHandle> moImpl;
+  };
+
+  struct ABLLinkAudioSink
+  {
+    ABLLinkAudioSink(ABLLink& link, const char* name, uint32_t maxNumSamples);
+
+    ableton::LinkAudioSink mImpl;
+    ABLLinkAudioSinkBufferHandle mBufferHandle;
   };
 }

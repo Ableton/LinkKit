@@ -116,6 +116,10 @@ extern "C"
     bool isEnabled,
     void *context);
 
+  typedef void (*ABLLinkIsAudioEnabledCallback)(
+    bool isEnabled,
+    void *context);
+
   /*! @brief Called if isConnected state changes.
    *
    *  @param isConnected Whether Link is currently connected to other
@@ -394,6 +398,46 @@ extern "C"
     uint64_t hostTimeAtOutput,
     double beatTime,
     double quantum);
+
+  bool ABLLinkIsAudioEnabled(ABLLinkRef);
+
+  void ABLLinkSetIsAudioEnabledCallback(
+    ABLLinkRef,
+    ABLLinkIsAudioEnabledCallback callback,
+    void* context);
+
+  typedef struct ABLLinkAudioSink *ABLLinkAudioSinkRef;
+
+  typedef struct ABLLinkAudioSinkBufferHandle *ABLLinkAudioSinkBufferHandleRef;
+
+  ABLLinkAudioSinkRef ABLLinkAudioSinkNew(
+    ABLLinkRef,
+    const char *name,
+    uint32_t maxNumSamples);
+
+  void ABLLinkAudioSinkDelete(ABLLinkAudioSinkRef);
+
+  uint32_t ABLLinkAudioSinkMaxNumSamples(ABLLinkAudioSinkRef);
+
+  void ABLLinkAudioSinkRequestMaxNumSamples(ABLLinkAudioSinkRef,
+    uint32_t maxNumSamples);
+
+  ABLLinkAudioSinkBufferHandleRef ABLLinkAudioRetainBuffer(ABLLinkAudioSinkRef);
+
+  bool ABLLinkAudioSinkBufferHandleIsValid(ABLLinkAudioSinkBufferHandleRef);
+
+  int16_t *ABLLinkAudioSinkBufferSamples(ABLLinkAudioSinkBufferHandleRef);
+
+  bool ABLLinkAudioReleaseAndCommitBuffer(ABLLinkAudioSinkRef,
+    ABLLinkAudioSinkBufferHandleRef,
+    ABLLinkSessionStateRef,
+    double beatsAtBufferBegin,
+    double quantum,
+    uint32_t numFrames,
+    uint32_t numChannels,
+    uint32_t sampleRate);
+
+  void ABLLinkAudioReleaseBuffer(ABLLinkAudioSinkBufferHandleRef);
 
 #ifdef __cplusplus
 }

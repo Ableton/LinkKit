@@ -19,12 +19,13 @@ extern "C"
           [](std::size_t) { },
           [](double) { },
           [](bool) { },
+          [](bool) { },
           [](bool) { }
         )
       )
     , mActive(true)
     , mEnabled(false)
-    , mImpl(initialBpm)
+    , mImpl(initialBpm, "")
     , mAudioSessionState{mImpl.captureAudioSessionState(), mImpl.clock()}
     , mAppSessionState{mImpl.captureAppSessionState(), mImpl.clock()}
   {
@@ -80,6 +81,22 @@ extern "C"
     return mImpl.isStartStopSyncEnabled();
   }
 
+  void ABLLink::enableLinkAudio(const bool enabled)
+  {
+    mImpl.enableLinkAudio(enabled);
+  }
+
+  bool ABLLink::isLinkAudioEnabled()
+  {
+    return mImpl.isLinkAudioEnabled();
+  }
+
+  ABLLinkAudioSink::ABLLinkAudioSink(ABLLink& link, const char* name, uint32_t maxNumSamples)
+    : mImpl(link.mImpl, name, maxNumSamples)
+  {
+  }
+
+
   // ABLLink API
 
   ABLLinkRef ABLLinkNew(const double bpm)
@@ -118,6 +135,7 @@ extern "C"
     ablLink->mpCallbacks->mTempoCallback = [](double) { };
     ablLink->mpCallbacks->mStartStopCallback = [](bool) { };
     ablLink->mpCallbacks->mIsStartStopSyncEnabledCallback = [](bool) { };
+    ablLink->mpCallbacks->mIsAudioEnabledCallback = [](bool) { };
 
     delete ablLink;
   }
@@ -179,6 +197,16 @@ extern "C"
     void* context)
   {
     ablLink->mpCallbacks->mIsStartStopSyncEnabledCallback = [=](const bool isEnabled) {
+      callback(isEnabled, context);
+    };
+  }
+
+    void ABLLinkSetIsAudioEnabledCallback(
+    ABLLinkRef ablLink,
+    ABLLinkIsAudioEnabledCallback callback,
+    void* context)
+  {
+    ablLink->mpCallbacks->mIsAudioEnabledCallback = [=](const bool isEnabled) {
       callback(isEnabled, context);
     };
   }
@@ -314,6 +342,71 @@ extern "C"
   {
     const auto micros = sessionState->mClock.ticksToMicros(hostTime);
     sessionState->mImpl.setIsPlayingAndRequestBeatAtTime(isPlaying, micros, beatTime, quantum);
+  }
+
+  bool ABLLinkIsAudioEnabled(ABLLinkRef ablLink)
+  {
+    return ablLink->mImpl.isLinkAudioEnabled();
+  }
+
+  void ABLLinkSetPeerName(ABLLinkRef ablLink, const char* name)
+  {
+    ablLink->mImpl.setPeerName(name);
+  }
+
+  ABLLinkAudioSinkRef ABLLinkAudioSinkNew(ABLLinkRef ablLink, const char* name, const uint32_t maxNumSamples)
+  {
+    return new ABLLinkAudioSink(*ablLink, name, maxNumSamples);
+  }
+
+  void ABLLinkAudioSinkDelete(ABLLinkAudioSinkRef sink)
+  {
+    delete sink;
+  }
+
+  uint32_t ABLLinkAudioSinkMaxNumSamples(ABLLinkAudioSinkRef sink) {
+    return static_cast<uint32_t>(sink->mImpl.maxNumSamples());
+  }
+
+  void ABLLinkAudioSinkRequestMaxNumSamples(ABLLinkAudioSinkRef sink, const uint32_t maxNumSamples)
+  {
+    sink->mImpl.requestMaxNumSamples(maxNumSamples);
+  }
+
+  ABLLinkAudioSinkBufferHandleRef ABLLinkAudioRetainBuffer(ABLLinkAudioSinkRef sink)
+  {
+    sink->mBufferHandle.moImpl.emplace(sink->mImpl);
+    return &sink->mBufferHandle;
+  }
+
+  bool ABLLinkAudioSinkBufferHandleIsValid(ABLLinkAudioSinkBufferHandleRef bufferHandle)
+  {
+    return bufferHandle->moImpl.has_value() && *bufferHandle->moImpl;
+  }
+
+  int16_t* ABLLinkAudioSinkBufferSamples(ABLLinkAudioSinkBufferHandleRef bufferHandle)
+  {
+    return bufferHandle->moImpl->samples;
+  }
+
+  bool ABLLinkAudioReleaseAndCommitBuffer(
+    ABLLinkAudioSinkRef sink,
+    ABLLinkAudioSinkBufferHandleRef bufferHandle,
+    ABLLinkSessionStateRef sessionState,
+    const double beatsAtBufferBegin,
+    const double quantum,
+    const uint32_t numFrames,
+    const uint32_t numChannels,
+    const uint32_t sampleRate)
+  {
+    const auto result =sink->mBufferHandle.moImpl->commit(sessionState->mImpl, beatsAtBufferBegin, quantum, numFrames, numChannels, sampleRate);
+    bufferHandle->moImpl.reset();
+    return result;
+  }
+
+  void ABLLinkAudioReleaseBuffer(ABLLinkAudioSinkBufferHandleRef bufferHandle)
+  {
+    bufferHandle->moImpl.reset();
   }
 
 } // extern "C"
