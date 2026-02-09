@@ -37,6 +37,12 @@ jobs:
           cd link_kit
           make link_dir=../link
 
+      - name: Build LinkHut
+        run: xcodebuild -project link_kit/build/LinkKit.xcodeproj -scheme LinkHut -sdk iphonesimulator build
+
+      - name: Build LinkHut example
+        run: xcodebuild -project link_kit/build/output/LinkKit/examples/LinkHut/LinkHut.xcodeproj -sdk iphonesimulator build
+
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
