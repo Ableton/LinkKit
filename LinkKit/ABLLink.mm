@@ -195,31 +195,31 @@ extern "C"
 
   ABLLinkSessionStateRef ABLLinkCaptureAudioSessionState(ABLLinkRef ablLink)
   {
-    ablLink->mAudioSessionState.impl = ablLink->mImpl.captureAudioSessionState();
-    ablLink->mAudioSessionState.clock = ablLink->mImpl.clock();
+    ablLink->mAudioSessionState.mImpl = ablLink->mImpl.captureAudioSessionState();
+    ablLink->mAudioSessionState.mClock = ablLink->mImpl.clock();
     return &ablLink->mAudioSessionState;
   }
 
   void ABLLinkCommitAudioSessionState(ABLLinkRef ablLink, ABLLinkSessionStateRef sessionState)
   {
-    ablLink->mImpl.commitAudioSessionState(sessionState->impl);
+    ablLink->mImpl.commitAudioSessionState(sessionState->mImpl);
   }
 
   ABLLinkSessionStateRef ABLLinkCaptureAppSessionState(ABLLinkRef ablLink)
   {
-    ablLink->mAppSessionState.impl = ablLink->mImpl.captureAppSessionState();
-    ablLink->mAppSessionState.clock = ablLink->mImpl.clock();
+    ablLink->mAppSessionState.mImpl = ablLink->mImpl.captureAppSessionState();
+    ablLink->mAppSessionState.mClock = ablLink->mImpl.clock();
     return &ablLink->mAppSessionState;
   }
 
   void ABLLinkCommitAppSessionState(ABLLinkRef ablLink, ABLLinkSessionStateRef sessionState)
   {
-    ablLink->mImpl.commitAppSessionState(sessionState->impl);
+    ablLink->mImpl.commitAppSessionState(sessionState->mImpl);
   }
 
   double ABLLinkGetTempo(ABLLinkSessionStateRef sessionState)
   {
-    return sessionState->impl.tempo();
+    return sessionState->mImpl.tempo();
   }
 
   void ABLLinkSetTempo(
@@ -227,8 +227,8 @@ extern "C"
     const double bpm,
     const uint64_t hostTimeAtOutput)
   {
-    const auto micros = sessionState->clock.ticksToMicros(hostTimeAtOutput);
-    sessionState->impl.setTempo(bpm, micros);
+    const auto micros = sessionState->mClock.ticksToMicros(hostTimeAtOutput);
+    sessionState->mImpl.setTempo(bpm, micros);
   }
 
   double ABLLinkBeatAtTime(
@@ -236,8 +236,8 @@ extern "C"
     const uint64_t hostTime,
     const double quantum)
   {
-    const auto micros = sessionState->clock.ticksToMicros(hostTime);
-    return sessionState->impl.beatAtTime(micros, quantum);
+    const auto micros = sessionState->mClock.ticksToMicros(hostTime);
+    return sessionState->mImpl.beatAtTime(micros, quantum);
   }
 
   double ABLLinkPhaseAtTime(
@@ -245,8 +245,8 @@ extern "C"
     const uint64_t hostTime,
     const double quantum)
   {
-    const auto micros = sessionState->clock.ticksToMicros(hostTime);
-    return sessionState->impl.phaseAtTime(micros, quantum);
+    const auto micros = sessionState->mClock.ticksToMicros(hostTime);
+    return sessionState->mImpl.phaseAtTime(micros, quantum);
   }
 
   uint64_t ABLLinkTimeAtBeat(
@@ -254,8 +254,8 @@ extern "C"
     const double beatTime,
     const double quantum)
   {
-    const auto micros = sessionState->impl.timeAtBeat(beatTime, quantum);
-    return sessionState->clock.microsToTicks(micros);
+    const auto micros = sessionState->mImpl.timeAtBeat(beatTime, quantum);
+    return sessionState->mClock.microsToTicks(micros);
   }
 
   void ABLLinkRequestBeatAtTime(
@@ -264,8 +264,8 @@ extern "C"
     const uint64_t hostTime,
     const double quantum)
   {
-    auto micros = sessionState->clock.ticksToMicros(hostTime);
-    sessionState->impl.requestBeatAtTime(beatTime, micros, quantum);
+    auto micros = sessionState->mClock.ticksToMicros(hostTime);
+    sessionState->mImpl.requestBeatAtTime(beatTime, micros, quantum);
   }
 
   void ABLLinkForceBeatAtTime(
@@ -274,8 +274,8 @@ extern "C"
     const std::uint64_t hostTime,
     const double quantum)
   {
-    auto micros = sessionState->clock.ticksToMicros(hostTime);
-    sessionState->impl.forceBeatAtTime(beatTime, micros, quantum);
+    auto micros = sessionState->mClock.ticksToMicros(hostTime);
+    sessionState->mImpl.forceBeatAtTime(beatTime, micros, quantum);
   }
 
   void ABLLinkSetIsPlaying(
@@ -283,18 +283,18 @@ extern "C"
     const bool isPlaying,
     const uint64_t hostTime)
   {
-    const auto micros = sessionState->clock.ticksToMicros(hostTime);
-    sessionState->impl.setIsPlaying(isPlaying, micros);
+    const auto micros = sessionState->mClock.ticksToMicros(hostTime);
+    sessionState->mImpl.setIsPlaying(isPlaying, micros);
   }
 
   bool ABLLinkIsPlaying(ABLLinkSessionStateRef sessionState)
   {
-    return sessionState->impl.isPlaying();
+    return sessionState->mImpl.isPlaying();
   }
 
   uint64_t ABLLinkTimeForIsPlaying(ABLLinkSessionStateRef sessionState)
   {
-    return sessionState->clock.microsToTicks(sessionState->impl.timeForIsPlaying());
+    return sessionState->mClock.microsToTicks(sessionState->mImpl.timeForIsPlaying());
   }
 
   void ABLLinkRequestBeatAtStartPlayingTime(
@@ -302,7 +302,7 @@ extern "C"
     const double beatTime,
     const double quantum)
   {
-    sessionState->impl.requestBeatAtStartPlayingTime(beatTime, quantum);
+    sessionState->mImpl.requestBeatAtStartPlayingTime(beatTime, quantum);
   }
 
   void ABLLinkSetIsPlayingAndRequestBeatAtTime(
@@ -312,8 +312,8 @@ extern "C"
     double beatTime,
     double quantum)
   {
-    const auto micros = sessionState->clock.ticksToMicros(hostTime);
-    sessionState->impl.setIsPlayingAndRequestBeatAtTime(isPlaying, micros, beatTime, quantum);
+    const auto micros = sessionState->mClock.ticksToMicros(hostTime);
+    sessionState->mImpl.setIsPlayingAndRequestBeatAtTime(isPlaying, micros, beatTime, quantum);
   }
 
 } // extern "C"

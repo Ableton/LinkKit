@@ -43,8 +43,8 @@ extern "C"
 
   struct ABLLinkSessionState
   {
-    ableton::Link::SessionState impl;
-    ableton::Link::Clock clock;
+    ableton::Link::SessionState mImpl;
+    ableton::Link::Clock mClock;
   };
 
   struct ABLLink
