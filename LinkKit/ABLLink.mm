@@ -34,6 +34,29 @@ extern "C"
   }
 }
 
+namespace {
+
+// Wrappers that adapt AudioBufferList to the header-only buffer copy functions
+template <typename T>
+void SCopyBuffer(const uint32_t numFrames, AudioBufferList* input, int16_t* output) {
+  T* src = (T*)input->mBuffers[0].mData;
+  ableton::link_kit::CopyBufferMono(numFrames, src, output);
+}
+
+template <typename T>
+void SCopyBufferStereo(const uint32_t numFrames, AudioBufferList* input, int16_t* output) {
+  T* left = (T*)input->mBuffers[0].mData;
+  T* right = (T*)input->mBuffers[1].mData;
+  ableton::link_kit::CopyBufferStereoNonInterleaved(numFrames, left, right, output);
+}
+
+template <typename T>
+void SCopyBufferStereoInterleaved(const uint32_t numFrames, AudioBufferList* input, int16_t* output) {
+  T* src = (T*)input->mBuffers[0].mData;
+  ableton::link_kit::CopyBufferStereoInterleaved(numFrames, src, output);
+}
+
+}
 
 extern "C"
 {
@@ -433,6 +456,115 @@ extern "C"
   void ABLLinkAudioReleaseBuffer(ABLLinkAudioSinkBufferHandleRef bufferHandle)
   {
     bufferHandle->moImpl.reset();
+  }
+
+  void ABLLinkSetPropertiesFromASBD(ABLLinkAudioSinkRef sink, const AudioStreamBasicDescription *asbd)
+  {
+    sink->mASBD = *asbd;
+    sink->mSink.requestMaxNumSamples(asbd->mChannelsPerFrame * asbd->mFramesPerPacket);
+
+    sink->mBufferCopyFn = nullptr;
+
+    if (sink->mASBD.mFormatID == kAudioFormatLinearPCM) {
+      switch (sink->mASBD.mBitsPerChannel) {
+        case 16: {
+          if (asbd->mFormatFlags & kAudioFormatFlagIsSignedInteger) {
+            if (asbd->mChannelsPerFrame == 1) {
+              sink->mBufferCopyFn = &SCopyBuffer<int16_t>;
+            } else {
+              if (asbd->mFormatFlags & kAudioFormatFlagIsNonInterleaved) {
+                sink->mBufferCopyFn = &SCopyBufferStereo<int16_t>;
+              } else {
+                sink->mBufferCopyFn = &SCopyBufferStereoInterleaved<int16_t>;
+              }
+            }
+          } else {
+            if (asbd->mChannelsPerFrame == 1) {
+                sink->mBufferCopyFn = &SCopyBuffer<uint16_t>;
+            } else {
+              if (asbd->mFormatFlags & kAudioFormatFlagIsNonInterleaved) {
+                sink->mBufferCopyFn = &SCopyBufferStereo<uint16_t>;
+              } else {
+                sink->mBufferCopyFn = &SCopyBufferStereoInterleaved<uint16_t>;
+              }
+            }
+          }
+          break;
+        }
+       case 32: {
+         if (asbd->mFormatFlags & kAudioFormatFlagIsFloat) {
+           if (asbd->mChannelsPerFrame == 1) {
+             sink->mBufferCopyFn = &SCopyBuffer<float>;
+           } else {
+             if (asbd->mFormatFlags & kAudioFormatFlagIsNonInterleaved) {
+               sink->mBufferCopyFn = &SCopyBufferStereo<float>;
+             } else {
+               sink->mBufferCopyFn = &SCopyBufferStereoInterleaved<float>;
+             }
+           }
+         } else if (asbd->mFormatFlags & kAudioFormatFlagIsSignedInteger) {
+            if (asbd->mChannelsPerFrame == 1) {
+              sink->mBufferCopyFn = &SCopyBuffer<int32_t>;
+            } else {
+              if (asbd->mFormatFlags & kAudioFormatFlagIsNonInterleaved) {
+                sink->mBufferCopyFn = &SCopyBufferStereo<int32_t>;
+              } else {
+                sink->mBufferCopyFn = &SCopyBufferStereoInterleaved<int32_t>;
+              }
+            }
+          } else {
+            if (asbd->mChannelsPerFrame == 1) {
+              sink->mBufferCopyFn = &SCopyBuffer<uint32_t>;
+            } else {
+              if (asbd->mFormatFlags & kAudioFormatFlagIsNonInterleaved) {
+                sink->mBufferCopyFn = &SCopyBufferStereo<uint32_t>;
+              } else {
+                sink->mBufferCopyFn = &SCopyBufferStereoInterleaved<uint32_t>;
+              }
+            }
+          }
+          break;
+        }
+        break;
+        default:
+          break;
+      }
+    }
+  }
+
+  bool ABLLinkCommitCoreAudioBufferWithBeats(
+    ABLLinkAudioSinkRef sink,
+    ABLLinkSessionStateRef sessionState,
+    const double beatsAtBufferBegin,
+    const double quantum,
+    const uint32_t numFrames,
+    AudioBufferList *ioData)
+  {
+    if (sink->mBufferCopyFn == nullptr || (sink->mImpl.maxNumSamples() >= sink->mASBD.mChannelsPerFrame * numFrames))
+    {
+      return false;
+    }
+
+    ABLLinkAudioSinkBufferHandleRef bufferHandle = ABLLinkAudioRetainBuffer(sink);
+    if (ABLLinkAudioSinkBufferHandleIsValid(bufferHandle))
+    {
+      auto* output = ABLLinkAudioSinkBufferSamples(bufferHandle);
+      sink->mBufferCopyFn(numFrames, ioData, output);
+      return ABLLinkAudioReleaseAndCommitBuffer(sink, bufferHandle, sessionState, beatsAtBufferBegin, quantum, numFrames, sink->mASBD.mChannelsPerFrame, sink->mASBD.mSampleRate);
+    }
+    return false;
+  }
+
+  bool ABLLinkCommitCoreAudioBufferWithHostTime(
+    ABLLinkAudioSinkRef sink,
+    ABLLinkSessionStateRef sessionState,
+    const uint64_t hostTimeAtBufferBegin,
+    const double quantum,
+    const uint32_t numFrames,
+    AudioBufferList *ioData)
+  {
+    const double beatsAtBufferBegin = ABLLinkBeatAtTime(sessionState, hostTimeAtBufferBegin, quantum);
+    return ABLLinkCommitCoreAudioBufferWithBeats(sink, sessionState, beatsAtBufferBegin, quantum, numFrames, ioData);
   }
 
 } // extern "C"

@@ -35,6 +35,7 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+#include <AudioToolbox/AudioToolbox.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -438,6 +439,26 @@ extern "C"
     uint32_t sampleRate);
 
   void ABLLinkAudioReleaseBuffer(ABLLinkAudioSinkBufferHandleRef);
+
+  void ABLLinkSetPropertiesFromASBD(
+      ABLLinkAudioSinkRef,
+      const AudioStreamBasicDescription *asbd);
+
+  bool ABLLinkCommitCoreAudioBufferWithBeats(
+      ABLLinkAudioSinkRef sink,
+      ABLLinkSessionStateRef sessionState,
+      double beatsAtBufferBegin,
+      double quantum,
+      uint32_t numFrames,
+      AudioBufferList *ioData);
+
+  bool ABLLinkCommitCoreAudioBufferWithHostTime(
+      ABLLinkAudioSinkRef sink,
+      ABLLinkSessionStateRef sessionState,
+      uint64_t hostTimeAtBufferBegin,
+      double quantum,
+      uint32_t numFrames,
+      AudioBufferList *ioData);
 
 #ifdef __cplusplus
 }

@@ -5,6 +5,7 @@
 #include <optional>
 #include <memory>
 #include <ableton/LinkAudio.hpp>
+#include <AudioToolbox/AudioToolbox.h>
 #include "detail/ABLSettingsViewController.h"
 
 extern "C"
@@ -75,11 +76,15 @@ extern "C"
     std::optional<ableton::LinkAudioSink::BufferHandle> moImpl;
   };
 
+  typedef void (*BufferCopyFn)(const uint32_t numFrames, AudioBufferList* input, int16_t* output);
+
   struct ABLLinkAudioSink
   {
     ABLLinkAudioSink(ABLLink& link, const char* name, uint32_t maxNumSamples);
 
     ableton::LinkAudioSink mImpl;
     ABLLinkAudioSinkBufferHandle mBufferHandle;
+    AudioStreamBasicDescription mASBD;
+    BufferCopyFn mBufferCopyFn = nullptr;
   };
 }
