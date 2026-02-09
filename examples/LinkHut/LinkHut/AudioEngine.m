@@ -310,7 +310,8 @@ static void StreamFormatCallback(
 
 # pragma mark - create and delete engine
 - (instancetype)initWithTempo:(Float64)bpm {
-    if ([super init]) {
+    self = [super init];
+    if (self) {
         [self initLinkData:bpm];
         [self setupAudioEngine];
         [[NSNotificationCenter defaultCenter] addObserver:self
