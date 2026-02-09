@@ -8,6 +8,9 @@
 #define ABLNotificationEnabledKey @"ABLNotificationEnabled"
 #define ABLLinkStartStopSyncSupportedKey @"ABLLinkStartStopSyncSupported"
 #define ABLLinkStartStopSyncEnabledKey @"ABLStartStopSyncEnabled"
+#define ABLLinkAudioSupportedKey @"ABLLinkAudioSupported"
+#define ABLLinkAudioEnabledKey @"ABLLinkAudioEnabled"
+#define ABLLinkPeerName @"ABLLinkPeerName"
 #define ABLLinkSuppressNotificationsKey @"ABLLinkSuppressNotifications"
 
 struct ABLLink;

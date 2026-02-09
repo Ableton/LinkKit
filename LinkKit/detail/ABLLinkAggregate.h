@@ -62,6 +62,7 @@ extern "C"
     bool isStartStopSyncEnabled();
     void enableLinkAudio(bool);
     bool isLinkAudioEnabled();
+    void setPeerName(const char*);
 
     std::shared_ptr<ABLLinkCallbacks> mpCallbacks;
     bool mActive;

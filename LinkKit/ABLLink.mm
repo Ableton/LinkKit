@@ -80,6 +80,9 @@ extern "C"
   {
     mpSettingsViewController = [[ABLSettingsViewController alloc] initWithLink:this];
 
+    NSString* name = [[NSUserDefaults standardUserDefaults] objectForKey:ABLLinkPeerName];
+    mImpl.setPeerName([name UTF8String]);
+
     mImpl.setNumPeersCallback(
       [this] (const std::size_t numPeers) {
         auto pCallbacks = mpCallbacks;
@@ -138,6 +141,11 @@ extern "C"
   bool ABLLink::isLinkAudioEnabled()
   {
     return mImpl.isLinkAudioEnabled();
+  }
+
+  void ABLLink::setPeerName(const char* name)
+  {
+    mImpl.setPeerName(name);
   }
 
   ABLLinkAudioSink::ABLLinkAudioSink(ABLLink& link, const char* name, uint32_t maxNumSamples)
@@ -461,7 +469,7 @@ extern "C"
   void ABLLinkSetPropertiesFromASBD(ABLLinkAudioSinkRef sink, const AudioStreamBasicDescription *asbd)
   {
     sink->mASBD = *asbd;
-    sink->mSink.requestMaxNumSamples(asbd->mChannelsPerFrame * asbd->mFramesPerPacket);
+    sink->mImpl.requestMaxNumSamples(asbd->mChannelsPerFrame * asbd->mFramesPerPacket);
 
     sink->mBufferCopyFn = nullptr;
 

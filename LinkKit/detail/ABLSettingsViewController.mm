@@ -20,10 +20,33 @@ void initUserDefaultFlag(NSString* key, BOOL defaultVal)
   }
 }
 
+void initUserDefaultObject(NSString* key, NSObject*defaultVal)
+{
+  if (![[NSUserDefaults standardUserDefaults] objectForKey:key])
+  {
+    [[NSUserDefaults standardUserDefaults] setObject:defaultVal forKey:key];
+  }
+}
+
+NSString* defaultPeerName() {
+  NSBundle* mainBundle = [NSBundle mainBundle];
+  return [mainBundle objectForInfoDictionaryKey:ABLLinkPeerName] ?: @"Link App";
+}
+
+void initPeerName() {
+  initUserDefaultObject(ABLLinkPeerName, defaultPeerName());
+}
+
 BOOL isStartStopSyncSupported()
 {
   NSBundle* mainBundle = [NSBundle mainBundle];
   return [[mainBundle objectForInfoDictionaryKey:ABLLinkStartStopSyncSupportedKey] boolValue];
+}
+
+BOOL isLinkAudioSupported()
+{
+  NSBundle* mainBundle = [NSBundle mainBundle];
+  return [[mainBundle objectForInfoDictionaryKey:ABLLinkAudioSupportedKey] boolValue];
 }
 
 } // unnamed
@@ -57,6 +80,20 @@ static NSString* const kSyncStartStopSubtitleString =
 [LocalizedString resourcesLocalizedString: @"SyncStartStopSubtitle" comment: @""]
 ?: @"Send and listen to Start/Stop commands";
 
+static NSString* const kLinkAudioTitleString =
+[LocalizedString resourcesLocalizedString: @"EnableLinkAudioTitle" comment: @""]
+?: @"Enable Audio";
+static NSString* const kLinkAudioSubtitleString =
+[LocalizedString resourcesLocalizedString: @"EnableLinkAudioSubtitle" comment: @""]
+?: @"Share audio with Link peers";
+
+static NSString* const kPeerNameTitleString =
+[LocalizedString resourcesLocalizedString: @"PeerNameTitle" comment: @""]
+?: @"Peer Name";
+static NSString* const kPeerNameSubtitleString =
+[LocalizedString resourcesLocalizedString: @"PeerNameSubtitle" comment: @""]
+?: @"Other Link peers see that name";
+
 static NSString* const kConnectedPeersSectionTitleString =
 [LocalizedString resourcesLocalizedString: @"ConnectedPeersSectionTitle" comment: @""]
 ?: @"CONNECTED PEERS";
@@ -88,6 +125,9 @@ static NSInteger const kConnectedPeersSection = 2;
 
   UITableViewCell* _notificationsCell;
   UITableViewCell* _syncStartStopCell;
+  UITableViewCell* _audioCell;
+  UITableViewCell* _peerNameCell;
+  UITextField* _peerNameTextField;
 
   UITableViewCell* _statusCell;
 
@@ -138,6 +178,8 @@ _Pragma("clang diagnostic pop")
     initUserDefaultFlag(ABLLinkEnabledKey, NO);
     initUserDefaultFlag(ABLNotificationEnabledKey, YES);
     initUserDefaultFlag(ABLLinkStartStopSyncEnabledKey, NO);
+    initUserDefaultFlag(ABLLinkAudioEnabledKey, NO);
+    initPeerName();
 
     // Listen for layoutMargins changes to update cell layouts accordingly
     [self.tableView addObserver:self
@@ -254,6 +296,59 @@ _Pragma("clang diagnostic pop")
   return _syncStartStopCell;
 }
 
+-(UITableViewCell*)audioCell
+{
+  if (_audioCell == nil)
+  {
+    _audioCell = [[UITableViewCell alloc]
+                          initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:nil];
+
+    _audioCell.textLabel.text = kLinkAudioTitleString;
+    _audioCell.detailTextLabel.text = kLinkAudioSubtitleString;
+    _audioCell.detailTextLabel.textColor = [UIColor grayColor];
+
+    UISwitch *switchView = [[UISwitch alloc] initWithFrame:CGRectZero];
+    switchView.on = [self isLinkAudioEnabled];
+    [switchView addTarget:self action:@selector(enableLinkAudio:) forControlEvents:UIControlEventValueChanged];
+
+    _audioCell.accessoryView = switchView;
+  }
+  return _audioCell;
+}
+
+
+-(void)updatePeerNameTextColor
+{
+  if ([_peerNameTextField.text isEqualToString:defaultPeerName()]) {
+    _peerNameTextField.textColor = [UIColor grayColor];
+  } else {
+    _peerNameTextField.textColor = nil;
+  }
+}
+
+-(UITableViewCell*)peerNameCell
+{
+  if (_peerNameCell == nil)
+  {
+    _peerNameCell = [[UITableViewCell alloc]
+                          initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:nil];
+
+    _peerNameCell.textLabel.text = kPeerNameTitleString;
+    _peerNameCell.detailTextLabel.text = kPeerNameSubtitleString;
+    _peerNameCell.detailTextLabel.textColor = [UIColor grayColor];
+
+    _peerNameTextField = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, 150, 30)];
+    _peerNameTextField.text = [[NSUserDefaults standardUserDefaults] objectForKey:ABLLinkPeerName];
+    [self updatePeerNameTextColor];
+    _peerNameTextField.textAlignment = NSTextAlignmentRight;
+    _peerNameTextField.autocorrectionType = UITextAutocorrectionTypeNo;
+    _peerNameTextField.autocapitalizationType = UITextAutocapitalizationTypeNone;
+    [_peerNameTextField addTarget:self action:@selector(onPeerName:) forControlEvents:UIControlEventEditingDidEndOnExit];
+    _peerNameCell.accessoryView = _peerNameTextField;
+  }
+  return _peerNameCell;
+}
+
 -(UITableViewCell*)statusCell
 {
   if (_statusCell == nil)
@@ -320,6 +415,8 @@ _Pragma("clang diagnostic pop")
   _enableDisableCellFooter = nil;
   _notificationsCell = nil;
   _syncStartStopCell = nil;
+  _audioCell = nil;
+  _peerNameCell = nil;
   _statusCell = nil;
   _connectedAppsFooterView = nil;
 
@@ -449,7 +546,12 @@ _Pragma("clang diagnostic pop")
       return 1;
 
     case kDetailSettingsSection:
-      return isStartStopSyncSupported() ? 2 : 1;
+    {
+      NSInteger numRows = 1;
+      numRows = isStartStopSyncSupported() ? numRows + 1 : numRows;
+      numRows = isLinkAudioSupported() ? numRows + 2 : numRows;
+      return numRows;
+    }
 
     case kConnectedPeersSection:
       return 1;
@@ -473,7 +575,15 @@ _Pragma("clang diagnostic pop")
       }
       else if (indexPath.row == 1)
       {
-        return [self syncStartStopCell];
+        return isStartStopSyncSupported() ? [self syncStartStopCell] : [self audioCell];
+      }
+      else if (indexPath.row == 2)
+      {
+        return isStartStopSyncSupported() ? [self audioCell] : [self peerNameCell];
+      }
+      else if (indexPath.row == 3)
+      {
+        return [self peerNameCell];
       }
 
     case kConnectedPeersSection:
@@ -597,6 +707,11 @@ _Pragma("clang diagnostic pop")
   return _ablLink->isStartStopSyncEnabled();
 }
 
+-(BOOL)isLinkAudioEnabled
+{
+  return _ablLink->isLinkAudioEnabled();
+}
+
 -(void)enableStartStopSync:(UISwitch*)sender
 {
   BOOL enabled = sender.on;
@@ -609,6 +724,38 @@ _Pragma("clang diagnostic pop")
     _ablLink->enableStartStopSync(enabled);
     _ablLink->mpCallbacks->mIsStartStopSyncEnabledCallback(enabled);
   }
+}
+
+-(void)enableLinkAudio:(UISwitch*)sender
+{
+  BOOL enabled = sender.on;
+
+  [[NSUserDefaults standardUserDefaults] setBool:enabled forKey:ABLLinkAudioEnabledKey];
+  [[NSUserDefaults standardUserDefaults] synchronize];
+
+  if (enabled != _ablLink->isLinkAudioEnabled())
+  {
+    _ablLink->enableLinkAudio(enabled);
+    _ablLink->mpCallbacks->mIsAudioEnabledCallback(enabled);
+  }
+}
+
+-(void)onPeerName:(UITextField*)textField
+{
+  NSLog(@"Peer Name: %@", textField.text);
+
+  if (textField.text.length == 0) {
+    textField.text = defaultPeerName();
+  }
+
+  NSString* name = textField.text;
+
+  [[NSUserDefaults standardUserDefaults] setObject:name forKey:ABLLinkPeerName];
+  [[NSUserDefaults standardUserDefaults] synchronize];
+
+  [self updatePeerNameTextColor];
+
+  _ablLink->setPeerName([name UTF8String]);
 }
 
 @end
