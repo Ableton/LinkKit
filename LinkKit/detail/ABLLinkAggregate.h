@@ -3,7 +3,7 @@
 #pragma once
 
 #include <memory>
-#include <ableton/Link.hpp>
+#include <ableton/LinkAudio.hpp>
 #include "detail/ABLSettingsViewController.h"
 
 extern "C"
