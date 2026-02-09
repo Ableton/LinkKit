@@ -56,5 +56,7 @@
 	<true/>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>Ableton Link</string>
 </dict>
 </plist>
