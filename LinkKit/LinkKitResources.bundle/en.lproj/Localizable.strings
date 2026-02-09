@@ -14,6 +14,9 @@
 "EnableLinkAudioTitle" = "Share Audio";
 "EnableLinkAudioSubtitle" = "Share audio with Link peers";
 
+"PeerNameTitle" = "Peer Name";
+"PeerNameSubtitle" = "Other Link peers see that name";
+
 "ConnectedPeersSectionTitle" = "CONNECTED PEERS";
 
 "PeersConnectedZero" = "No peers connected";

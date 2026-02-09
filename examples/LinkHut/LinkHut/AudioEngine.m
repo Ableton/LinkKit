@@ -6,6 +6,7 @@
 #include <mach/mach_time.h>
 #include "AudioEngine.h"
 #include <os/lock.h>
+#include "ABLLinkUtils.h"
 
 #define INVALID_BEAT_TIME DBL_MIN
 #define INVALID_BPM DBL_MIN
@@ -30,6 +31,7 @@ typedef struct {
  */
 typedef struct {
     ABLLinkRef ablLink;
+    ABLLinkAudioSinkRef ablLinkAudioSink;
     // Shared between threads. Only write when engine not running.
     Float64 sampleRate;
     // Shared between threads. Only write when engine not running.
@@ -221,6 +223,14 @@ static OSStatus audioCallback(
             (SInt16*)ioData->mBuffers[0].mData);
     }
 
+    ABLLinkCommitCoreAudioBufferWithHostTime(
+      linkData->ablLinkAudioSink,
+      sessionState,
+      hostTimeAtBufferBegin,
+      linkData->localEngineData.quantum,
+      inNumberFrames,
+      ioData);
+
     return noErr;
 }
 
@@ -266,6 +276,13 @@ static OSStatus audioCallback(
     return _linkData.ablLink;
 }
 
+- (void)updateSinkAudioProperties {
+    AudioStreamBasicDescription asbd;
+    UInt32 dataSize = sizeof(asbd);
+    AudioUnitGetProperty(_ioUnit, kAudioUnitProperty_StreamFormat, kAudioUnitScope_Input, 0, &asbd, &dataSize);
+    ABLLinkSetPropertiesFromASBD(_linkData.ablLinkAudioSink, &asbd);
+}
+
 # pragma mark - Handle AVAudioSession changes
 - (void)handleRouteChange:(NSNotification *)notification {
 #pragma unused(notification)
@@ -306,6 +323,8 @@ static void StreamFormatCallback(
             [engine start];
         }
     }
+
+    [engine updateSinkAudioProperties];
 }
 
 # pragma mark - create and delete engine
@@ -342,6 +361,7 @@ _Pragma("clang diagnostic pop")
     [[NSNotificationCenter defaultCenter] removeObserver:self
                                                     name:@"AVAudioSessionRouteChangeNotification"
                                                   object:[AVAudioSession sharedInstance]];
+    ABLLinkAudioSinkDelete(_linkData.ablLinkAudioSink);
     ABLLinkDelete(_linkData.ablLink);
 }
 
@@ -379,6 +399,7 @@ _Pragma("clang diagnostic pop")
     mach_timebase_info(&timeInfo);
 
     _linkData.ablLink = ABLLinkNew(bpm);
+    _linkData.ablLinkAudioSink = ABLLinkAudioSinkNew(_linkData.ablLink, "metro", 8192);
     _linkData.sampleRate = [AVAudioSession sharedInstance].sampleRate;
     _linkData.secondsToHostTime = (1.0e9 * timeInfo.denom) / (Float64)timeInfo.numer;
     _linkData.sharedEngineData.outputLatency =
@@ -457,6 +478,8 @@ _Pragma("clang diagnostic pop")
         @"Adding Listener to Stream Format changes failed. Error code: %d '%.4s'",
         (int)result,
         (const char *)(&result));
+
+    [self updateSinkAudioProperties];
 
     // Set Audio Callback
     AURenderCallbackStruct ioRemoteInput;

@@ -4,6 +4,10 @@
 <dict>
 	<key>ABLLinkStartStopSyncSupported</key>
 	<true/>
+	<key>ABLLinkAudioSupported</key>
+	<true/>
+	<key>ABLLinkPeerName</key>
+	<string>LinkHut</string>
 	<key>CFBundleLocalizations</key>
 	<array>
 		<string>en</string>
