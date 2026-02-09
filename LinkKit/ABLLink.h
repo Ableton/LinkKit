@@ -117,6 +117,10 @@ extern "C"
     bool isEnabled,
     void *context);
 
+  /*! @brief Called if IsAudioEnabled state changes.
+   *
+   *  @param isEnabled Whether audio sharing is currently enabled.
+   */
   typedef void (*ABLLinkIsAudioEnabledCallback)(
     bool isEnabled,
     void *context);
@@ -400,35 +404,126 @@ extern "C"
     double beatTime,
     double quantum);
 
+  /*! @brief Is audio sharing currently enabled?
+   *
+   *  @discussion Returns true if audio sharing is currently enabled.
+   *  The audio sharing status is only controllable by the user via the
+   *  Link settings view and is not controllable programmatically.
+   *
+   *  To expose the audio sharing toggle in the Link settings view, a
+   *  Boolean entry with the key ABLLinkAudioSupported must be added to
+   *  Info.plist and set to YES.
+   *
+   *  By adding a string entry with the key ABLLinkPeerName to Info.plist,
+   *  a default local peer name for identification in the Link session can
+   *  be set. If the entry is not present the app will be identified by
+   *  the name "Link App". The effective peer name can be changed by the
+   *  user via the Link settings view.
+   */
   bool ABLLinkIsAudioEnabled(ABLLinkRef);
 
+  /*! @brief Invoked on the main thread when the user changes the
+   *  audio sharing enabled state via the Link settings view.
+   */
   void ABLLinkSetIsAudioEnabledCallback(
     ABLLinkRef,
     ABLLinkIsAudioEnabledCallback callback,
     void* context);
 
+  /*! @brief Reference to an audio sink instance.
+   *
+   *  @discussion An audio sink announces an audio channel to the Link
+   *  session and can be used to send audio samples to other peers.
+   */
   typedef struct ABLLinkAudioSink *ABLLinkAudioSinkRef;
 
+  /*! @brief Reference to an audio sink buffer handle.
+   *
+   *  @discussion A buffer handle provides access to a buffer for writing
+   *  audio samples that will be sent to other peers.
+   */
   typedef struct ABLLinkAudioSinkBufferHandle *ABLLinkAudioSinkBufferHandleRef;
 
+  /*! @brief Create a new audio sink with a name and maximum buffer size.
+   *
+   *  @param name The name of the audio channel, visible to other peers.
+   *  @param maxNumSamples Maximum buffer size in samples. This should
+   *  account for the number of channels times the number of samples per
+   *  channel in one audio callback.
+   *
+   *  @discussion The announced channel is visible to other peers for the
+   *  lifetime of the sink. Audio will only be sent if at least one peer
+   *  in the session has requested it.
+   */
   ABLLinkAudioSinkRef ABLLinkAudioSinkNew(
     ABLLinkRef,
     const char *name,
     uint32_t maxNumSamples);
 
+  /*! @brief Destroy an audio sink and cleanup its associated resources.
+   *
+   *  @discussion After deletion, the audio channel will no longer be
+   *  visible to other peers in the session.
+   */
   void ABLLinkAudioSinkDelete(ABLLinkAudioSinkRef);
 
+  /*! @brief Get the current maximum number of samples a buffer handle can hold.
+   *
+   *  @discussion This function is lockfree.
+   */
   uint32_t ABLLinkAudioSinkMaxNumSamples(ABLLinkAudioSinkRef);
 
+  /*! @brief Request a maximum buffer size for future buffers.
+   *
+   *  @discussion Increase the number of samples retained buffer handles
+   *  can hold. If the requested number of samples is smaller than the
+   *  current maximum number of samples this is a no-op. This function is
+   *  lockfree.
+   */
   void ABLLinkAudioSinkRequestMaxNumSamples(ABLLinkAudioSinkRef,
     uint32_t maxNumSamples);
 
+  /*! @brief Retain a buffer for writing audio samples.
+   *
+   *  @discussion Only one buffer handle can be retained at a time. This
+   *  function is lockfree. A buffer handle should never outlive the audio
+   *  sink it was created from. Returns NULL if no corresponding source
+   *  exists or no buffer is available.
+   */
   ABLLinkAudioSinkBufferHandleRef ABLLinkAudioRetainBuffer(ABLLinkAudioSinkRef);
 
+  /*! @brief Check if the buffer handle is valid.
+   *
+   *  @discussion Make sure to check this before using the handle. The
+   *  handle may be invalid if no peer has currently requested audio from
+   *  this sink or no buffer is available. This function is lockfree.
+   */
   bool ABLLinkAudioSinkBufferHandleIsValid(ABLLinkAudioSinkBufferHandleRef);
 
+  /*! @brief Get a pointer to the buffer for writing samples.
+   *
+   *  @discussion Audio buffers are interleaved and samples are represented
+   *  as 16-bit signed integers. This function is lockfree.
+   */
   int16_t *ABLLinkAudioSinkBufferSamples(ABLLinkAudioSinkBufferHandleRef);
 
+  /*! @brief Commit the buffer after writing samples and release the handle.
+   *
+   *  @param sessionState The current Link session state.
+   *  @param beatsAtBufferBegin Beat at the start of the buffer.
+   *  @param quantum Quantum value for beat mapping.
+   *  @param numFrames Number of frames written.
+   *  @param numChannels Number of channels (1 for mono, 2 for stereo).
+   *  @param sampleRate Sample rate in Hz.
+   *  @return True if the buffer was successfully committed.
+   *
+   *  @discussion After calling this function, the buffer handle should not
+   *  be used anymore. The Link session state, quantum, and beats at buffer
+   *  begin must be the same as used for rendering the audio locally.
+   *  Changes to the Link session state should always be made before
+   *  rendering and eventually writing the buffer. numFrames * numChannels
+   *  may not exceed maxNumSamples. This function is lockfree.
+   */
   bool ABLLinkAudioReleaseAndCommitBuffer(ABLLinkAudioSinkRef,
     ABLLinkAudioSinkBufferHandleRef,
     ABLLinkSessionStateRef,
@@ -438,12 +533,41 @@ extern "C"
     uint32_t numChannels,
     uint32_t sampleRate);
 
+  /*! @brief Release the buffer handle without committing.
+   *
+   *  @discussion Use this to release a buffer without sending it to other
+   *  peers. After calling this function, the buffer handle should not be
+   *  used anymore. This function is lockfree.
+   */
   void ABLLinkAudioReleaseBuffer(ABLLinkAudioSinkBufferHandleRef);
 
+  /*! @brief Configure audio properties from an AudioStreamBasicDescription.
+   *
+   *  @param asbd Pointer to an AudioStreamBasicDescription containing
+   *  the audio format properties.
+   *
+   *  @discussion This is a convenience function for iOS/macOS to configure
+   *  the audio sink with the properties from a Core Audio format description.
+   */
   void ABLLinkSetPropertiesFromASBD(
       ABLLinkAudioSinkRef,
       const AudioStreamBasicDescription *asbd);
 
+  /*! @brief Convenience function to commit a Core Audio buffer using beat time.
+   *
+   *  @param sink The audio sink to commit the buffer to.
+   *  @param sessionState The current Link session state.
+   *  @param beatsAtBufferBegin Beat at the start of the buffer.
+   *  @param quantum Quantum value for beat mapping.
+   *  @param numFrames Number of frames in the buffer.
+   *  @param ioData Pointer to the AudioBufferList containing the audio data.
+   *  @return True if the buffer was successfully committed.
+   *
+   *  @discussion This is a convenience function for iOS/macOS that directly
+   *  commits audio data from a Core Audio AudioBufferList. The Link session
+   *  state, quantum, and beats at buffer begin must be the same as used for
+   *  rendering the audio locally. This function is lockfree.
+   */
   bool ABLLinkCommitCoreAudioBufferWithBeats(
       ABLLinkAudioSinkRef sink,
       ABLLinkSessionStateRef sessionState,
@@ -452,6 +576,21 @@ extern "C"
       uint32_t numFrames,
       AudioBufferList *ioData);
 
+  /*! @brief Convenience function to commit a Core Audio buffer using host time.
+   *
+   *  @param sink The audio sink to commit the buffer to.
+   *  @param sessionState The current Link session state.
+   *  @param hostTimeAtBufferBegin Host time at the start of the buffer.
+   *  @param quantum Quantum value for beat mapping.
+   *  @param numFrames Number of frames in the buffer.
+   *  @param ioData Pointer to the AudioBufferList containing the audio data.
+   *  @return True if the buffer was successfully committed.
+   *
+   *  @discussion This is a convenience function for iOS/macOS that directly
+   *  commits audio data from a Core Audio AudioBufferList. The Link session
+   *  state and quantum must be the same as used for rendering the audio
+   *  locally. This function is lockfree.
+   */
   bool ABLLinkCommitCoreAudioBufferWithHostTime(
       ABLLinkAudioSinkRef sink,
       ABLLinkSessionStateRef sessionState,
