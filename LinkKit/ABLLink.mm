@@ -24,13 +24,13 @@ extern "C"
       )
     , mActive(true)
     , mEnabled(false)
-    , mLink(initialBpm)
-    , mAudioSessionState{mLink.captureAudioSessionState(), mLink.clock()}
-    , mAppSessionState{mLink.captureAppSessionState(), mLink.clock()}
+    , mImpl(initialBpm)
+    , mAudioSessionState{mImpl.captureAudioSessionState(), mImpl.clock()}
+    , mAppSessionState{mImpl.captureAppSessionState(), mImpl.clock()}
   {
     mpSettingsViewController = [[ABLSettingsViewController alloc] initWithLink:this];
 
-    mLink.setNumPeersCallback(
+    mImpl.setNumPeersCallback(
       [this] (const std::size_t numPeers) {
         auto pCallbacks = mpCallbacks;
         dispatch_async(dispatch_get_main_queue(), ^{
@@ -39,7 +39,7 @@ extern "C"
         });
     });
 
-    mLink.setTempoCallback(
+    mImpl.setTempoCallback(
       [this] (const double tempo) {
         auto pCallbacks = mpCallbacks;
         dispatch_async(dispatch_get_main_queue(), ^{
@@ -47,7 +47,7 @@ extern "C"
         });
     });
 
-    mLink.setStartStopCallback(
+    mImpl.setStartStopCallback(
       [this] (const bool isStarted) {
         auto pCallbacks = mpCallbacks;
         dispatch_async(dispatch_get_main_queue(), ^{
@@ -62,22 +62,22 @@ extern "C"
 
     const bool startStopSyncEnabled =
       [[NSUserDefaults standardUserDefaults] boolForKey:ABLLinkStartStopSyncEnabledKey];
-    mLink.enableStartStopSync(startStopSyncEnabled);
+    mImpl.enableStartStopSync(startStopSyncEnabled);
   }
 
   void ABLLink::updateEnabled()
   {
-    mLink.enable(mActive && mEnabled);
+    mImpl.enable(mActive && mEnabled);
   }
 
   void ABLLink::enableStartStopSync(const bool enabled)
   {
-    mLink.enableStartStopSync(enabled);
+    mImpl.enableStartStopSync(enabled);
   }
 
   bool ABLLink::isStartStopSyncEnabled()
   {
-    return mLink.isStartStopSyncEnabled();
+    return mImpl.isStartStopSyncEnabled();
   }
 
   // ABLLink API
@@ -87,7 +87,7 @@ extern "C"
     ABLLink* ablLink = new ABLLink(bpm);
     // Install notification callback
     ablLink->mpCallbacks->mPeerCountCallback = [ablLink](const std::size_t peers) {
-      if(ablLink->mLink.isEnabled())
+      if(ablLink->mImpl.isEnabled())
       {
         const size_t oldNumPeers = ablLink->mpSettingsViewController.numberOfPeers;
         if (oldNumPeers == 0 && peers > 0) {
@@ -135,12 +135,12 @@ extern "C"
 
   bool ABLLinkIsStartStopSyncEnabled(ABLLinkRef ablLink)
   {
-    return ablLink->mLink.isStartStopSyncEnabled();
+    return ablLink->mImpl.isStartStopSyncEnabled();
   }
 
   bool ABLLinkIsConnected(ABLLinkRef ablLink)
   {
-    return ablLink->mLink.isEnabled() && ablLink->mLink.numPeers() > 0;
+    return ablLink->mImpl.isEnabled() && ablLink->mImpl.numPeers() > 0;
   }
 
   void ABLLinkSetSessionTempoCallback(
@@ -195,26 +195,26 @@ extern "C"
 
   ABLLinkSessionStateRef ABLLinkCaptureAudioSessionState(ABLLinkRef ablLink)
   {
-    ablLink->mAudioSessionState.impl = ablLink->mLink.captureAudioSessionState();
-    ablLink->mAudioSessionState.clock = ablLink->mLink.clock();
+    ablLink->mAudioSessionState.impl = ablLink->mImpl.captureAudioSessionState();
+    ablLink->mAudioSessionState.clock = ablLink->mImpl.clock();
     return &ablLink->mAudioSessionState;
   }
 
   void ABLLinkCommitAudioSessionState(ABLLinkRef ablLink, ABLLinkSessionStateRef sessionState)
   {
-    ablLink->mLink.commitAudioSessionState(sessionState->impl);
+    ablLink->mImpl.commitAudioSessionState(sessionState->impl);
   }
 
   ABLLinkSessionStateRef ABLLinkCaptureAppSessionState(ABLLinkRef ablLink)
   {
-    ablLink->mAppSessionState.impl = ablLink->mLink.captureAppSessionState();
-    ablLink->mAppSessionState.clock = ablLink->mLink.clock();
+    ablLink->mAppSessionState.impl = ablLink->mImpl.captureAppSessionState();
+    ablLink->mAppSessionState.clock = ablLink->mImpl.clock();
     return &ablLink->mAppSessionState;
   }
 
   void ABLLinkCommitAppSessionState(ABLLinkRef ablLink, ABLLinkSessionStateRef sessionState)
   {
-    ablLink->mLink.commitAppSessionState(sessionState->impl);
+    ablLink->mImpl.commitAppSessionState(sessionState->impl);
   }
 
   double ABLLinkGetTempo(ABLLinkSessionStateRef sessionState)

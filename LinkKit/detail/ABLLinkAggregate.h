@@ -58,7 +58,7 @@ extern "C"
     std::shared_ptr<ABLLinkCallbacks> mpCallbacks;
     bool mActive;
     std::atomic<bool> mEnabled;
-    ableton::Link mLink;
+    ableton::Link mImpl;
     ABLSettingsViewController *mpSettingsViewController;
     ABLLinkSessionState mAudioSessionState;
     ABLLinkSessionState mAppSessionState;
