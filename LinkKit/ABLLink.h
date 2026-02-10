@@ -526,7 +526,7 @@ extern "C"
    */
   bool ABLLinkAudioReleaseAndCommitBuffer(ABLLinkAudioSinkRef,
     ABLLinkAudioSinkBufferHandleRef,
-    ABLLinkSessionStateRef,
+    ABLLinkSessionStateRef sessionState,
     double beatsAtBufferBegin,
     double quantum,
     uint32_t numFrames,
