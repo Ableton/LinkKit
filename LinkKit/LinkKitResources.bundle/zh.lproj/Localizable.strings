@@ -11,6 +11,12 @@
 "SyncStartStopTitle" = "开始/结束同步";
 "SyncStartStopSubtitle" = "发送并听到开始/结束指令";
 
+"EnableLinkAudioTitle" = "共享音频";
+"EnableLinkAudioSubtitle" = "与 Link 应用程序共享音频";
+
+"PeerNameTitle" = "应用程序名称";
+"PeerNameSubtitle" = "其他 Link 应用程序将看到该名称";
+
 "ConnectedPeersSectionTitle" = "已连接的应用程序";
 
 "PeersConnectedZero" = "没有可连接的应用程序";

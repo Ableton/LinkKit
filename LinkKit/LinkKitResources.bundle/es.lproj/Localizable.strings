@@ -11,6 +11,12 @@
 "SyncStartStopTitle" = "Iniciar/detener sincronización";
 "SyncStartStopSubtitle" = "Enviar y escuchar comandos de Iniciar/Detener";
 
+"EnableLinkAudioTitle" = "Compartir audio";
+"EnableLinkAudioSubtitle" = "Comparta audio con colegas de Link";
+
+"PeerNameTitle" = "Nombre del colega";
+"PeerNameSubtitle" = "Otros colegas de Link ven ese nombre";
+
 "ConnectedPeersSectionTitle" = "COLEGAS CONECTADOS";
 
 "PeersConnectedZero" = "No hay colegas conectados";

@@ -11,6 +11,12 @@
 "SyncStartStopTitle" = "Synchro de démarrage/arrêt";
 "SyncStartStopSubtitle" = "Envoi et réception de commandes de démarrage/arrêt";
 
+"EnableLinkAudioTitle" = "Partager l'audio";
+"EnableLinkAudioSubtitle" = "Partager l'audio avec les pairs Link";
+
+"PeerNameTitle" = "Nom du pair";
+"PeerNameSubtitle" = "Les autres pairs Link voient ce nom";
+
 "ConnectedPeersSectionTitle" = "PAIRS CONNECTÉS";
 
 "PeersConnectedZero" = "Aucun pair connecté";

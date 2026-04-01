@@ -11,6 +11,12 @@
 "SyncStartStopTitle" = "Синхронизация Начало/Стоп";
 "SyncStartStopSubtitle" = "Отправка и ожидание команд Начало/Стоп";
 
+"EnableLinkAudioTitle" = "Поделиться аудио";
+"EnableLinkAudioSubtitle" = "Передача аудио другим устройствам Link";
+
+"PeerNameTitle" = "Имя устройства";
+"PeerNameSubtitle" = "Другие устройства Link видят это имя";
+
 "ConnectedPeersSectionTitle" = "связанные устройства";
 
 "PeersConnectedZero" = "Нет связи с другим устройством";

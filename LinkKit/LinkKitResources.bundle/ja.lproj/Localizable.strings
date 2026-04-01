@@ -11,6 +11,12 @@
 "SyncStartStopTitle" = "同期開始/停止";
 "SyncStartStopSubtitle" = "開始/停止コマンドを送信してリッスン";
 
+"EnableLinkAudioTitle" = "オーディオを共有";
+"EnableLinkAudioSubtitle" = "Linkユーザーとオーディオを共有";
+
+"PeerNameTitle" = "ユーザー名";
+"PeerNameSubtitle" = "他のLinkユーザーにはこの名前が表示されます";
+
 "ConnectedPeersSectionTitle" = "接続中のユーザー";
 
 "PeersConnectedZero" = "接続中のユーザーなし";
