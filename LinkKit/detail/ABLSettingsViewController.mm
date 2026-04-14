@@ -343,7 +343,7 @@ _Pragma("clang diagnostic pop")
     _peerNameTextField.textAlignment = NSTextAlignmentRight;
     _peerNameTextField.autocorrectionType = UITextAutocorrectionTypeNo;
     _peerNameTextField.autocapitalizationType = UITextAutocapitalizationTypeNone;
-    [_peerNameTextField addTarget:self action:@selector(onPeerName:) forControlEvents:UIControlEventEditingDidEndOnExit];
+    [_peerNameTextField addTarget:self action:@selector(onPeerName:) forControlEvents:UIControlEventEditingDidEnd];
     _peerNameCell.accessoryView = _peerNameTextField;
   }
   return _peerNameCell;
