@@ -51,5 +51,5 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: LinkKit.zip
-          path: link_kit/build/output/LinkKit.zip
+          name: LinkKit
+          path: link_kit/build/output/LinkKit
