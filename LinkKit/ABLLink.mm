@@ -1,5 +1,6 @@
 // Copyright: 2018, Ableton AG, Berlin. All rights reserved.
 
+#include <cstring>
 #include <dispatch/dispatch.h>
 #include <ableton/util/Injected.hpp>
 #include "ABLLink.h"
@@ -69,7 +70,8 @@ extern "C"
           [](double) { },
           [](bool) { },
           [](bool) { },
-          [](bool) { }
+          [](bool) { },
+          []() { }
         )
       )
     , mActive(true)
@@ -105,6 +107,14 @@ extern "C"
         auto pCallbacks = mpCallbacks;
         dispatch_async(dispatch_get_main_queue(), ^{
          pCallbacks->mStartStopCallback(isStarted);
+        });
+    });
+
+    mImpl.setChannelsChangedCallback(
+      [this] () {
+        auto pCallbacks = mpCallbacks;
+        dispatch_async(dispatch_get_main_queue(), ^{
+          pCallbacks->mAudioChannelsChangedCallback();
         });
     });
 
@@ -158,6 +168,12 @@ extern "C"
   {
   }
 
+  ABLLinkAudioSource::ABLLinkAudioSource(
+    ABLLink& link, ableton::link_audio::Id id, AudioSourceBufferCallback callback)
+    : mImpl(link.mImpl, id, std::move(callback))
+  {
+  }
+
 
   // ABLLink API
 
@@ -198,6 +214,7 @@ extern "C"
     ablLink->mpCallbacks->mStartStopCallback = [](bool) { };
     ablLink->mpCallbacks->mIsStartStopSyncEnabledCallback = [](bool) { };
     ablLink->mpCallbacks->mIsAudioEnabledCallback = [](bool) { };
+    ablLink->mpCallbacks->mAudioChannelsChangedCallback = []() { };
 
     delete ablLink;
   }
@@ -578,6 +595,154 @@ extern "C"
   {
     const double beatsAtBufferBegin = ABLLinkBeatAtTime(sessionState, hostTimeAtBufferBegin, quantum);
     return ABLLinkCommitCoreAudioBufferWithBeats(sink, sessionState, beatsAtBufferBegin, quantum, numFrames, ioData);
+  }
+
+  // Receiving audio: channels, sources, buffer info
+
+  ABLLinkAudioChannelList ABLLinkAudioGetChannelList(ABLLinkRef ablLink)
+  {
+    ABLLinkAudioChannelList result{};
+    const auto channels = ablLink->mImpl.channels();
+    result.count = channels.size();
+    if (result.count == 0) {
+      return result;
+    }
+
+    result.channels = static_cast<ABLLinkAudioChannel*>(
+      std::calloc(result.count, sizeof(ABLLinkAudioChannel)));
+    if (!result.channels) {
+      result.count = 0;
+      return result;
+    }
+
+    for (size_t i = 0; i < result.count; ++i) {
+      const auto& src = channels[i];
+      std::memcpy(&result.channels[i].id, src.id.data(), sizeof(ABLLinkAudioChannelId));
+      std::memcpy(&result.channels[i].peerId, src.peerId.data(), sizeof(ABLLinkAudioPeerId));
+      result.channels[i].name = strdup(src.name.c_str());
+      result.channels[i].peerName = strdup(src.peerName.c_str());
+    }
+
+    return result;
+  }
+
+  void ABLLinkAudioFreeChannelList(ABLLinkAudioChannelList list)
+  {
+    if (!list.channels) {
+      return;
+    }
+    for (size_t i = 0; i < list.count; ++i) {
+      std::free(const_cast<char*>(list.channels[i].name));
+      std::free(const_cast<char*>(list.channels[i].peerName));
+    }
+    std::free(list.channels);
+  }
+
+  void ABLLinkAudioSetChannelListChangedCallback(
+    ABLLinkRef ablLink,
+    ABLLinkAudioChannelListChangedCallback callback,
+    void* context)
+  {
+    ablLink->mpCallbacks->mAudioChannelsChangedCallback = [=]() {
+      if (callback) {
+        callback(context);
+      }
+    };
+  }
+
+  bool ABLLinkAudioSourceBufferInfoBeginBeats(
+    const ABLLinkAudioSourceBufferInfo* info,
+    ABLLinkSessionStateRef sessionState,
+    const double quantum,
+    double* outBeats)
+  {
+    if (!info || !sessionState || !outBeats || info->sampleRate == 0) {
+      return false;
+    }
+    ableton::LinkAudioSource::BufferHandle::Info cppInfo{};
+    cppInfo.numChannels = info->numChannels;
+    cppInfo.numFrames = info->numFrames;
+    cppInfo.sampleRate = info->sampleRate;
+    cppInfo.count = info->count;
+    cppInfo.sessionBeatTime = info->sessionBeatTime;
+    cppInfo.tempo = info->tempo;
+    std::memcpy(cppInfo.sessionId.data(), &info->sessionId, sizeof(ABLLinkAudioSessionId));
+
+    const auto beats = cppInfo.beginBeats(sessionState->mImpl, quantum);
+    if (!beats) {
+      return false;
+    }
+    *outBeats = *beats;
+    return true;
+  }
+
+  bool ABLLinkAudioSourceBufferInfoEndBeats(
+    const ABLLinkAudioSourceBufferInfo* info,
+    ABLLinkSessionStateRef sessionState,
+    const double quantum,
+    double* outBeats)
+  {
+    if (!info || !sessionState || !outBeats || info->sampleRate == 0) {
+      return false;
+    }
+    ableton::LinkAudioSource::BufferHandle::Info cppInfo{};
+    cppInfo.numChannels = info->numChannels;
+    cppInfo.numFrames = info->numFrames;
+    cppInfo.sampleRate = info->sampleRate;
+    cppInfo.count = info->count;
+    cppInfo.sessionBeatTime = info->sessionBeatTime;
+    cppInfo.tempo = info->tempo;
+    std::memcpy(cppInfo.sessionId.data(), &info->sessionId, sizeof(ABLLinkAudioSessionId));
+
+    const auto beats = cppInfo.endBeats(sessionState->mImpl, quantum);
+    if (!beats) {
+      return false;
+    }
+    *outBeats = *beats;
+    return true;
+  }
+
+  ABLLinkAudioSourceRef ABLLinkAudioSourceNew(
+    ABLLinkRef ablLink,
+    ABLLinkAudioChannelId channelId,
+    ABLLinkAudioSourceBufferCallback callback,
+    void* context)
+  {
+    ableton::link_audio::Id id{};
+    std::memcpy(id.data(), &channelId, sizeof(ABLLinkAudioChannelId));
+    return new ABLLinkAudioSource(*ablLink, id,
+      [callback, context](ableton::LinkAudioSource::BufferHandle handle) {
+        if (!callback) {
+          return;
+        }
+        ABLLinkAudioSourceBuffer buffer{};
+        buffer.samples = handle.samples;
+        buffer.info.numChannels = handle.info.numChannels;
+        buffer.info.numFrames = handle.info.numFrames;
+        buffer.info.sampleRate = handle.info.sampleRate;
+        buffer.info.count = handle.info.count;
+        buffer.info.sessionBeatTime = handle.info.sessionBeatTime;
+        buffer.info.tempo = handle.info.tempo;
+        std::memcpy(&buffer.info.sessionId, handle.info.sessionId.data(),
+          sizeof(ABLLinkAudioSessionId));
+        callback(&buffer, context);
+      });
+  }
+
+  void ABLLinkAudioSourceDelete(ABLLinkAudioSourceRef source)
+  {
+    delete source;
+  }
+
+  ABLLinkAudioChannelId ABLLinkAudioSourceGetChannelId(ABLLinkAudioSourceRef source)
+  {
+    ABLLinkAudioChannelId result = 0;
+    if (!source) {
+      return result;
+    }
+    const auto id = source->mImpl.id();
+    std::memcpy(&result, id.data(), sizeof(ABLLinkAudioChannelId));
+    return result;
   }
 
 } // extern "C"

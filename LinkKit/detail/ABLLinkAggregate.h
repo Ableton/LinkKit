@@ -17,6 +17,7 @@ extern "C"
   using StartStopCallback = std::function<void (bool)>;
   using IsStartStopSyncEnabledCallback = std::function<void (bool)>;
   using IsAudioEnabledCallback = std::function<void (bool)>;
+  using AudioChannelsChangedCallback = std::function<void ()>;
 
   struct ABLLinkCallbacks
   {
@@ -27,7 +28,8 @@ extern "C"
       TempoCallback tempo,
       StartStopCallback startStop,
       IsStartStopSyncEnabledCallback startStopSyncEnabled,
-      IsAudioEnabledCallback audioEnabled)
+      IsAudioEnabledCallback audioEnabled,
+      AudioChannelsChangedCallback audioChannelsChanged)
       : mIsConnectedCallback(std::move(connected))
       , mIsEnabledCallback(std::move(enabled))
       , mPeerCountCallback(std::move(peerCount))
@@ -35,6 +37,7 @@ extern "C"
       , mStartStopCallback(std::move(startStop))
       , mIsStartStopSyncEnabledCallback(std::move(startStopSyncEnabled))
       , mIsAudioEnabledCallback(std::move(audioEnabled))
+      , mAudioChannelsChangedCallback(std::move(audioChannelsChanged))
     {
     }
 
@@ -45,6 +48,7 @@ extern "C"
     StartStopCallback mStartStopCallback;
     IsStartStopSyncEnabledCallback mIsStartStopSyncEnabledCallback;
     IsAudioEnabledCallback mIsAudioEnabledCallback;
+    AudioChannelsChangedCallback mAudioChannelsChangedCallback;
   };
 
   struct ABLLinkSessionState
@@ -87,5 +91,16 @@ extern "C"
     ABLLinkAudioSinkBufferHandle mBufferHandle;
     AudioStreamBasicDescription mASBD;
     BufferCopyFn mBufferCopyFn = nullptr;
+  };
+
+  using AudioSourceBufferCallback =
+    std::function<void (ableton::LinkAudioSource::BufferHandle)>;
+
+  struct ABLLinkAudioSource
+  {
+    ABLLinkAudioSource(ABLLink& link, ableton::link_audio::Id id,
+      AudioSourceBufferCallback callback);
+
+    ableton::LinkAudioSource mImpl;
   };
 }

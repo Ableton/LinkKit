@@ -34,6 +34,7 @@
 #pragma once
 
 #include <stdbool.h>
+#include <stddef.h>
 #include <stdint.h>
 #include <AudioToolbox/AudioToolbox.h>
 
@@ -598,6 +599,146 @@ extern "C"
       double quantum,
       uint32_t numFrames,
       AudioBufferList *ioData);
+
+  /*! @brief Identifier for a Link Audio channel. */
+  typedef uint64_t ABLLinkAudioChannelId;
+
+  /*! @brief Identifier for a Link Audio peer. */
+  typedef uint64_t ABLLinkAudioPeerId;
+
+  /*! @brief Identifier for a Link Audio session. */
+  typedef uint64_t ABLLinkAudioSessionId;
+
+  /*! @brief Description of a Link Audio channel available in the session.
+   *
+   *  @discussion The id and peerId are persistent for the lifetime of a channel.
+   *  The name and peerName may change over time and are meant for display purposes.
+   */
+  typedef struct ABLLinkAudioChannel
+  {
+    ABLLinkAudioChannelId id;
+    const char *name;
+    ABLLinkAudioPeerId peerId;
+    const char *peerName;
+  } ABLLinkAudioChannel;
+
+  /*! @brief A list of Link Audio channels.
+   *
+   *  @discussion The list is owned by the caller and must be released using
+   *  ABLLinkAudioFreeChannelList.
+   */
+  typedef struct ABLLinkAudioChannelList
+  {
+    ABLLinkAudioChannel *channels;
+    size_t count;
+  } ABLLinkAudioChannelList;
+
+  /*! @brief Get the list of currently available Link Audio channels in the session.
+   *
+   *  @discussion The returned list must be released using ABLLinkAudioFreeChannelList.
+   */
+  ABLLinkAudioChannelList ABLLinkAudioGetChannelList(ABLLinkRef);
+
+  /*! @brief Free a channel list returned by ABLLinkAudioGetChannelList. */
+  void ABLLinkAudioFreeChannelList(ABLLinkAudioChannelList list);
+
+  /*! @brief Called when the set of available Link Audio channels changes.
+   *
+   *  @discussion This is invoked when channels are discovered or disappear and when
+   *  channel or peer names change. Invoked on the main thread.
+   */
+  typedef void (*ABLLinkAudioChannelListChangedCallback)(void *context);
+
+  /*! @brief Register a callback to be notified when the set of available Link Audio
+   *  channels changes.
+   */
+  void ABLLinkAudioSetChannelListChangedCallback(
+    ABLLinkRef,
+    ABLLinkAudioChannelListChangedCallback callback,
+    void *context);
+
+  /*! @brief Reference to an audio source instance.
+   *
+   *  @discussion An audio source receives audio samples for a specific channel
+   *  published by another peer in the session.
+   */
+  typedef struct ABLLinkAudioSource *ABLLinkAudioSourceRef;
+
+  /*! @brief Metadata of a buffer of received audio. */
+  typedef struct ABLLinkAudioSourceBufferInfo
+  {
+    size_t numChannels;       /*!< Number of channels in the buffer. */
+    size_t numFrames;         /*!< Number of frames in the buffer. */
+    uint32_t sampleRate;      /*!< Sample rate in Hz. */
+    uint64_t count;           /*!< Sequence number of the buffer. */
+    double sessionBeatTime;   /*!< Use the begin/end-beats helpers below to map this
+                                   to local beat time. */
+    double tempo;             /*!< Tempo of the originating session in BPM. */
+    ABLLinkAudioSessionId sessionId; /*!< ID of the session the buffer belongs to. */
+  } ABLLinkAudioSourceBufferInfo;
+
+  /*! @brief A buffer of received audio passed to a Link Audio source callback. */
+  typedef struct ABLLinkAudioSourceBuffer
+  {
+    int16_t *samples;
+    ABLLinkAudioSourceBufferInfo info;
+  } ABLLinkAudioSourceBuffer;
+
+  /*! @brief Map the beat time at the begin of the buffer to the local Link session
+   *  state.
+   *  @param info Buffer info from a received source buffer.
+   *  @param sessionState The current Link session state.
+   *  @param quantum Quantum value for beat mapping.
+   *  @param outBeats Out parameter receiving the local beat time at buffer begin.
+   *  @return True if the buffer originates from the same Link session and outBeats was
+   *  written, false otherwise.
+   */
+  bool ABLLinkAudioSourceBufferInfoBeginBeats(
+    const ABLLinkAudioSourceBufferInfo *info,
+    ABLLinkSessionStateRef sessionState,
+    double quantum,
+    double *outBeats);
+
+  /*! @brief Map the beat time at the end of the buffer to the local Link session state.
+   *  @return True if the buffer originates from the same Link session and outBeats was
+   *  written, false otherwise.
+   */
+  bool ABLLinkAudioSourceBufferInfoEndBeats(
+    const ABLLinkAudioSourceBufferInfo *info,
+    ABLLinkSessionStateRef sessionState,
+    double quantum,
+    double *outBeats);
+
+  /*! @brief Called when a buffer of audio is received for a Link Audio source.
+   *
+   *  @discussion Invoked on a Link-managed thread. Neither the buffer pointer nor its
+   *  samples pointer remain valid after the callback returns — copy or process the
+   *  samples synchronously.
+   */
+  typedef void (*ABLLinkAudioSourceBufferCallback)(
+    const ABLLinkAudioSourceBuffer *buffer,
+    void *context);
+
+  /*! @brief Create a Link Audio source for the given channel.
+   *
+   *  @param channelId The ID of the channel to receive. Channel IDs can be obtained
+   *  via ABLLinkAudioGetChannelList.
+   *  @param callback Invoked on a Link-managed thread when a buffer is received.
+   *  @param context Opaque context pointer passed to the callback.
+   *
+   *  @discussion The source remains active until ABLLinkAudioSourceDelete is called.
+   */
+  ABLLinkAudioSourceRef ABLLinkAudioSourceNew(
+    ABLLinkRef,
+    ABLLinkAudioChannelId channelId,
+    ABLLinkAudioSourceBufferCallback callback,
+    void *context);
+
+  /*! @brief Destroy a Link Audio source and stop receiving its audio. */
+  void ABLLinkAudioSourceDelete(ABLLinkAudioSourceRef);
+
+  /*! @brief Get the channel ID a source is receiving from. */
+  ABLLinkAudioChannelId ABLLinkAudioSourceGetChannelId(ABLLinkAudioSourceRef);
 
 #ifdef __cplusplus
 }
