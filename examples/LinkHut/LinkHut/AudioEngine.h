@@ -14,4 +14,6 @@
 - (void)requestTransportStop;
 - (ABLLinkRef)linkRef;
 
+- (void)setPingPongChannelId:(ABLLinkAudioChannelId)channelId;
+
 @end

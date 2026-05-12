@@ -32,6 +32,8 @@ typedef struct {
 typedef struct {
     ABLLinkRef ablLink;
     ABLLinkAudioSinkRef ablLinkAudioSink;
+    ABLLinkAudioSinkRef pingPongSink;
+    ABLLinkAudioSourceRef pingPongSource;
     // Shared between threads. Only write when engine not running.
     Float64 sampleRate;
     // Shared between threads. Only write when engine not running.
@@ -234,6 +236,77 @@ static OSStatus audioCallback(
     return noErr;
 }
 
+/*
+ * Ping-pong source callback. Called on a Link-managed thread when a buffer is received
+ * from the selected channel. Forwards the incoming audio to the ping-pong sink so
+ * other peers receive the bounced-back signal.
+ *
+ * NOTE — this is a test/demo implementation, not a model for production code. The
+ * source callback runs on a Link-managed thread, but ABLLinkCaptureAppSessionState is
+ * not safe to call concurrently. For the ease of the example, we cache the incoming audio
+ * and pass it to the ping pong source on the main thread.
+ * A production LinkKit client should hand the samples to the audio thread and align and process
+ * the audio according to the applications needs.
+ */
+static void onSourceBuffer(const ABLLinkAudioSourceBuffer *buffer, void *context) {
+    LinkData *linkData = (LinkData *)context;
+    if (!linkData->pingPongSink) {
+        return;
+    }
+
+    const size_t numFrames = buffer->info.numFrames;
+    const size_t numChannels = buffer->info.numChannels;
+    const size_t totalSamples = numFrames * numChannels;
+
+    if (ABLLinkAudioSinkMaxNumSamples(linkData->pingPongSink) < totalSamples) {
+        ABLLinkAudioSinkRequestMaxNumSamples(linkData->pingPongSink, (uint32_t)totalSamples);
+        return;
+    }
+
+    // The buffer and its samples are only valid for the duration of this callback,
+    // so copy what we need before dispatching.
+    int16_t *samplesCopy = (int16_t *)malloc(totalSamples * sizeof(int16_t));
+    if (!samplesCopy) {
+        return;
+    }
+    memcpy(samplesCopy, buffer->samples, totalSamples * sizeof(int16_t));
+    const ABLLinkAudioSourceBufferInfo infoCopy = buffer->info;
+
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (!linkData->pingPongSink) {
+            free(samplesCopy);
+            return;
+        }
+        const ABLLinkSessionStateRef sessionState =
+            ABLLinkCaptureAppSessionState(linkData->ablLink);
+
+        os_unfair_lock_lock(&lock);
+        const double quantum = linkData->sharedEngineData.quantum;
+        os_unfair_lock_unlock(&lock);
+
+        double beginBeats = 0.0;
+        if (!ABLLinkAudioSourceBufferInfoBeginBeats(
+                &infoCopy, sessionState, quantum, &beginBeats)) {
+            free(samplesCopy);
+            return;
+        }
+
+        ABLLinkAudioSinkBufferHandleRef handle = ABLLinkAudioRetainBuffer(linkData->pingPongSink);
+        if (!ABLLinkAudioSinkBufferHandleIsValid(handle)) {
+            ABLLinkAudioReleaseBuffer(handle);
+            free(samplesCopy);
+            return;
+        }
+
+        int16_t *out = ABLLinkAudioSinkBufferSamples(handle);
+        memcpy(out, samplesCopy, totalSamples * sizeof(int16_t));
+        ABLLinkAudioReleaseAndCommitBuffer(linkData->pingPongSink, handle, sessionState,
+            beginBeats, quantum, (uint32_t)infoCopy.numFrames,
+            (uint32_t)infoCopy.numChannels, infoCopy.sampleRate);
+        free(samplesCopy);
+    });
+}
+
 # pragma mark - AudioEngine
 
 @interface AudioEngine () {
@@ -361,6 +434,13 @@ _Pragma("clang diagnostic pop")
     [[NSNotificationCenter defaultCenter] removeObserver:self
                                                     name:@"AVAudioSessionRouteChangeNotification"
                                                   object:[AVAudioSession sharedInstance]];
+    // Delete the source first so its callback can no longer fire into the sink.
+    if (_linkData.pingPongSource) {
+        ABLLinkAudioSourceDelete(_linkData.pingPongSource);
+    }
+    if (_linkData.pingPongSink) {
+        ABLLinkAudioSinkDelete(_linkData.pingPongSink);
+    }
     ABLLinkAudioSinkDelete(_linkData.ablLinkAudioSink);
     ABLLinkDelete(_linkData.ablLink);
 }
@@ -400,6 +480,8 @@ _Pragma("clang diagnostic pop")
 
     _linkData.ablLink = ABLLinkNew(bpm);
     _linkData.ablLinkAudioSink = ABLLinkAudioSinkNew(_linkData.ablLink, "metro", 8192);
+    _linkData.pingPongSink = NULL;
+    _linkData.pingPongSource = NULL;
     _linkData.sampleRate = [AVAudioSession sharedInstance].sampleRate;
     _linkData.secondsToHostTime = (1.0e9 * timeInfo.denom) / (Float64)timeInfo.numer;
     _linkData.sharedEngineData.outputLatency =
@@ -516,6 +598,34 @@ _Pragma("clang diagnostic pop")
         @"Uninitializing Audio Unit failed. Error code: %d '%.4s'",
         (int)result,
         (const char *)(&result));
+}
+
+# pragma mark - ping-pong source
+
+- (void)setPingPongChannelId:(ABLLinkAudioChannelId)channelId {
+    const ABLLinkAudioChannelId current =
+        _linkData.pingPongSource ? ABLLinkAudioSourceGetChannelId(_linkData.pingPongSource) : 0;
+    if (channelId == current) {
+        return;
+    }
+
+    // Tear down source before sink so callback can't fire into a freed sink.
+    if (_linkData.pingPongSource) {
+        ABLLinkAudioSourceDelete(_linkData.pingPongSource);
+        _linkData.pingPongSource = NULL;
+    }
+    if (_linkData.pingPongSink || channelId == 0) {
+        ABLLinkAudioSinkDelete(_linkData.pingPongSink);
+        _linkData.pingPongSink = NULL;
+    }
+
+    if (channelId != 0) {
+        if (!_linkData.pingPongSink) {
+            _linkData.pingPongSink = ABLLinkAudioSinkNew(_linkData.ablLink, "ping-pong", 8192);
+        }
+        _linkData.pingPongSource = ABLLinkAudioSourceNew(
+            _linkData.ablLink, channelId, onSourceBuffer, &_linkData);
+    }
 }
 
 @end

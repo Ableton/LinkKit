@@ -207,10 +207,91 @@ struct Controls: View {
   #endif
 }
 
+struct PingPongPicker: View {
+  @EnvironmentObject private var engine: AudioEngineController
+  @State private var showingSheet = false
+
+  var body: some View {
+    Button {
+      showingSheet = true
+    } label: {
+      HStack(spacing: 4) {
+        Text("Audio Ping-Pong:")
+        Text(engine.pingPongChannel?.name ?? "Off").foregroundColor(.secondary)
+        Image(systemName: "chevron.down").imageScale(.small)
+      }
+      .font(.system(size: fontSize * 0.8))
+    }
+    .sheet(isPresented: $showingSheet) {
+      PingPongSheet(showingSheet: $showingSheet)
+        .environmentObject(engine)
+    }
+  }
+}
+
+struct PingPongSheet: View {
+  @EnvironmentObject private var engine: AudioEngineController
+  @Binding var showingSheet: Bool
+
+  var body: some View {
+    NavigationView {
+      List {
+        Section {
+          Text("This will forward the incoming audio from the selected ping-pong source "
+            + "to the sink \"ping-pong\" so other peers receive the bounced-back signal.")
+            .font(.footnote)
+            .foregroundColor(.secondary)
+        }
+        Button {
+          engine.pingPongChannel = nil
+          showingSheet = false
+        } label: {
+          HStack {
+            Text("Off").foregroundColor(.primary)
+            Spacer()
+            if engine.pingPongChannel == nil {
+              Image(systemName: "checkmark")
+            }
+          }
+        }
+        ForEach(engine.availableChannels, id: \.id) { channel in
+          Button {
+            engine.pingPongChannel = channel
+            showingSheet = false
+          } label: {
+            HStack {
+              VStack(alignment: .leading) {
+                Text(channel.name).foregroundColor(.primary)
+                Text(channel.peerName).font(.caption).foregroundColor(.secondary)
+              }
+              Spacer()
+              if engine.pingPongChannel?.id == channel.id {
+                Image(systemName: "checkmark")
+              }
+            }
+          }
+        }
+      }
+      .navigationTitle("Ping-Pong Source")
+      .navigationBarTitleDisplayMode(.inline)
+      .toolbar {
+        ToolbarItem(placement: .cancellationAction) {
+          Button("Cancel") { showingSheet = false }
+        }
+      }
+    }
+  }
+}
+
 struct ContentView: View {
+  @EnvironmentObject private var engine: AudioEngineController
+
   var body: some View {
     VStack {
       HStack {
+        if engine.isAudioEnabled {
+          PingPongPicker().padding(.leading)
+        }
         Spacer()
         LinkSettingsButton().padding()
       }
