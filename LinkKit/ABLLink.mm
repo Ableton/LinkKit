@@ -116,6 +116,11 @@ extern "C"
     const bool startStopSyncEnabled =
       [[NSUserDefaults standardUserDefaults] boolForKey:ABLLinkStartStopSyncEnabledKey];
     mImpl.enableStartStopSync(startStopSyncEnabled);
+
+    const bool audioEnabled =
+      [[NSUserDefaults standardUserDefaults] boolForKey:ABLLinkAudioEnabledKey];
+    mImpl.enableLinkAudio(audioEnabled);
+    mpCallbacks->mIsAudioEnabledCallback(audioEnabled);
   }
 
   void ABLLink::updateEnabled()
