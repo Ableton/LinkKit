@@ -8,6 +8,8 @@
 #define ABLNotificationEnabledKey @"ABLNotificationEnabled"
 #define ABLLinkStartStopSyncSupportedKey @"ABLLinkStartStopSyncSupported"
 #define ABLLinkStartStopSyncEnabledKey @"ABLStartStopSyncEnabled"
+#define ABLLinkArrangementSyncSupportedKey @"ABLLinkArrangementSyncSupported"
+#define ABLLinkArrangementSyncEnabledKey @"ABLLinkArrangementSyncEnabled"
 #define ABLLinkAudioSupportedKey @"ABLLinkAudioSupported"
 #define ABLLinkAudioEnabledKey @"ABLLinkAudioEnabled"
 #define ABLLinkPeerName @"ABLLinkPeerName"

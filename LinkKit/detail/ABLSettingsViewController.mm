@@ -43,6 +43,12 @@ BOOL isStartStopSyncSupported()
   return [[mainBundle objectForInfoDictionaryKey:ABLLinkStartStopSyncSupportedKey] boolValue];
 }
 
+BOOL isArrangementSyncSupported()
+{
+  NSBundle* mainBundle = [NSBundle mainBundle];
+  return [[mainBundle objectForInfoDictionaryKey:ABLLinkArrangementSyncSupportedKey] boolValue];
+}
+
 BOOL isLinkAudioSupported()
 {
   NSBundle* mainBundle = [NSBundle mainBundle];
@@ -50,6 +56,12 @@ BOOL isLinkAudioSupported()
 }
 
 } // unnamed
+
+typedef NS_ENUM(NSInteger, ABLSyncMode) {
+  ABLSyncModeTempoOnly = 0,
+  ABLSyncModeStartStop,
+  ABLSyncModeArrangement,
+};
 
 
 // String constants
@@ -80,6 +92,27 @@ static NSString* const kSyncStartStopSubtitleString =
 [LocalizedString resourcesLocalizedString: @"SyncStartStopSubtitle" comment: @""]
 ?: @"Send and listen to Start/Stop commands";
 
+static NSString* const kModeTitleString =
+[LocalizedString resourcesLocalizedString: @"ModeTitle" comment: @""]
+?: @"Mode";
+static NSString* const kModeSubtitleString =
+[LocalizedString resourcesLocalizedString: @"ModeSubtitle" comment: @""]
+?: @"Choose what to sync with other peers";
+static NSString* const kModeInfoString =
+[LocalizedString resourcesLocalizedString: @"ModeInfo" comment: @""]
+?: @"If Start/Stop is selected, start and stop commands will be synced across all "
+   "peers that also have Start/Stop enabled. Arrangement also shares the arrangement "
+   "position.";
+static NSString* const kModeTempoOnlyString =
+[LocalizedString resourcesLocalizedString: @"ModeTempoOnly" comment: @""]
+?: @"Tempo Only";
+static NSString* const kModeStartStopString =
+[LocalizedString resourcesLocalizedString: @"ModeStartStop" comment: @""]
+?: @"Start/Stop";
+static NSString* const kModeArrangementString =
+[LocalizedString resourcesLocalizedString: @"ModeArrangement" comment: @""]
+?: @"Arrangement";
+
 static NSString* const kLinkAudioTitleString =
 [LocalizedString resourcesLocalizedString: @"EnableLinkAudioTitle" comment: @""]
 ?: @"Enable Audio";
@@ -109,6 +142,68 @@ static NSString* const kPeersConnectedManyString =
 ?: @"Connected to %zu peers";
 
 
+static NSString* STitleForSyncMode(ABLSyncMode mode)
+{
+  switch (mode)
+  {
+    case ABLSyncModeStartStop:
+      return kModeStartStopString;
+    case ABLSyncModeArrangement:
+      return kModeArrangementString;
+    default:
+      return kModeTempoOnlyString;
+  }
+}
+
+// Selection page for the sync mode, pushed from the Mode row. Shows one
+// checkmark row per available mode with an explanatory footer text.
+@interface ABLSyncModeSelectionViewController : UITableViewController
+@property (nonatomic, copy) NSArray<NSNumber*>* modes;
+@property (nonatomic, copy) NSString* footerText;
+@property (nonatomic, copy) ABLSyncMode (^currentMode)(void);
+@property (nonatomic, copy) void (^onSelectMode)(ABLSyncMode);
+@end
+
+@implementation ABLSyncModeSelectionViewController
+
+-(NSInteger)numberOfSectionsInTableView:(UITableView*)tableView
+{
+  return 1;
+}
+
+-(NSInteger)tableView:(UITableView*)tableView numberOfRowsInSection:(NSInteger)section
+{
+  return (NSInteger)self.modes.count;
+}
+
+-(UITableViewCell*)tableView:(UITableView*)tableView
+       cellForRowAtIndexPath:(NSIndexPath*)indexPath
+{
+  UITableViewCell* cell = [[UITableViewCell alloc]
+                           initWithStyle:UITableViewCellStyleDefault reuseIdentifier:nil];
+  const ABLSyncMode mode =
+    (ABLSyncMode)self.modes[(NSUInteger)indexPath.row].integerValue;
+  cell.textLabel.text = STitleForSyncMode(mode);
+  cell.accessoryType = mode == self.currentMode()
+    ? UITableViewCellAccessoryCheckmark
+    : UITableViewCellAccessoryNone;
+  return cell;
+}
+
+-(NSString*)tableView:(UITableView*)tableView titleForFooterInSection:(NSInteger)section
+{
+  return self.footerText;
+}
+
+-(void)tableView:(UITableView*)tableView didSelectRowAtIndexPath:(NSIndexPath*)indexPath
+{
+  [tableView deselectRowAtIndexPath:indexPath animated:YES];
+  self.onSelectMode((ABLSyncMode)self.modes[(NSUInteger)indexPath.row].integerValue);
+  [tableView reloadData];
+}
+
+@end
+
 // Section indices
 static NSInteger const kLinkEnableDisableSection = 0;
 static NSInteger const kDetailSettingsSection = 1;
@@ -118,6 +213,7 @@ typedef NS_ENUM(NSInteger, ABLDetailRow)
 {
   ABLDetailRowNotifications,
   ABLDetailRowStartStopSync,
+  ABLDetailRowMode,
   ABLDetailRowLinkAudio,
   ABLDetailRowPeerName,
 };
@@ -133,6 +229,8 @@ typedef NS_ENUM(NSInteger, ABLDetailRow)
 
   UITableViewCell* _notificationsCell;
   UITableViewCell* _syncStartStopCell;
+  UITableViewCell* _modeCell;
+  UILabel* _modeValueLabel;
   UITableViewCell* _audioCell;
   UITableViewCell* _peerNameCell;
   UITextField* _peerNameTextField;
@@ -191,6 +289,7 @@ _Pragma("clang diagnostic pop")
     initUserDefaultFlag(ABLLinkEnabledKey, NO);
     initUserDefaultFlag(ABLNotificationEnabledKey, YES);
     initUserDefaultFlag(ABLLinkStartStopSyncEnabledKey, NO);
+    initUserDefaultFlag(ABLLinkArrangementSyncEnabledKey, NO);
     initUserDefaultFlag(ABLLinkAudioEnabledKey, NO);
     initPeerName();
 
@@ -286,13 +385,100 @@ _Pragma("clang diagnostic pop")
     _syncStartStopCell.detailTextLabel.textColor = [UIColor grayColor];
 
     UISwitch *switchView = [[UISwitch alloc] initWithFrame:CGRectZero];
-    switchView.on = [self isStartStopSyncEnabled];
+    switchView.on = _ablLink->isStartStopSyncEnabled();
     [switchView addTarget:self action:@selector(enableStartStopSync:) forControlEvents:UIControlEventValueChanged];
 
     _syncStartStopCell.accessoryView = switchView;
 
   }
   return _syncStartStopCell;
+}
+
+-(UITableViewCell*)modeCell
+{
+  if (_modeCell == nil)
+  {
+    _modeCell = [[UITableViewCell alloc]
+                 initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:nil];
+
+    _modeCell.textLabel.text = kModeTitleString;
+    _modeCell.detailTextLabel.text = kModeSubtitleString;
+    _modeCell.detailTextLabel.textColor = [UIColor grayColor];
+
+    _modeValueLabel = [UILabel new];
+    _modeValueLabel.textColor = [UIColor secondaryLabelColor];
+
+    UIImageSymbolConfiguration* configuration =
+      [UIImageSymbolConfiguration configurationWithPointSize:14
+                                                      weight:UIImageSymbolWeightSemibold];
+    // chevron.forward mirrors automatically in right-to-left layouts.
+    UIImageView* chevron = [[UIImageView alloc]
+      initWithImage:[UIImage systemImageNamed:@"chevron.forward"
+                            withConfiguration:configuration]];
+    chevron.tintColor = [UIColor tertiaryLabelColor];
+
+    UIStackView* accessoryView =
+      [[UIStackView alloc] initWithArrangedSubviews:@[_modeValueLabel, chevron]];
+    accessoryView.axis = UILayoutConstraintAxisHorizontal;
+    accessoryView.alignment = UIStackViewAlignmentCenter;
+    accessoryView.spacing = 6;
+    _modeCell.accessoryView = accessoryView;
+
+    [self updateModeCell];
+  }
+  return _modeCell;
+}
+
+// The mode selection is only shown when arrangement sync is supported; Start
+// Stop is always included because arrangement synchronization implies
+// start/stop synchronization.
+-(NSArray<NSNumber*>*)availableSyncModes
+{
+  return
+    @[@(ABLSyncModeTempoOnly), @(ABLSyncModeStartStop), @(ABLSyncModeArrangement)];
+}
+
+// A subtitle-style cell uses detailTextLabel for the text beneath the title, so
+// the current value and the disclosure chevron are shown in a custom accessory
+// view instead of accessoryType/detailTextLabel.
+-(void)updateModeCell
+{
+  _modeValueLabel.text = STitleForSyncMode([self currentSyncMode]);
+
+  UIView* accessoryView = _modeCell.accessoryView;
+  const CGSize size =
+    [accessoryView systemLayoutSizeFittingSize:UILayoutFittingCompressedSize];
+  accessoryView.frame = CGRectMake(0, 0, size.width, size.height);
+  // Reassign the accessory view so the cell repositions it for the new size.
+  _modeCell.accessoryView = accessoryView;
+}
+
+-(void)showModeSelection
+{
+  ABLSyncModeSelectionViewController* controller =
+    [[ABLSyncModeSelectionViewController alloc] initWithStyle:UITableViewStyleGrouped];
+  controller.title = kModeTitleString;
+  controller.modes = [self availableSyncModes];
+  controller.footerText = kModeInfoString;
+  __weak ABLSettingsViewController* weakSelf = self;
+  controller.currentMode = ^ABLSyncMode{
+    return weakSelf ? [weakSelf currentSyncMode] : ABLSyncModeTempoOnly;
+  };
+  controller.onSelectMode = ^(ABLSyncMode mode) {
+    [weakSelf setSyncMode:mode];
+  };
+
+  if (self.navigationController)
+  {
+    [self.navigationController pushViewController:controller animated:YES];
+  }
+  else
+  {
+    [self presentViewController:
+      [[UINavigationController alloc] initWithRootViewController:controller]
+                       animated:YES
+                     completion:nil];
+  }
 }
 
 -(UITableViewCell*)audioCell
@@ -576,7 +762,11 @@ _Pragma("clang diagnostic pop")
 {
   NSMutableArray<NSNumber*>* rows = [NSMutableArray array];
   [rows addObject:@(ABLDetailRowNotifications)];
-  if (isStartStopSyncSupported())
+  if (isArrangementSyncSupported())
+  {
+    [rows addObject:@(ABLDetailRowMode)];
+  }
+  else if (isStartStopSyncSupported())
   {
     [rows addObject:@(ABLDetailRowStartStopSync)];
   }
@@ -622,6 +812,9 @@ _Pragma("clang diagnostic pop")
 
     case ABLDetailRowStartStopSync:
       return [self syncStartStopCell];
+
+    case ABLDetailRowMode:
+      return [self modeCell];
 
     case ABLDetailRowLinkAudio:
       return [self audioCell];
@@ -716,7 +909,27 @@ _Pragma("clang diagnostic pop")
 
 -(BOOL)tableView:(UITableView *)tableView shouldHighlightRowAtIndexPath:(NSIndexPath *)indexPath
 {
-  return NO;
+  return [self isModeCellAtIndexPath:indexPath];
+}
+
+-(BOOL)isModeCellAtIndexPath:(NSIndexPath*)indexPath
+{
+  if (indexPath.section != kDetailSettingsSection)
+  {
+    return NO;
+  }
+  NSArray<NSNumber*>* rows = [self detailRows];
+  return (NSUInteger)indexPath.row < rows.count
+    && rows[(NSUInteger)indexPath.row].integerValue == ABLDetailRowMode;
+}
+
+-(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+  [tableView deselectRowAtIndexPath:indexPath animated:YES];
+  if ([self isModeCellAtIndexPath:indexPath])
+  {
+    [self showModeSelection];
+  }
 }
 
 // ========================= Link ========================= //
@@ -752,11 +965,6 @@ _Pragma("clang diagnostic pop")
   [[NSUserDefaults standardUserDefaults] setBool:sender.on forKey:ABLNotificationEnabledKey];
 }
 
--(BOOL)isStartStopSyncEnabled
-{
-  return _ablLink->isStartStopSyncEnabled();
-}
-
 -(BOOL)isLinkAudioEnabled
 {
   return _ablLink->isLinkAudioEnabled();
@@ -764,16 +972,30 @@ _Pragma("clang diagnostic pop")
 
 -(void)enableStartStopSync:(UISwitch*)sender
 {
-  BOOL enabled = sender.on;
+  _ablLink->enableStartStopSync(sender.on);
+}
 
-  [[NSUserDefaults standardUserDefaults] setBool:enabled forKey:ABLLinkStartStopSyncEnabledKey];
-  [[NSUserDefaults standardUserDefaults] synchronize];
-
-  if (enabled != _ablLink->isStartStopSyncEnabled())
+-(ABLSyncMode)currentSyncMode
+{
+  if (_ablLink->isArrangementSyncEnabled())
   {
-    _ablLink->enableStartStopSync(enabled);
-    _ablLink->mpCallbacks->mIsStartStopSyncEnabledCallback(enabled);
+    return ABLSyncModeArrangement;
   }
+  if (_ablLink->isStartStopSyncEnabled())
+  {
+    return ABLSyncModeStartStop;
+  }
+  return ABLSyncModeTempoOnly;
+}
+
+-(void)setSyncMode:(ABLSyncMode)mode
+{
+  // Disable arrangement sync before disabling start/stop sync; enabling
+  // arrangement sync implicitly enables start/stop sync.
+  _ablLink->enableArrangementSync(mode == ABLSyncModeArrangement);
+  _ablLink->enableStartStopSync(mode != ABLSyncModeTempoOnly);
+
+  [self updateModeCell];
 }
 
 -(void)enableLinkAudio:(UISwitch*)sender
