@@ -83,8 +83,27 @@ extern "C"
    *  programmatically.
    *  To allow the user to enable Start Stop Sync a Boolean entry YES under
    *  the key ABLLinkStartStopSyncSupported must be added to Info.plist.
+   *  If ABLLinkArrangementSyncSupported is set to YES, Start Stop Sync is
+   *  supported implicitly and this key is not needed.
    */
   bool ABLLinkIsStartStopSyncEnabled(ABLLinkRef);
+
+  /*! @brief Is Arrangement Sync currently enabled by the user?
+   *
+   *  @discussion On top of start/stop synchronization, arrangement
+   *  synchronization allows peers to share arrangement beat times with
+   *  other peers that have the feature enabled. Enabling arrangement
+   *  synchronization also enables start/stop synchronization and
+   *  disabling start/stop synchronization also disables arrangement
+   *  synchronization.
+   *  The Arrangement Sync Enabled status is only controllable by the
+   *  user via the Link settings dialog and is not controllable
+   *  programmatically.
+   *  To allow the user to enable Arrangement Sync a Boolean entry YES
+   *  under the key ABLLinkArrangementSyncSupported must be added to
+   *  Info.plist.
+   */
+  bool ABLLinkIsArrangementSyncEnabled(ABLLinkRef);
 
   /*! @brief Called if Session Tempo changes.
    *
@@ -118,6 +137,14 @@ extern "C"
    *  @param isEnabled Whether Start Stop Sync is currently enabled.
    */
   typedef void (*ABLLinkIsStartStopSyncEnabledCallback)(
+    bool isEnabled,
+    void *context);
+
+  /*! @brief Called if IsArrangementSyncEnabled state changes.
+   *
+   *  @param isEnabled Whether Arrangement Sync is currently enabled.
+   */
+  typedef void (*ABLLinkIsArrangementSyncEnabledCallback)(
     bool isEnabled,
     void *context);
 
@@ -176,6 +203,14 @@ extern "C"
   void ABLLinkSetIsStartStopSyncEnabledCallback(
     ABLLinkRef,
     ABLLinkIsStartStopSyncEnabledCallback callback,
+    void* context);
+
+  /*! @brief Invoked on the main thread when the user changes the
+   *  arrangement sync enabled state via the Link settings view.
+   */
+  void ABLLinkSetIsArrangementSyncEnabledCallback(
+    ABLLinkRef,
+    ABLLinkIsArrangementSyncEnabledCallback callback,
     void* context);
 
   /*! @brief Invoked on the main thread when the isConnected state
@@ -303,6 +338,9 @@ extern "C"
    *  peers. For non-negative beat values, the following
    *  property holds: fmod(ABLLinkBeatAtTime(tl, ht, q), q) ==
    *  ABLLinkPhaseAtTime(tl, ht, q).
+   *  When arrangement synchronization is enabled this beat time is
+   *  shared with all other peers that have arrangement synchronization
+   *  enabled.
    */
   double ABLLinkBeatAtTime(
     ABLLinkSessionStateRef,
@@ -359,6 +397,9 @@ extern "C"
    *  session. The client only needs to invoke this method to
    *  achieve this behavior and should not need to explicitly check
    *  the number of peers.
+   *
+   *  With arrangement synchronization enabled the requested beat time
+   *  is shared with other peers that have the feature enabled.
    */
   void ABLLinkRequestBeatAtTime(
     ABLLinkSessionStateRef,
@@ -386,6 +427,13 @@ extern "C"
    *  application layer when implementing such a feature so that
    *  users do not accidentally disrupt Link sessions that they may
    *  join.
+   *
+   *  This always re-maps the local timeline. When arrangement
+   *  synchronization is enabled it additionally moves the shared
+   *  arrangement beat to the same position, so peers with arrangement
+   *  sync follow the jump. The arrangement jump is immediate and
+   *  non-quantized and preserves the current launch time, so it does
+   *  not restart transport.
    */
   void ABLLinkForceBeatAtTime(
     ABLLinkSessionStateRef,
@@ -393,7 +441,15 @@ extern "C"
     uint64_t hostTimeAtOutput,
     double quantum);
 
-  /*! @brief: Set if transport should be playing or stopped at the given time. */
+  /*! @brief: Set if transport should be playing or stopped at the given time.
+   *
+   *  @discussion Peers that have arrangement sync enabled share the
+   *  start/stop state with peers that only have start/stop
+   *  synchronization enabled. When changing the start/stop state from a
+   *  peer that does not have arrangement synchronization enabled, the
+   *  state is not shared with peers that have arrangement
+   *  synchronization enabled.
+   */
   void ABLLinkSetIsPlaying(
     ABLLinkSessionStateRef,
     bool isPlaying,
@@ -402,8 +458,25 @@ extern "C"
   /*! @brief: Is transport playing? */
   bool ABLLinkIsPlaying(ABLLinkSessionStateRef);
 
-  /*! @brief: Get the time at which a transport start/stop occurs */
+  /*! @brief: Get the time at which a transport start/stop occurs
+   *
+   *  @discussion This is the raw time at which the start/stop command is
+   *  executed, with the same semantics for start/stop and arrangement
+   *  synchronization.
+   */
   uint64_t ABLLinkTimeForIsPlaying(ABLLinkSessionStateRef);
+
+  /*! @brief: Get the time at which arrangement transport actually starts.
+   *
+   *  @discussion Only meaningful when arrangement synchronization is
+   *  enabled. Unlike ABLLinkTimeForIsPlaying (the raw start-command
+   *  time), this is the quantized launch time at which this peer, and
+   *  all peers with arrangement sync and the same quantum, begin
+   *  playing. It is shared across peers, so it enables the same deferred
+   *  start behaviour as start/stop synchronization. When no arrangement
+   *  is present it falls back to ABLLinkTimeForIsPlaying.
+   */
+  uint64_t ABLLinkTimeForArrangementIsPlaying(ABLLinkSessionStateRef);
 
   /*! @brief: Convenience function to attempt to map the given beat to the time
    *  when transport is starting to play in context to the given quantum.
@@ -423,6 +496,26 @@ extern "C"
     uint64_t hostTimeAtOutput,
     double beatTime,
     double quantum);
+
+  /*! @brief: Map the given arrangement beat to the given time.
+   *
+   *  @discussion Only meaningful when arrangement synchronization is
+   *  enabled; it is a no-op on the values reported by
+   *  ABLLinkBeatAtTime/ABLLinkPhaseAtTime/ABLLinkTimeAtBeat while
+   *  arrangement sync is disabled.
+   *
+   *  DANGER: Arrangement synchronization lets peers share an absolute
+   *  beat time. This function performs an immediate, non-quantized jump:
+   *  after it is called, ABLLinkBeatAtTime(time) == beat. It is intended
+   *  for beat-time jumps while transport is playing, where peers should
+   *  follow even off the quantum grid. To start transport quantized, use
+   *  ABLLinkSetIsPlayingAndRequestBeatAtTime, which snaps the start onto
+   *  the shared session phase grid.
+   */
+  void ABLLinkSetArrangementBeatAtTime(
+    ABLLinkSessionStateRef,
+    double beatTime,
+    uint64_t hostTimeAtOutput);
 
   /*! @brief Is audio sharing currently enabled?
    *

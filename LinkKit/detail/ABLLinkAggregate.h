@@ -17,6 +17,7 @@ extern "C"
   using TempoCallback = std::function<void (double)>;
   using StartStopCallback = std::function<void (bool)>;
   using IsStartStopSyncEnabledCallback = std::function<void (bool)>;
+  using IsArrangementSyncEnabledCallback = std::function<void (bool)>;
   using IsAudioEnabledCallback = std::function<void (bool)>;
   using AudioChannelsChangedCallback = std::function<void ()>;
 
@@ -30,6 +31,7 @@ extern "C"
       TempoCallback tempo,
       StartStopCallback startStop,
       IsStartStopSyncEnabledCallback startStopSyncEnabled,
+      IsArrangementSyncEnabledCallback arrangementSyncEnabled,
       IsAudioEnabledCallback audioEnabled,
       AudioChannelsChangedCallback audioChannelsChanged)
       : mIsConnectedCallback(std::move(connected))
@@ -39,6 +41,7 @@ extern "C"
       , mTempoCallback(std::move(tempo))
       , mStartStopCallback(std::move(startStop))
       , mIsStartStopSyncEnabledCallback(std::move(startStopSyncEnabled))
+      , mIsArrangementSyncEnabledCallback(std::move(arrangementSyncEnabled))
       , mIsAudioEnabledCallback(std::move(audioEnabled))
       , mAudioChannelsChangedCallback(std::move(audioChannelsChanged))
     {
@@ -51,6 +54,7 @@ extern "C"
     TempoCallback mTempoCallback;
     StartStopCallback mStartStopCallback;
     IsStartStopSyncEnabledCallback mIsStartStopSyncEnabledCallback;
+    IsArrangementSyncEnabledCallback mIsArrangementSyncEnabledCallback;
     IsAudioEnabledCallback mIsAudioEnabledCallback;
     AudioChannelsChangedCallback mAudioChannelsChangedCallback;
   };
@@ -68,6 +72,10 @@ extern "C"
     void updateEnabled();
     void enableStartStopSync(bool);
     bool isStartStopSyncEnabled();
+    void enableArrangementSync(bool);
+    void syncEnabledStateChanged(
+      bool wasStartStopSyncEnabled, bool wasArrangementSyncEnabled);
+    bool isArrangementSyncEnabled();
     void enableLinkAudio(bool);
     bool isLinkAudioEnabled();
     void setPeerName(const char*);

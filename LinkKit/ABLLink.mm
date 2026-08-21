@@ -73,6 +73,7 @@ extern "C"
           [](bool) { },
           [](bool) { },
           [](bool) { },
+          [](bool) { },
           []() { }
         )
       )
@@ -125,9 +126,13 @@ extern "C"
     mpCallbacks->mIsEnabledCallback(linkEnabled);
     updateEnabled();
 
-    const bool startStopSyncEnabled =
+    const bool arrangementSyncEnabled =
+      [[NSUserDefaults standardUserDefaults] boolForKey:ABLLinkArrangementSyncEnabledKey];
+
+    const bool startStopSyncEnabled = arrangementSyncEnabled ||
       [[NSUserDefaults standardUserDefaults] boolForKey:ABLLinkStartStopSyncEnabledKey];
     mImpl.enableStartStopSync(startStopSyncEnabled);
+    mImpl.enableArrangementSync(arrangementSyncEnabled);
 
     const bool audioEnabled =
       [[NSUserDefaults standardUserDefaults] boolForKey:ABLLinkAudioEnabledKey];
@@ -142,12 +147,50 @@ extern "C"
 
   void ABLLink::enableStartStopSync(const bool enabled)
   {
+    const bool wasStartStopSyncEnabled = mImpl.isStartStopSyncEnabled();
+    const bool wasArrangementSyncEnabled = mImpl.isArrangementSyncEnabled();
     mImpl.enableStartStopSync(enabled);
+    syncEnabledStateChanged(wasStartStopSyncEnabled, wasArrangementSyncEnabled);
   }
 
   bool ABLLink::isStartStopSyncEnabled()
   {
     return mImpl.isStartStopSyncEnabled();
+  }
+
+  void ABLLink::enableArrangementSync(const bool enabled)
+  {
+    const bool wasStartStopSyncEnabled = mImpl.isStartStopSyncEnabled();
+    const bool wasArrangementSyncEnabled = mImpl.isArrangementSyncEnabled();
+    mImpl.enableArrangementSync(enabled);
+    syncEnabledStateChanged(wasStartStopSyncEnabled, wasArrangementSyncEnabled);
+  }
+
+  void ABLLink::syncEnabledStateChanged(
+    const bool wasStartStopSyncEnabled, const bool wasArrangementSyncEnabled)
+  {
+    const bool startStopSyncEnabled = mImpl.isStartStopSyncEnabled();
+    const bool arrangementSyncEnabled = mImpl.isArrangementSyncEnabled();
+
+    [[NSUserDefaults standardUserDefaults] setBool:startStopSyncEnabled
+                                            forKey:ABLLinkStartStopSyncEnabledKey];
+    [[NSUserDefaults standardUserDefaults] setBool:arrangementSyncEnabled
+                                            forKey:ABLLinkArrangementSyncEnabledKey];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+
+    if (startStopSyncEnabled != wasStartStopSyncEnabled)
+    {
+      mpCallbacks->mIsStartStopSyncEnabledCallback(startStopSyncEnabled);
+    }
+    if (arrangementSyncEnabled != wasArrangementSyncEnabled)
+    {
+      mpCallbacks->mIsArrangementSyncEnabledCallback(arrangementSyncEnabled);
+    }
+  }
+
+  bool ABLLink::isArrangementSyncEnabled()
+  {
+    return mImpl.isArrangementSyncEnabled();
   }
 
   void ABLLink::enableLinkAudio(const bool enabled)
@@ -220,6 +263,7 @@ extern "C"
     ablLink->mpCallbacks->mTempoCallback = [](double) { };
     ablLink->mpCallbacks->mStartStopCallback = [](bool) { };
     ablLink->mpCallbacks->mIsStartStopSyncEnabledCallback = [](bool) { };
+    ablLink->mpCallbacks->mIsArrangementSyncEnabledCallback = [](bool) { };
     ablLink->mpCallbacks->mIsAudioEnabledCallback = [](bool) { };
     ablLink->mpCallbacks->mAudioChannelsChangedCallback = []() { };
 
@@ -240,6 +284,11 @@ extern "C"
   bool ABLLinkIsStartStopSyncEnabled(ABLLinkRef ablLink)
   {
     return ablLink->mImpl.isStartStopSyncEnabled();
+  }
+
+  bool ABLLinkIsArrangementSyncEnabled(ABLLinkRef ablLink)
+  {
+    return ablLink->mImpl.isArrangementSyncEnabled();
   }
 
   bool ABLLinkIsConnected(ABLLinkRef ablLink)
@@ -288,6 +337,16 @@ extern "C"
     void* context)
   {
     ablLink->mpCallbacks->mIsStartStopSyncEnabledCallback = [=](const bool isEnabled) {
+      callback(isEnabled, context);
+    };
+  }
+
+  void ABLLinkSetIsArrangementSyncEnabledCallback(
+    ABLLinkRef ablLink,
+    ABLLinkIsArrangementSyncEnabledCallback callback,
+    void* context)
+  {
+    ablLink->mpCallbacks->mIsArrangementSyncEnabledCallback = [=](const bool isEnabled) {
       callback(isEnabled, context);
     };
   }
@@ -426,6 +485,12 @@ extern "C"
     return sessionState->mClock.microsToTicks(sessionState->mImpl.timeForIsPlaying());
   }
 
+  uint64_t ABLLinkTimeForArrangementIsPlaying(ABLLinkSessionStateRef sessionState)
+  {
+    return sessionState->mClock.microsToTicks(
+      sessionState->mImpl.timeForArrangementIsPlaying());
+  }
+
   void ABLLinkRequestBeatAtStartPlayingTime(
     ABLLinkSessionStateRef sessionState,
     const double beatTime,
@@ -443,6 +508,15 @@ extern "C"
   {
     const auto micros = sessionState->mClock.ticksToMicros(hostTime);
     sessionState->mImpl.setIsPlayingAndRequestBeatAtTime(isPlaying, micros, beatTime, quantum);
+  }
+
+  void ABLLinkSetArrangementBeatAtTime(
+    ABLLinkSessionStateRef sessionState,
+    const double beatTime,
+    const uint64_t hostTime)
+  {
+    const auto micros = sessionState->mClock.ticksToMicros(hostTime);
+    sessionState->mImpl.setArrangementBeatAtTime(beatTime, micros);
   }
 
   bool ABLLinkIsAudioEnabled(ABLLinkRef ablLink)
