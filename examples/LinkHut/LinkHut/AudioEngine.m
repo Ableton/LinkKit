@@ -22,6 +22,7 @@ typedef struct {
     Float64 resetToBeatTime;
     BOOL requestStart;
     BOOL requestStop;
+    BOOL requestBeatTimeJump;
     Float64 proposeBpm;
     Float64 quantum;
 } EngineData;
@@ -59,6 +60,7 @@ static void pullEngineData(LinkData* linkData) {
     linkData->localEngineData.proposeBpm = INVALID_BPM;
     linkData->localEngineData.requestStart = NO;
     linkData->localEngineData.requestStop = NO;
+    linkData->localEngineData.requestBeatTimeJump = NO;
 
     // Attempt to grab the lock guarding the shared engine data but
     // don't block if we can't get it.
@@ -78,6 +80,10 @@ static void pullEngineData(LinkData* linkData) {
         linkData->localEngineData.requestStop = linkData->sharedEngineData.requestStop;
         linkData->sharedEngineData.requestStop = NO;
 
+        linkData->localEngineData.requestBeatTimeJump =
+          linkData->sharedEngineData.requestBeatTimeJump;
+        linkData->sharedEngineData.requestBeatTimeJump = NO;
+
         linkData->localEngineData.proposeBpm = linkData->sharedEngineData.proposeBpm;
         linkData->sharedEngineData.proposeBpm = INVALID_BPM;
         os_unfair_lock_unlock(&lock);
@@ -90,6 +96,7 @@ static void pullEngineData(LinkData* linkData) {
  */
 static void renderMetronomeIntoBuffer(
     const ABLLinkSessionStateRef sessionState,
+    const BOOL arrangementSyncOn,
     const Float64 quantum,
     const UInt64 beginHostTime,
     const Float64 sampleRate,
@@ -107,14 +114,22 @@ static void renderMetronomeIntoBuffer(
     // The number of host ticks that elapse between samples
     const Float64 hostTicksPerSample = secondsToHostTime / sampleRate;
 
+    // With arrangement sync the shared launch point is
+    // ABLLinkTimeForArrangementIsPlaying: the beat is absolute, so deferral is
+    // driven by that quantized launch time. Without it, only make sound for
+    // positive beat magnitudes; negative beat magnitudes are count-in beats.
+    const UInt64 arrangementIsPlayingTime =
+        arrangementSyncOn ? ABLLinkTimeForArrangementIsPlaying(sessionState) : 0;
+
     for (UInt32 i = 0; i < bufferSize; ++i) {
         Float64 amplitude = 0.;
         // Compute the host time for this sample.
         const UInt64 hostTime = beginHostTime + llround(i * hostTicksPerSample);
         const UInt64 lastSampleHostTime = hostTime - llround(hostTicksPerSample);
-        // Only make sound for positive beat magnitudes. Negative beat
-        // magnitudes are count-in beats.
-        if (ABLLinkBeatAtTime(sessionState, hostTime, quantum) >= 0.) {
+        const BOOL launchStarted = arrangementSyncOn
+            ? hostTime >= arrangementIsPlayingTime
+            : ABLLinkBeatAtTime(sessionState, hostTime, quantum) >= 0.;
+        if (launchStarted) {
             // If the phase wraps around between the last sample and the
             // current one with respect to a 1 beat quantum, then a click
             // should occur.
@@ -213,6 +228,13 @@ static OSStatus audioCallback(
         ABLLinkSetTempo(sessionState, linkData->localEngineData.proposeBpm, hostTimeAtBufferBegin);
     }
 
+    if (linkData->localEngineData.requestBeatTimeJump) {
+        // Non-quantized jump of the shared arrangement timeline to beat 0. This is
+        // a no-op unless arrangement sync is enabled, so without it the local
+        // timeline is untouched.
+        ABLLinkSetArrangementBeatAtTime(sessionState, 0., hostTimeAtBufferBegin);
+    }
+
     ABLLinkCommitAudioSessionState(linkData->ablLink, sessionState);
 
     // When playing, render the metronome sound
@@ -220,7 +242,8 @@ static OSStatus audioCallback(
         // Only render the metronome sound to the first channel. This
         // might help with source separate for timing analysis.
         renderMetronomeIntoBuffer(
-            sessionState, linkData->localEngineData.quantum, hostTimeAtBufferBegin, linkData->sampleRate,
+            sessionState, ABLLinkIsArrangementSyncEnabled(linkData->ablLink),
+            linkData->localEngineData.quantum, hostTimeAtBufferBegin, linkData->sampleRate,
             linkData->secondsToHostTime, inNumberFrames, &linkData->timeAtLastClick,
             (SInt16*)ioData->mBuffers[0].mData);
     }
@@ -342,6 +365,12 @@ static void onSourceBuffer(const ABLLinkAudioSourceBuffer *buffer, void *context
 - (void)requestTransportStop {
     os_unfair_lock_lock(&lock);
     _linkData.sharedEngineData.requestStop = YES;
+    os_unfair_lock_unlock(&lock);
+}
+
+- (void)requestBeatTimeJump {
+    os_unfair_lock_lock(&lock);
+    _linkData.sharedEngineData.requestBeatTimeJump = YES;
     os_unfair_lock_unlock(&lock);
 }
 
@@ -490,6 +519,7 @@ _Pragma("clang diagnostic pop")
     _linkData.sharedEngineData.proposeBpm = INVALID_BPM;
     _linkData.sharedEngineData.requestStart = NO;
     _linkData.sharedEngineData.requestStop = NO;
+    _linkData.sharedEngineData.requestBeatTimeJump = NO;
     _linkData.sharedEngineData.quantum = 4; // quantize to 4 beats
     _linkData.localEngineData = _linkData.sharedEngineData;
     _linkData.timeAtLastClick = 0;

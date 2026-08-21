@@ -12,6 +12,7 @@
 - (void)setQuantum:(Float64)quantum;
 - (void)requestTransportStart;
 - (void)requestTransportStop;
+- (void)requestBeatTimeJump;
 - (ABLLinkRef)linkRef;
 
 - (void)setPingPongChannelId:(ABLLinkAudioChannelId)channelId;

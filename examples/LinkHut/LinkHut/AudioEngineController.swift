@@ -42,6 +42,8 @@ class AudioEngineController: ObservableObject {
 
   @Published private(set) var isAudioEnabled = false
 
+  @Published private(set) var isArrangementSyncEnabled = false
+
   @Published var pingPongChannel: LinkAudioChannel? {
     didSet {
       audioEngine?.setPingPongChannelId(pingPongChannel?.id ?? 0)
@@ -50,6 +52,10 @@ class AudioEngineController: ObservableObject {
 
   var link: ABLLinkRef? {
     audioEngine?.linkRef()
+  }
+
+  func jumpToBeatZero() {
+    audioEngine?.requestBeatTimeJump()
   }
 
   func startAudioEngine() {
@@ -88,6 +94,16 @@ class AudioEngineController: ObservableObject {
       { enabled, context in
         Unmanaged<AudioEngineController>.fromOpaque(context!).takeUnretainedValue()
           .isAudioEnabled = enabled
+      },
+      Unmanaged.passUnretained(self).toOpaque()
+    )
+
+    isArrangementSyncEnabled = ABLLinkIsArrangementSyncEnabled(audioEngine?.linkRef())
+    ABLLinkSetIsArrangementSyncEnabledCallback(
+      audioEngine?.linkRef(),
+      { enabled, context in
+        Unmanaged<AudioEngineController>.fromOpaque(context!).takeUnretainedValue()
+          .isArrangementSyncEnabled = enabled
       },
       Unmanaged.passUnretained(self).toOpaque()
     )

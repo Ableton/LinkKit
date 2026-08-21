@@ -121,6 +121,13 @@ struct Metronome: View {
         Text(String(format: "Beat Time: %.2f", engine.beatTime)).font(.system(size: fontSize))
           .padding()
         Spacer()
+        if engine.isArrangementSyncEnabled {
+          Button(action: { engine.jumpToBeatZero() }) {
+            Text("Jump to 0")
+              .font(.system(size: fontSize * 0.8))
+          }
+          .padding()
+        }
       }
     }
   }
