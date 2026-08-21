@@ -11,6 +11,13 @@
 "SyncStartStopTitle" = "同期開始/停止";
 "SyncStartStopSubtitle" = "開始/停止コマンドを送信してリッスン";
 
+"ModeTitle" = "モード";
+"ModeSubtitle" = "他のユーザーと同期する内容を選択";
+"ModeInfo" = "開始/停止を選択すると、開始/停止コマンドが、同じく開始/停止を有効にしているすべてのユーザーと同期されます。アレンジメントでは、さらにアレンジメントの位置も共有されます。";
+"ModeTempoOnly" = "テンポのみ";
+"ModeStartStop" = "開始/停止";
+"ModeArrangement" = "アレンジメント";
+
 "EnableLinkAudioTitle" = "オーディオを共有";
 "EnableLinkAudioSubtitle" = "Linkユーザーとオーディオを共有";
 

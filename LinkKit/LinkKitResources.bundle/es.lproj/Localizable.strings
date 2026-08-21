@@ -11,6 +11,13 @@
 "SyncStartStopTitle" = "Iniciar/detener sincronización";
 "SyncStartStopSubtitle" = "Enviar y escuchar comandos de Iniciar/Detener";
 
+"ModeTitle" = "Modo";
+"ModeSubtitle" = "Elija qué sincronizar con otros colegas";
+"ModeInfo" = "Si se selecciona Iniciar/Detener, los comandos de inicio y detención se sincronizarán con todos los colegas que también tengan habilitado Iniciar/Detener. Arreglo comparte además la posición del arreglo.";
+"ModeTempoOnly" = "Solo tempo";
+"ModeStartStop" = "Iniciar/Detener";
+"ModeArrangement" = "Arreglo";
+
 "EnableLinkAudioTitle" = "Compartir audio";
 "EnableLinkAudioSubtitle" = "Comparta audio con colegas de Link";
 

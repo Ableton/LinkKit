@@ -11,6 +11,13 @@
 "SyncStartStopTitle" = "Synchro de démarrage/arrêt";
 "SyncStartStopSubtitle" = "Envoi et réception de commandes de démarrage/arrêt";
 
+"ModeTitle" = "Mode";
+"ModeSubtitle" = "Choisissez ce qui est synchronisé avec les autres pairs";
+"ModeInfo" = "Si Démarrage/arrêt est sélectionné, les commandes de démarrage et d'arrêt sont synchronisées avec tous les pairs ayant également activé Démarrage/arrêt. Arrangement partage en plus la position d'arrangement.";
+"ModeTempoOnly" = "Tempo uniquement";
+"ModeStartStop" = "Démarrage/arrêt";
+"ModeArrangement" = "Arrangement";
+
 "EnableLinkAudioTitle" = "Partager l'audio";
 "EnableLinkAudioSubtitle" = "Partager l'audio avec les pairs Link";
 

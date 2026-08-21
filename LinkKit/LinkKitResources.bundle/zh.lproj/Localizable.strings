@@ -11,6 +11,13 @@
 "SyncStartStopTitle" = "开始/结束同步";
 "SyncStartStopSubtitle" = "发送并听到开始/结束指令";
 
+"ModeTitle" = "模式";
+"ModeSubtitle" = "选择与其他应用程序同步的内容";
+"ModeInfo" = "选择开始/结束后，开始和结束指令将与所有同样启用了开始/结束的应用程序同步。Arrangement 还会共享 Arrangement 位置。";
+"ModeTempoOnly" = "仅速度";
+"ModeStartStop" = "开始/结束";
+"ModeArrangement" = "Arrangement";
+
 "EnableLinkAudioTitle" = "共享音频";
 "EnableLinkAudioSubtitle" = "与 Link 应用程序共享音频";
 

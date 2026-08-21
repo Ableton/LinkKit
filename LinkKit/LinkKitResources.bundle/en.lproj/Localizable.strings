@@ -11,6 +11,13 @@
 "SyncStartStopTitle" = "Sync Start/Stop";
 "SyncStartStopSubtitle" = "Send and listen to Start/Stop commands";
 
+"ModeTitle" = "Mode";
+"ModeSubtitle" = "Choose what to sync with other peers";
+"ModeInfo" = "If Start/Stop is selected, start and stop commands will be synced across all peers that also have Start/Stop enabled. Arrangement also shares the arrangement position.";
+"ModeTempoOnly" = "Tempo Only";
+"ModeStartStop" = "Start/Stop";
+"ModeArrangement" = "Arrangement";
+
 "EnableLinkAudioTitle" = "Share Audio";
 "EnableLinkAudioSubtitle" = "Share audio with Link peers";
 

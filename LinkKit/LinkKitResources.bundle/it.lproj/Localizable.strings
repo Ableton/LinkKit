@@ -11,6 +11,13 @@
 "SyncStartStopTitle" = "Sincronizza Start/Stop";
 "SyncStartStopSubtitle" = "Invia e recepisci i comandi Start/Stop";
 
+"ModeTitle" = "Modalità";
+"ModeSubtitle" = "Scegli cosa sincronizzare con gli altri peer";
+"ModeInfo" = "Se è selezionato Start/Stop, i comandi di avvio e arresto vengono sincronizzati con tutti i peer che hanno anch'essi abilitato Start/Stop. Arrangiamento condivide anche la posizione dell'arrangiamento.";
+"ModeTempoOnly" = "Solo tempo";
+"ModeStartStop" = "Start/Stop";
+"ModeArrangement" = "Arrangiamento";
+
 "EnableLinkAudioTitle" = "Condividi audio";
 "EnableLinkAudioSubtitle" = "Condividi l'audio con i peer Link";
 
