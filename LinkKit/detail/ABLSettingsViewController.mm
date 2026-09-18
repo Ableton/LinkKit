@@ -140,8 +140,11 @@ typedef NS_ENUM(NSInteger, ABLDetailRow)
   UITableViewCell* _statusCell;
 
   UIView* _connectedAppsFooterView;
+  NSLayoutConstraint* _connectedAppsLabelLeadingConstraint;
 
   BOOL _originalToolbarHidden;
+
+  BOOL _footerMarginsUpdateScheduled;
 }
 
 ABL_NOT_IMPLEMENTED_INITIALIZER(initWithCoder:(NSCoder *)aDecoder)
@@ -391,21 +394,41 @@ _Pragma("clang diagnostic pop")
 - (void)viewLayoutMarginsDidChange
 {
   [super viewLayoutMarginsDidChange];
-  [self recreateAllCells];
+
+  if (!_footerMarginsUpdateScheduled)
+  {
+    _footerMarginsUpdateScheduled = YES;
+    __weak __typeof(self) weakSelf = self;
+    dispatch_async(dispatch_get_main_queue(), ^{
+      __typeof(self) strongSelf = weakSelf;
+      if (strongSelf != nil)
+      {
+        strongSelf->_footerMarginsUpdateScheduled = NO;
+        [strongSelf updateFooterLayoutMargins];
+      }
+    });
+  }
 }
 
--(void)recreateAllCells
+-(void)updateFooterLayoutMargins
 {
-  _enableDisableCell = nil;
-  _enableDisableCellFooter = nil;
-  _notificationsCell = nil;
-  _syncStartStopCell = nil;
-  _audioCell = nil;
-  _peerNameCell = nil;
-  _statusCell = nil;
-  _connectedAppsFooterView = nil;
+  const UIEdgeInsets margins = self.tableView.layoutMargins;
 
-  [self.tableView reloadData];
+  if (_enableDisableCellFooter != nil)
+  {
+    UIEdgeInsets contentInset = _enableDisableCellFooter.contentInset;
+    contentInset.left = margins.left;
+    _enableDisableCellFooter.contentInset = contentInset;
+
+    UIEdgeInsets textContainerInset = _enableDisableCellFooter.textContainerInset;
+    textContainerInset.right = margins.right;
+    _enableDisableCellFooter.textContainerInset = textContainerInset;
+  }
+
+  _connectedAppsLabelLeadingConstraint.constant = margins.left;
+
+  [self.tableView beginUpdates];
+  [self.tableView endUpdates];
 }
 
 -(void)updateEnableDisableCellFooterVisibility
@@ -488,13 +511,21 @@ _Pragma("clang diagnostic pop")
     activityIndicator.translatesAutoresizingMaskIntoConstraints = NO;
     [_connectedAppsFooterView addSubview: activityIndicator];
 
-    CGFloat leftInset = self.tableView.layoutMargins.left;
+    _connectedAppsLabelLeadingConstraint =
+      [NSLayoutConstraint constraintWithItem:label
+                                   attribute:NSLayoutAttributeLeading
+                                   relatedBy:NSLayoutRelationEqual
+                                      toItem:_connectedAppsFooterView
+                                   attribute:NSLayoutAttributeLeading
+                                  multiplier:1
+                                    constant:self.tableView.layoutMargins.left];
+    [_connectedAppsFooterView addConstraint:_connectedAppsLabelLeadingConstraint];
 
     NSDictionary* views = NSDictionaryOfVariableBindings(label, activityIndicator);
     [_connectedAppsFooterView addConstraints:
-     [NSLayoutConstraint constraintsWithVisualFormat:@"|-leftInset-[label]-[activityIndicator]"
+     [NSLayoutConstraint constraintsWithVisualFormat:@"[label]-[activityIndicator]"
                                              options:0
-                                             metrics:@{@"leftInset": @(leftInset)}
+                                             metrics:nil
                                                views:views]];
 
     [_connectedAppsFooterView addConstraint:[NSLayoutConstraint constraintWithItem:label
