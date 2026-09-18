@@ -188,19 +188,12 @@ _Pragma("clang diagnostic pop")
     initUserDefaultFlag(ABLLinkStartStopSyncEnabledKey, NO);
     initUserDefaultFlag(ABLLinkAudioEnabledKey, NO);
     initPeerName();
-
-    // Listen for layoutMargins changes to update cell layouts accordingly
-    [self.tableView addObserver:self
-                     forKeyPath:@"layoutMargins"
-                        options:NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld
-                        context:nil];
   }
   return self;
 }
 
 -(void)deinit
 {
-  [self.tableView removeObserver:self forKeyPath:@"layoutMargins" ];
   _ablLink = nil;
 }
 
@@ -208,22 +201,6 @@ _Pragma("clang diagnostic pop")
 {
   _numberOfPeers = numberOfPeers;
   [self updateConnectedPeersCount:numberOfPeers];
-}
-
--(void)observeValueForKeyPath:(NSString *)keyPath
-                     ofObject:(id)object
-                       change:(NSDictionary<NSKeyValueChangeKey,id> *)change
-                      context:(void *)context
-{
-  if ([object isEqual:self.tableView] && [keyPath isEqualToString:@"layoutMargins"])
-  {
-    UIEdgeInsets oldMargin = ((NSValue*)change[NSKeyValueChangeOldKey]).UIEdgeInsetsValue;
-    UIEdgeInsets newMargin = ((NSValue*)change[NSKeyValueChangeNewKey]).UIEdgeInsetsValue;
-    if (!UIEdgeInsetsEqualToEdgeInsets(oldMargin, newMargin))
-    {
-      [self recreateAllCells];
-    }
-  }
 }
 
 -(void)viewWillAppear:(BOOL)animated
