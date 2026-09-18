@@ -144,6 +144,8 @@ typedef NS_ENUM(NSInteger, ABLDetailRow)
 
   BOOL _originalToolbarHidden;
 
+  BOOL _detailSectionsVisible;
+
   BOOL _footerMarginsUpdateScheduled;
 }
 
@@ -191,6 +193,9 @@ _Pragma("clang diagnostic pop")
     initUserDefaultFlag(ABLLinkStartStopSyncEnabledKey, NO);
     initUserDefaultFlag(ABLLinkAudioEnabledKey, NO);
     initPeerName();
+
+    _detailSectionsVisible =
+      [[NSUserDefaults standardUserDefaults] boolForKey:ABLLinkEnabledKey];
   }
   return self;
 }
@@ -209,6 +214,12 @@ _Pragma("clang diagnostic pop")
 -(void)viewWillAppear:(BOOL)animated
 {
   [super viewWillAppear:animated];
+
+  if (_detailSectionsVisible != [self isEnabled])
+  {
+    _detailSectionsVisible = [self isEnabled];
+    [self.tableView reloadData];
+  }
 
   _originalToolbarHidden = self.navigationController.toolbarHidden;
   [self.navigationController setToolbarHidden:NO];
@@ -350,6 +361,12 @@ _Pragma("clang diagnostic pop")
 
 -(void)animatedEnabledChange:(BOOL)enabled
 {
+  if (_detailSectionsVisible == enabled)
+  {
+    return;
+  }
+  _detailSectionsVisible = enabled;
+
   NSMutableIndexSet* indexSet = [NSMutableIndexSet indexSet];
   [indexSet addIndex:kDetailSettingsSection];
   [indexSet addIndex:kConnectedPeersSection];
@@ -433,7 +450,7 @@ _Pragma("clang diagnostic pop")
 
 -(void)updateEnableDisableCellFooterVisibility
 {
-  [self enableDisableCellFooter].hidden = [self isEnabled];
+  [self enableDisableCellFooter].hidden = _detailSectionsVisible;
 }
 
 // ========================= Footer ==================================== //
@@ -459,7 +476,7 @@ _Pragma("clang diagnostic pop")
     textContainerInsets.right = self.tableView.layoutMargins.right;
     textView.textContainerInset = textContainerInsets;
 
-    textView.hidden = [self isEnabled];
+    textView.hidden = _detailSectionsVisible;
     
     // Setting textView.dataDetectorTypes = UIDataDetectorTypeLink blocks the audio thread,
     // when a debugger is attached. This leads to audio dropouts when initializing the view
@@ -552,7 +569,7 @@ _Pragma("clang diagnostic pop")
 
 -(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
-  return [self isEnabled] ? 3 : 1;
+  return _detailSectionsVisible ? 3 : 1;
 }
 
 -(NSArray<NSNumber*>*)detailRows
@@ -643,7 +660,7 @@ _Pragma("clang diagnostic pop")
 
 - (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section
 {
-  if (section == kLinkEnableDisableSection && ![self isEnabled])
+  if (section == kLinkEnableDisableSection && !_detailSectionsVisible)
   {
     return kDescriptionLongString;
   }
@@ -670,7 +687,7 @@ _Pragma("clang diagnostic pop")
   switch (section) {
     case kLinkEnableDisableSection:
     {
-      if ([self isEnabled])
+      if (_detailSectionsVisible)
       {
         return 0;
       }
@@ -729,7 +746,10 @@ _Pragma("clang diagnostic pop")
     _ablLink->mpCallbacks->mIsEnabledCallback(enabled);
     _ablLink->updateEnabled();
 
-    [self animatedEnabledChange:enabled];
+    __weak __typeof(self) weakSelf = self;
+    dispatch_async(dispatch_get_main_queue(), ^{
+      [weakSelf animatedEnabledChange:enabled];
+    });
   }
 }
 
