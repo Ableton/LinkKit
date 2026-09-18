@@ -114,6 +114,14 @@ static NSInteger const kLinkEnableDisableSection = 0;
 static NSInteger const kDetailSettingsSection = 1;
 static NSInteger const kConnectedPeersSection = 2;
 
+typedef NS_ENUM(NSInteger, ABLDetailRow)
+{
+  ABLDetailRowNotifications,
+  ABLDetailRowStartStopSync,
+  ABLDetailRowLinkAudio,
+  ABLDetailRowPeerName,
+};
+
 
 @implementation ABLSettingsViewController
 {
@@ -539,6 +547,22 @@ _Pragma("clang diagnostic pop")
   return [self isEnabled] ? 3 : 1;
 }
 
+-(NSArray<NSNumber*>*)detailRows
+{
+  NSMutableArray<NSNumber*>* rows = [NSMutableArray array];
+  [rows addObject:@(ABLDetailRowNotifications)];
+  if (isStartStopSyncSupported())
+  {
+    [rows addObject:@(ABLDetailRowStartStopSync)];
+  }
+  if (isLinkAudioSupported())
+  {
+    [rows addObject:@(ABLDetailRowLinkAudio)];
+    [rows addObject:@(ABLDetailRowPeerName)];
+  }
+  return rows;
+}
+
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
   switch (section) {
@@ -546,12 +570,7 @@ _Pragma("clang diagnostic pop")
       return 1;
 
     case kDetailSettingsSection:
-    {
-      NSInteger numRows = 1;
-      numRows = isStartStopSyncSupported() ? numRows + 1 : numRows;
-      numRows = isLinkAudioSupported() ? numRows + 2 : numRows;
-      return numRows;
-    }
+      return (NSInteger)[self detailRows].count;
 
     case kConnectedPeersSection:
       return 1;
@@ -562,6 +581,31 @@ _Pragma("clang diagnostic pop")
   }
 }
 
+-(UITableViewCell*)detailSettingsCellForRow:(NSInteger)row
+{
+  NSArray<NSNumber*>* rows = [self detailRows];
+  if (row < 0 || row >= (NSInteger)rows.count)
+  {
+    NSAssert(NO, @"Invalid row in the detail settings section");
+    return [UITableViewCell new];
+  }
+
+  switch ((ABLDetailRow)rows[(NSUInteger)row].integerValue)
+  {
+    case ABLDetailRowNotifications:
+      return [self notificationsCell];
+
+    case ABLDetailRowStartStopSync:
+      return [self syncStartStopCell];
+
+    case ABLDetailRowLinkAudio:
+      return [self audioCell];
+
+    case ABLDetailRowPeerName:
+      return [self peerNameCell];
+  }
+}
+
 -(UITableViewCell*)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
   switch (indexPath.section) {
@@ -569,30 +613,14 @@ _Pragma("clang diagnostic pop")
       return [self enableDisableCell];
 
     case kDetailSettingsSection:
-      if (indexPath.row == 0)
-      {
-        return [self notificationsCell];
-      }
-      else if (indexPath.row == 1)
-      {
-        return isStartStopSyncSupported() ? [self syncStartStopCell] : [self audioCell];
-      }
-      else if (indexPath.row == 2)
-      {
-        return isStartStopSyncSupported() ? [self audioCell] : [self peerNameCell];
-      }
-      else if (indexPath.row == 3)
-      {
-        return [self peerNameCell];
-      }
+      return [self detailSettingsCellForRow:indexPath.row];
 
     case kConnectedPeersSection:
       return [self statusCell];
 
     default:
       NSAssert(NO, @"Invalid indexPath");
-      return nil;
-
+      return [UITableViewCell new];
   }
 }
 
