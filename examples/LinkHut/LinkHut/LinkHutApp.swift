@@ -13,7 +13,7 @@ struct LinkHutApp: App {
       ContentView()
         .environmentObject(audioEngineController)
     }
-    .onChange(of: scenePhase) { phase in
+    .onChange(of: scenePhase) { _, phase in
       switch phase {
       case .active:
         // Unconditionally activate Link when becoming active.

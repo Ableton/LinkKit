@@ -189,8 +189,6 @@ struct Controls: View {
     let orientationChanged = NotificationCenter.default.publisher(
       for: UIDevice.orientationDidChangeNotification
     )
-    .makeConnectable()
-    .autoconnect()
 
     var body: some View {
       Group {
