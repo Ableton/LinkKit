@@ -1,5 +1,6 @@
 // Copyright: 2018, Ableton AG, Berlin. All rights reserved.
 
+#include <cassert>
 #include <cstring>
 #include <dispatch/dispatch.h>
 #include <ableton/util/Injected.hpp>
@@ -488,6 +489,7 @@ extern "C"
     const uint32_t numChannels,
     const uint32_t sampleRate)
   {
+    assert(bufferHandle == &sink->mBufferHandle);
     const auto result =sink->mBufferHandle.moImpl->commit(sessionState->mImpl, beatsAtBufferBegin, quantum, numFrames, numChannels, sampleRate);
     bufferHandle->moImpl.reset();
     return result;
