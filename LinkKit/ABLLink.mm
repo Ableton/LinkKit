@@ -468,6 +468,11 @@ extern "C"
     return bufferHandle->moImpl.has_value() && *bufferHandle->moImpl;
   }
 
+  uint32_t ABLLinkAudioSinkBufferHandleMaxNumSamples(ABLLinkAudioSinkBufferHandleRef bufferHandle)
+  {
+    return static_cast<uint32_t>(bufferHandle->moImpl->maxNumSamples);
+  }
+
   int16_t* ABLLinkAudioSinkBufferSamples(ABLLinkAudioSinkBufferHandleRef bufferHandle)
   {
     return bufferHandle->moImpl->samples;

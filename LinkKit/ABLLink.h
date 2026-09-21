@@ -511,6 +511,14 @@ extern "C"
    */
   bool ABLLinkAudioSinkBufferHandleIsValid(ABLLinkAudioSinkBufferHandleRef);
 
+  /*! @brief Get the maximum number of samples the buffer handle can hold.
+   *
+   *  @discussion This is the capacity of the retained buffer, the
+   *  maximum value of numFrames * numChannels that may be passed to
+   *  ABLLinkAudioReleaseAndCommitBuffer. This function is lockfree.
+   */
+  uint32_t ABLLinkAudioSinkBufferHandleMaxNumSamples(ABLLinkAudioSinkBufferHandleRef);
+
   /*! @brief Get a pointer to the buffer for writing samples.
    *
    *  @discussion Audio buffers are interleaved and samples are represented
