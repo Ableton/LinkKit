@@ -580,7 +580,7 @@ extern "C"
     const uint32_t numFrames,
     AudioBufferList *ioData)
   {
-    if (sink->mBufferCopyFn == nullptr || (sink->mImpl.maxNumSamples() >= sink->mASBD.mChannelsPerFrame * numFrames))
+    if (sink->mBufferCopyFn == nullptr)
     {
       return false;
     }
@@ -588,6 +588,13 @@ extern "C"
     ABLLinkAudioSinkBufferHandleRef bufferHandle = ABLLinkAudioRetainBuffer(sink);
     if (ABLLinkAudioSinkBufferHandleIsValid(bufferHandle))
     {
+      const auto numSamples = sink->mASBD.mChannelsPerFrame * numFrames;
+      if (ABLLinkAudioSinkBufferHandleMaxNumSamples(bufferHandle) < numSamples) {
+        ABLLinkAudioReleaseBuffer(bufferHandle);
+        ABLLinkAudioSinkRequestMaxNumSamples(sink, numSamples);
+        return ABLLinkCommitCoreAudioBufferWithBeats(sink, sessionState, beatsAtBufferBegin, quantum, numFrames, ioData);
+      }
+
       auto* output = ABLLinkAudioSinkBufferSamples(bufferHandle);
       sink->mBufferCopyFn(numFrames, ioData, output);
       return ABLLinkAudioReleaseAndCommitBuffer(sink, bufferHandle, sessionState, beatsAtBufferBegin, quantum, numFrames, sink->mASBD.mChannelsPerFrame, sink->mASBD.mSampleRate);
