@@ -443,6 +443,11 @@ extern "C"
     delete sink;
   }
 
+  void ABLLinkAudioSinkSetName(ABLLinkAudioSinkRef sink, const char* name)
+  {
+    sink->mImpl.setName(name);
+  }
+
   uint32_t ABLLinkAudioSinkMaxNumSamples(ABLLinkAudioSinkRef sink) {
     return static_cast<uint32_t>(sink->mImpl.maxNumSamples());
   }

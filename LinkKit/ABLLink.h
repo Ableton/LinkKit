@@ -468,6 +468,16 @@ extern "C"
    */
   void ABLLinkAudioSinkDelete(ABLLinkAudioSinkRef);
 
+  /*! @brief Change the name of an audio channel.
+   *
+   *  @param name The new name, visible to other peers. Names longer than
+   *  256 bytes will be truncated.
+   *
+   *  @discussion Renaming preserves the channel ID and existing sources.
+   *  This function is not thread-safe or realtime-safe.
+   */
+  void ABLLinkAudioSinkSetName(ABLLinkAudioSinkRef, const char *name);
+
   /*! @brief Get the current maximum number of samples a buffer handle can hold.
    *
    *  @discussion This function is lockfree.
