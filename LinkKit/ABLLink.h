@@ -138,6 +138,14 @@ extern "C"
     bool isConnected,
     void *context);
 
+  /*! @brief Called if the number of connected peers changes.
+   *
+   *  @param numPeers Connected peers
+   */
+  typedef void (*ABLLinkNumPeersCallback)(
+    size_t numPeers,
+    void *context);
+
   /*! @brief Invoked on the main thread when the tempo of the Link
    *  session changes.
    */
@@ -176,6 +184,14 @@ extern "C"
   void ABLLinkSetIsConnectedCallback(
     ABLLinkRef,
     ABLLinkIsConnectedCallback callback,
+    void* context);
+
+  /*! @brief Invoked on the main thread when the number of connected peers
+   *  changes.
+   */
+  void ABLLinkSetNumPeersCallback(
+    ABLLinkRef,
+    ABLLinkNumPeersCallback callback,
     void* context);
 
   /*! @brief A reference to a representation of Link's session state.

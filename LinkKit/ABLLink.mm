@@ -68,6 +68,7 @@ extern "C"
           [](bool) { },
           [](bool) { },
           [](std::size_t) { },
+          [](std::size_t) { },
           [](double) { },
           [](bool) { },
           [](bool) { },
@@ -184,6 +185,8 @@ extern "C"
     // Install notification callback
     ablLink->mpCallbacks->mInternalNumPeersCallback =
       [ablLink, wasConnected = false](const size_t peers) mutable {
+      ablLink->mpCallbacks->mNumPeersCallback(peers);
+
       const bool isConnected = peers > 0;
       if (isConnected != wasConnected)
       {
@@ -213,6 +216,7 @@ extern "C"
     ablLink->mpCallbacks->mIsConnectedCallback = [](bool) { };
     ablLink->mpCallbacks->mIsEnabledCallback = [](bool) { };
     ablLink->mpCallbacks->mInternalNumPeersCallback = [](std::size_t) { };
+    ablLink->mpCallbacks->mNumPeersCallback = [](std::size_t) { };
     ablLink->mpCallbacks->mTempoCallback = [](double) { };
     ablLink->mpCallbacks->mStartStopCallback = [](bool) { };
     ablLink->mpCallbacks->mIsStartStopSyncEnabledCallback = [](bool) { };
@@ -305,6 +309,16 @@ extern "C"
   {
     ablLink->mpCallbacks->mIsConnectedCallback = [=](const bool isConnected) {
       callback(isConnected, context);
+    };
+  }
+
+  void ABLLinkSetNumPeersCallback(
+    ABLLinkRef ablLink,
+    ABLLinkNumPeersCallback callback,
+    void* context)
+  {
+    ablLink->mpCallbacks->mNumPeersCallback = [=](const size_t numPeers) {
+      callback(numPeers, context);
     };
   }
 

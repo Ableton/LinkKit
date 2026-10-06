@@ -13,6 +13,7 @@ extern "C"
   using IsConnectedCallback = std::function<void (bool)>;
   using IsEnabledCallback = std::function<void (bool)>;
   using InternalNumPeersCallback = std::function<void (std::size_t)>;
+  using NumPeersCallback = std::function<void (std::size_t)>;
   using TempoCallback = std::function<void (double)>;
   using StartStopCallback = std::function<void (bool)>;
   using IsStartStopSyncEnabledCallback = std::function<void (bool)>;
@@ -25,6 +26,7 @@ extern "C"
       IsConnectedCallback connected,
       IsEnabledCallback enabled,
       InternalNumPeersCallback internalNumPeers,
+      NumPeersCallback numPeers,
       TempoCallback tempo,
       StartStopCallback startStop,
       IsStartStopSyncEnabledCallback startStopSyncEnabled,
@@ -33,6 +35,7 @@ extern "C"
       : mIsConnectedCallback(std::move(connected))
       , mIsEnabledCallback(std::move(enabled))
       , mInternalNumPeersCallback(std::move(internalNumPeers))
+      , mNumPeersCallback(std::move(numPeers))
       , mTempoCallback(std::move(tempo))
       , mStartStopCallback(std::move(startStop))
       , mIsStartStopSyncEnabledCallback(std::move(startStopSyncEnabled))
@@ -44,6 +47,7 @@ extern "C"
     IsConnectedCallback mIsConnectedCallback;
     IsEnabledCallback mIsEnabledCallback;
     InternalNumPeersCallback mInternalNumPeersCallback;
+    NumPeersCallback mNumPeersCallback;
     TempoCallback mTempoCallback;
     StartStopCallback mStartStopCallback;
     IsStartStopSyncEnabledCallback mIsStartStopSyncEnabledCallback;
