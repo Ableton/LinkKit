@@ -734,12 +734,6 @@ _Pragma("clang diagnostic pop")
   [[NSUserDefaults standardUserDefaults] setBool:enabled forKey:ABLLinkEnabledKey];
   [[NSUserDefaults standardUserDefaults] synchronize];
 
-  if (!enabled)
-  {
-    // We need to reset the number of peers manually
-    [self setNumberOfPeers:0];
-  }
-
   if (enabled != _ablLink->mEnabled)
   {
     _ablLink->mEnabled = enabled;

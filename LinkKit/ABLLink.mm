@@ -182,19 +182,21 @@ extern "C"
   {
     ABLLink* ablLink = new ABLLink(bpm);
     // Install notification callback
-    ablLink->mpCallbacks->mInternalNumPeersCallback = [ablLink](const std::size_t peers) {
+    ablLink->mpCallbacks->mInternalNumPeersCallback =
+      [ablLink, wasConnected = false](const size_t peers) mutable {
+      const bool isConnected = peers > 0;
+      if (isConnected != wasConnected)
+      {
+        wasConnected = isConnected;
+        ablLink->mpCallbacks->mIsConnectedCallback(isConnected);
+      }
+
+      [ablLink->mpSettingsViewController setNumberOfPeers:peers];
+
       if(ablLink->mImpl.isEnabled())
       {
-        const size_t oldNumPeers = ablLink->mpSettingsViewController.numberOfPeers;
-        if (oldNumPeers == 0 && peers > 0) {
-          ablLink->mpCallbacks->mIsConnectedCallback(true);
-        }
-        else if (oldNumPeers > 0 && peers == 0) {
-          ablLink->mpCallbacks->mIsConnectedCallback(false);
-        }
         [ABLNotificationView showNotificationMessage:peers];
-        [ablLink->mpSettingsViewController setNumberOfPeers:peers];
-        
+
         [[NSNotificationCenter defaultCenter] postNotification:
             [NSNotification notificationWithName:@"ABLLink.NumberOfPeersChanged" object:[NSNumber numberWithUnsignedLongLong:peers]]];
       }
