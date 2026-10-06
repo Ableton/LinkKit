@@ -12,7 +12,7 @@ extern "C"
 {
   using IsConnectedCallback = std::function<void (bool)>;
   using IsEnabledCallback = std::function<void (bool)>;
-  using PeerCountCallback = std::function<void (std::size_t)>;
+  using InternalNumPeersCallback = std::function<void (std::size_t)>;
   using TempoCallback = std::function<void (double)>;
   using StartStopCallback = std::function<void (bool)>;
   using IsStartStopSyncEnabledCallback = std::function<void (bool)>;
@@ -24,7 +24,7 @@ extern "C"
     ABLLinkCallbacks(
       IsConnectedCallback connected,
       IsEnabledCallback enabled,
-      PeerCountCallback peerCount,
+      InternalNumPeersCallback internalNumPeers,
       TempoCallback tempo,
       StartStopCallback startStop,
       IsStartStopSyncEnabledCallback startStopSyncEnabled,
@@ -32,7 +32,7 @@ extern "C"
       AudioChannelsChangedCallback audioChannelsChanged)
       : mIsConnectedCallback(std::move(connected))
       , mIsEnabledCallback(std::move(enabled))
-      , mPeerCountCallback(std::move(peerCount))
+      , mInternalNumPeersCallback(std::move(internalNumPeers))
       , mTempoCallback(std::move(tempo))
       , mStartStopCallback(std::move(startStop))
       , mIsStartStopSyncEnabledCallback(std::move(startStopSyncEnabled))
@@ -43,7 +43,7 @@ extern "C"
 
     IsConnectedCallback mIsConnectedCallback;
     IsEnabledCallback mIsEnabledCallback;
-    PeerCountCallback mPeerCountCallback;
+    InternalNumPeersCallback mInternalNumPeersCallback;
     TempoCallback mTempoCallback;
     StartStopCallback mStartStopCallback;
     IsStartStopSyncEnabledCallback mIsStartStopSyncEnabledCallback;

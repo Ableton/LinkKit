@@ -91,7 +91,7 @@ extern "C"
         auto pCallbacks = mpCallbacks;
         dispatch_async(dispatch_get_main_queue(), ^{
 
-          pCallbacks->mPeerCountCallback(numPeers);
+          pCallbacks->mInternalNumPeersCallback(numPeers);
         });
     });
 
@@ -182,7 +182,7 @@ extern "C"
   {
     ABLLink* ablLink = new ABLLink(bpm);
     // Install notification callback
-    ablLink->mpCallbacks->mPeerCountCallback = [ablLink](const std::size_t peers) {
+    ablLink->mpCallbacks->mInternalNumPeersCallback = [ablLink](const std::size_t peers) {
       if(ablLink->mImpl.isEnabled())
       {
         const size_t oldNumPeers = ablLink->mpSettingsViewController.numberOfPeers;
@@ -210,7 +210,7 @@ extern "C"
     // invoked during or after destruction of the library
     ablLink->mpCallbacks->mIsConnectedCallback = [](bool) { };
     ablLink->mpCallbacks->mIsEnabledCallback = [](bool) { };
-    ablLink->mpCallbacks->mPeerCountCallback = [](std::size_t) { };
+    ablLink->mpCallbacks->mInternalNumPeersCallback = [](std::size_t) { };
     ablLink->mpCallbacks->mTempoCallback = [](double) { };
     ablLink->mpCallbacks->mStartStopCallback = [](bool) { };
     ablLink->mpCallbacks->mIsStartStopSyncEnabledCallback = [](bool) { };
