@@ -73,6 +73,9 @@ extern "C"
   /*! @brief Is Link currently connected to other peers? */
   bool ABLLinkIsConnected(ABLLinkRef);
 
+  /*! @brief How many peers are currently connected? */
+  size_t ABLLinkNumPeers(ABLLinkRef);
+
   /*! @brief Is Start Stop Sync currently enabled by the user?
    *
    *  @discussion The Start Stop Sync Enabled status is only controllable

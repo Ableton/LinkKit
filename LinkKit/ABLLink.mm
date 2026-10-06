@@ -243,6 +243,11 @@ extern "C"
     return ablLink->mImpl.isEnabled() && ablLink->mImpl.numPeers() > 0;
   }
 
+  size_t ABLLinkNumPeers(ABLLinkRef ablLink)
+  {
+    return ablLink->mImpl.isEnabled() ? ablLink->mImpl.numPeers() : 0;
+  }
+
   void ABLLinkSetSessionTempoCallback(
     ABLLinkRef ablLink,
     ABLLinkSessionTempoCallback callback,
