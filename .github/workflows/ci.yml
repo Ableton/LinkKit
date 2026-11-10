@@ -11,7 +11,7 @@ jobs:
     runs-on: macos-26
 
     env:
-      LINK_HASH: 5ba907ae027a8c2ec8824463e37296dcefc5e9be
+      LINK_HASH: 593e670e2ce01e8c55338c92a0730a0ac641b652
     steps:
       - name: Checkout Link
         uses: actions/checkout@v4
